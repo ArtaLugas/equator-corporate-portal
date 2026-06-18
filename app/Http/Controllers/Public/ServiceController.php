@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Http\Controllers\Public;
+
+use App\Http\Controllers\Controller;
+use App\Models\Service;
+use App\Models\ServiceCategory;
+use Illuminate\Http\Request;
+
+class ServiceController extends Controller
+{
+    public function index(Request $request)
+    {
+        $categories = ServiceCategory::where('status', 'active')
+            ->withCount(['services' => fn ($q) => $q->where('status', 'published')])
+            ->orderBy('display_order')->get();
+
+        $activeCategory = $request->filled('category')
+            ? $categories->firstWhere('slug', $request->category)
+            : null;
+
+        $hasSearch = $request->filled('search');
+
+        // Total published services — surfaced as a credibility metric in the discovery bar.
+        $totalServices = Service::where('status', 'published')->count();
+
+        // Spotlight: featured services only on the unfiltered "All" view (no category, no search).
+        // Excluded from the main index below so a service never appears twice on the same screen.
+        $showcase = ! $activeCategory && ! $hasSearch;
+
+        $featured = $showcase
+            ? Service::where('status', 'published')
+                ->where('is_featured', true)
+                ->with('category')
+                ->latest()
+                ->take(3)->get()
+            : collect();
+
+        $services = Service::where('status', 'published')
+            ->with('category')
+            ->when($activeCategory, fn ($q) => $q->where('category_id', $activeCategory->id))
+            ->when($hasSearch, fn ($q) => $q->where('name', 'like', '%' . trim($request->search) . '%'))
+            ->when($featured->isNotEmpty(), fn ($q) => $q->whereNotIn('id', $featured->pluck('id')))
+            ->latest()
+            ->paginate(9)
+            ->withQueryString();
+
+        return view('public.services.index', compact(
+            'categories', 'services', 'activeCategory', 'featured', 'totalServices'
+        ));
+    }
+
+    public function show(string $slug)
+    {
+        $service = Service::where('status', 'published')
+            ->where('slug', $slug)
+            ->with('category')
+            ->firstOrFail();
+
+        $related = Service::where('status', 'published')
+            ->where('category_id', $service->category_id)
+            ->where('id', '!=', $service->id)
+            ->take(3)->get();
+
+        return view('public.services.show', compact('service', 'related'));
+    }
+}

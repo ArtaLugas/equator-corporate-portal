@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1,
+        "category_name": "Assessment and Planning",
+        "description": "<p>We help clients lay a strong foundation for their projects through rigorous assessments, strategic planning, and inclusive stakeholder engagement. Our services in this stage ensure that every initiative starts with clarity, evidence-based insight, and a socially and environmentally responsible roadmap.</p>",
+        "slug": "assessment-and-planning",
+        "image": "68a00ffd601d5.jpg",
+        "status": "active",
+        "created_at": "2025-08-16 11:58:37",
+        "updated_at": "2025-08-16 11:58:37"
+    },
+    {
+        "id": 2,
+        "category_name": "Implementation and Assistance",
+        "description": "<p>We provide hands-on support to implement plans effectively while ensuring alignment with regulatory frameworks, stakeholder expectations, and best practices. From resettlement action to community empowerment and permit execution, our team ensures smooth project delivery and long-term buy-in.</p>",
+        "slug": "implementation-and-assistance",
+        "image": "68a0101f47c40.jpg",
+        "status": "active",
+        "created_at": "2025-08-16 11:59:11",
+        "updated_at": "2025-08-16 11:59:11"
+    },
+    {
+        "id": 3,
+        "category_name": "Monitoring and Evaluation",
+        "description": "<p>We offer robust monitoring and evaluation services to ensure compliance, track performance, and capture lessons learned. By measuring social and environmental outcomes, we help clients stay accountable, improve impact, and sustain progress over time.</p>",
+        "slug": "monitoring-and-evaluation",
+        "image": "68a0105848dab.jpg",
+        "status": "active",
+        "created_at": "2025-08-16 12:00:08",
+        "updated_at": "2025-08-16 12:00:08"
+    }
+]

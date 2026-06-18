@@ -1,0 +1,18 @@
+[
+    {
+        "id": 5,
+        "web_setting_id": 1,
+        "label": "Bogor Office",
+        "iframe_map": "<iframe src=\"https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.532413969253!2d106.76179817606224!3d-6.580536064330251!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c4fbd5348c3d%3A0xfcab59d64d8f3941!2sEQUATOR!5e0!3m2!1sen!2sid!4v1755324192259!5m2!1sen!2sid\" width=\"100%\" height=\"450\" style=\"border:0;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade\"></iframe>",
+        "created_at": "2026-05-15 22:59:30",
+        "updated_at": "2026-05-15 22:59:30"
+    },
+    {
+        "id": 6,
+        "web_setting_id": 1,
+        "label": "Jakarta Office",
+        "iframe_map": "<iframe src=\"https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.254068967768!2d106.81848997605844!3d-6.230198361015869!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3002e0d8021%3A0x4c12f81f0d82e2ae!2sPT.%20Equator%20Global%20Internasional!5e0!3m2!1sen!2sid!4v1755324355677!5m2!1sen!2sid\" width=\"100%\" height=\"450\" style=\"border:0;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade\"></iframe>",
+        "created_at": "2026-05-15 22:59:30",
+        "updated_at": "2026-05-15 22:59:30"
+    }
+]

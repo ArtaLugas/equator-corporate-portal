@@ -1,0 +1,79 @@
+[
+    {
+        "id": 1,
+        "year": "1999",
+        "title": "The Beginning – Community Empowerment and Social Research",
+        "description": "<p>Established as Lembaga Pengembangan Masyarakat (LPM) Equator, the organization began with a strong commitment to empowering communities through grassroots development, carrying the credo &ldquo;Towards an Empowered Society.&rdquo; In its early years, Equator focused on delivering entrepreneurship training for productive workers, supporting small-scale farmers, and conducting socio-economic surveys. These early initiatives laid the foundation for Equator&rsquo;s credibility in community-based development and evidence-based planning.</p>",
+        "image": null,
+        "icon_class": "bi bi-house-heart",
+        "display_order": 1,
+        "created_at": "2025-08-16 11:25:49",
+        "updated_at": "2025-08-27 15:12:19"
+    },
+    {
+        "id": 2,
+        "year": "2004",
+        "title": "Expansion into Land Acquisition and Social Safeguards",
+        "description": "<p>Equator began addressing social issues related to land acquisition in large-scale development projects throughout Indonesia. This marked a strategic shift toward integrating social safeguards into infrastructure planning and implementation, ensuring that the voices and rights of affected communities were protected and reflected in decision-making processes.</p>",
+        "image": null,
+        "icon_class": "bi bi-shield-lock",
+        "display_order": 2,
+        "created_at": "2025-08-16 11:26:52",
+        "updated_at": "2025-08-16 11:34:40"
+    },
+    {
+        "id": 3,
+        "year": "2013",
+        "title": "Advocacy and Socialization of Land Acquisition Policy",
+        "description": "<p>Equator played a pivotal role in supporting the dissemination of Law No. 2 of 2012 on Land Acquisition for Public Interest. At the same time, it actively advocated for the integration of international social safeguards into national land acquisition regulations, promoting a more responsible and socially conscious approach to development.</p>",
+        "image": null,
+        "icon_class": "bi bi-bank",
+        "display_order": 3,
+        "created_at": "2025-08-16 11:30:49",
+        "updated_at": "2025-08-16 11:34:48"
+    },
+    {
+        "id": 4,
+        "year": "2014",
+        "title": "Institutional Growth into PT Equator Global Internasional",
+        "description": "<p>Equator formalized its transition into a corporate entity with the establishment of PT Equator Global Internasional. This move expanded the firm&rsquo;s capacity to operate as a professional consulting company in the social and environmental sectors, enabling greater participation in both national and international development initiatives.</p>",
+        "image": null,
+        "icon_class": "bi bi-building",
+        "display_order": 4,
+        "created_at": "2025-08-16 11:31:23",
+        "updated_at": "2025-08-16 11:31:23"
+    },
+    {
+        "id": 5,
+        "year": "2015",
+        "title": "Becoming a Leading Consultant in Social Safeguards",
+        "description": "<p>Equator reinforced its leadership by contributing to the drafting of Government Regulation No. 19/2021 and the related ATR/BPN Ministerial Regulation. The firm aligned its practices with the social safeguard policies of key international financial institutions such as the World Bank, ADB, IFC, AIIB, JICA, KfW, and IIF. During this time, Equator also delivered training and technical assistance on LARAP, IPP, GRM, ESIA, SEP, FPIC, CHMP, and GEDSI, while expanding into national permitting processes including KKPR, IUI, AMDAL, and KEK.</p>",
+        "image": null,
+        "icon_class": "bi bi-journal-check",
+        "display_order": 5,
+        "created_at": "2025-08-16 11:32:58",
+        "updated_at": "2025-08-16 11:32:58"
+    },
+    {
+        "id": 6,
+        "year": "2020",
+        "title": "Expansion into Environmental Consulting and ESG Integration",
+        "description": "<p>Responding to the growing demand for sustainability-focused solutions, Equator broadened its services into environmental consulting. The firm began leading projects related to Environmental and Social Impact Assessments (ESIA, EIA, SIA), while also supporting clients with ESG performance frameworks. This integration marked Equator&rsquo;s evolution into a more holistic consulting partner, bridging social and environmental dimensions.</p>",
+        "image": null,
+        "icon_class": "bi bi-tree",
+        "display_order": 6,
+        "created_at": "2025-08-16 11:33:25",
+        "updated_at": "2025-08-16 11:34:59"
+    },
+    {
+        "id": 7,
+        "year": "2025",
+        "title": "A Year of Transformation",
+        "description": "<p>The year 2025 represents a major turning point in Equator&rsquo;s journey. The company is undergoing a full transformation, including rebranding, retargeting of its vision, mission, and core values, and enhancing its digital systems and operational efficiency. With this transformation, Equator is positioning itself to expand its impact at the national and international levels, solidifying its identity as a forward-thinking, adaptive, and sustainability-driven consulting firm.</p>",
+        "image": null,
+        "icon_class": "bi bi-arrow-repeat",
+        "display_order": 7,
+        "created_at": "2025-08-16 11:34:06",
+        "updated_at": "2025-08-16 11:34:06"
+    }
+]

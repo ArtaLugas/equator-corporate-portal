@@ -1,0 +1,147 @@
+@import 'ckeditor5/ckeditor5.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* Scroll-reveal (replaces framer-motion whileInView) */
+.reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+
+/* Visible keyboard-focus ring (brand blue). Penting karena banyak
+   elemen memakai focus:outline-none tanpa pengganti. !important
+   dipakai agar menang atas utility outline-none. */
+*:focus-visible {
+    outline: 2px solid #006ccd !important; /* equator-bright */
+    outline-offset: 2px !important;
+    border-radius: 2px;
+}
+
+/* Hormati preferensi pengguna yang mengurangi gerak — TANPA mematikan
+   micro-interaction hover/scale yang ringan. Yang dinetralkan hanya:
+   (1) animasi keyframe yang berputar (ping, bounce, pan sinematik), dan
+   (2) gerak masuk besar pada scroll-reveal. */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* Reveal-on-scroll (Alpine x-intersect) & kelas .reveal langsung tampil
+       tanpa translate besar — tapi transisi hover/scale lain tetap mulus. */
+    [x-intersect],
+    .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+/* Rendered CKEditor content (frontend display inside .prose) */
+.prose ul.todo-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.prose ul.todo-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin: 0.25rem 0;
+}
+
+.prose ul.todo-list li::marker {
+    content: '';
+}
+
+.prose .todo-list__label > input[type='checkbox'] {
+    margin-top: 0.3rem;
+}
+
+.ck-editor__editable_inline {
+    min-height: 350px;
+    max-height: 700px;
+    overflow-y: auto;
+}
+
+.ck.ck-editor {
+    width: 100%;
+}
+
+.ck.ck-toolbar {
+    border-radius: 0.75rem 0.75rem 0 0 !important;
+}
+
+.ck.ck-editor__main > .ck-editor__editable {
+    border-radius: 0 0 0.75rem 0.75rem !important;
+}
+
+/*
+| Restore list styling inside the CKEditor editing area.
+| Tailwind's preflight resets ul/ol (list-style:none; margin/padding:0),
+| which also strips bullets/numbers from the editor preview. These rules
+| win by specificity (.ck-content ul > ul) and bring them back.
+*/
+.ck-content ul {
+    list-style: disc outside;
+    padding-left: 1.5rem;
+    margin: 0.75em 0;
+}
+
+.ck-content ol {
+    list-style: decimal outside;
+    padding-left: 1.5rem;
+    margin: 0.75em 0;
+}
+
+.ck-content li {
+    margin: 0.25em 0;
+}
+
+.ck-content ul ul {
+    list-style-type: circle;
+}
+
+.ck-content ul ul ul {
+    list-style-type: square;
+}
+
+.ck-content ol ol {
+    list-style-type: lower-alpha;
+}
+
+.ck-content ol ol ol {
+    list-style-type: lower-roman;
+}
+
+/* Todo / checklist inside the editor */
+.ck-content ul.todo-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.ck-content ul.todo-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}

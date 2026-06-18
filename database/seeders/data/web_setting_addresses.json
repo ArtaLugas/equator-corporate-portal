@@ -1,0 +1,18 @@
+[
+    {
+        "id": 8,
+        "web_setting_id": 1,
+        "label": "Bogor Office",
+        "address": "Jl. Letjen Ibrahim Adjie No.197, RT.01/RW.04, Loji, Kec. Bogor Bar., Kota Bogor, Jawa Barat 16117",
+        "created_at": "2026-05-15 22:59:30",
+        "updated_at": "2026-05-15 22:59:30"
+    },
+    {
+        "id": 9,
+        "web_setting_id": 1,
+        "label": "Jakarta Office",
+        "address": "Jl. Gatot Subroto No.Kav. 24-25, RT.2/RW.2, Karet Semanggi, Jakarta, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12930",
+        "created_at": "2026-05-15 22:59:30",
+        "updated_at": "2026-05-15 22:59:30"
+    }
+]

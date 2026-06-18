@@ -1,0 +1,263 @@
+[
+    {
+        "id": 1,
+        "name": "World Bank",
+        "logo": "partners/hN60Fa7ZuDt4bjiJRlicWOSHdpdPVptf1ucJxLaP.png",
+        "website_url": "https://www.worldbank.org",
+        "status": "active",
+        "created_at": "2025-08-16 12:43:51",
+        "updated_at": "2025-08-16 12:43:51"
+    },
+    {
+        "id": 2,
+        "name": "Asian Development Bank",
+        "logo": "partners/Sbw1mQRL5CzJkWP7GxtCQaxkPdXz4CkNMQjDsmsz.png",
+        "website_url": "https://www.adb.org",
+        "status": "active",
+        "created_at": "2025-08-16 12:44:12",
+        "updated_at": "2025-08-16 12:44:12"
+    },
+    {
+        "id": 3,
+        "name": "PT Vale Indonesia",
+        "logo": "partners/HYwOXZq8Mpuf3gqsUBGTCm1sZSr5yAe1KNTnG2TM.svg",
+        "website_url": "https://www.vale.com/indonesia",
+        "status": "active",
+        "created_at": "2025-08-16 12:44:36",
+        "updated_at": "2025-08-16 12:44:36"
+    },
+    {
+        "id": 4,
+        "name": "PT Bukit Asam",
+        "logo": "partners/gIIMz3sFyeGjZQXVA5gMFDipLxPVY7emla0qSXgl.png",
+        "website_url": "https://www.ptba.co.id",
+        "status": "active",
+        "created_at": "2025-08-16 12:45:37",
+        "updated_at": "2025-08-16 12:45:37"
+    },
+    {
+        "id": 5,
+        "name": "PLN",
+        "logo": "partners/tfoscvQBy3IWjIvVnYFkeMgB1U4WRx5CVDwJKgCD.png",
+        "website_url": "https://www.pln.co.id",
+        "status": "active",
+        "created_at": "2025-08-16 12:46:06",
+        "updated_at": "2025-08-16 12:46:06"
+    },
+    {
+        "id": 6,
+        "name": "Pertamina",
+        "logo": "partners/szb6y0aRW7UatwEP2z6yGWbeLz4z8plYZ5i5fRTI.png",
+        "website_url": "https://www.pertamina.com",
+        "status": "active",
+        "created_at": "2025-08-16 12:46:47",
+        "updated_at": "2025-08-16 12:46:47"
+    },
+    {
+        "id": 7,
+        "name": "PT KHN",
+        "logo": "partners/XEjxxt62tswiYEVmOetNMqM0uwqoqSMzH1TravLT.png",
+        "website_url": "https://www.ptkhn.com",
+        "status": "active",
+        "created_at": "2025-08-16 12:47:26",
+        "updated_at": "2025-08-16 12:47:26"
+    },
+    {
+        "id": 8,
+        "name": "KfW",
+        "logo": "partners/os9mb1CN5Ihcwgh1IMikO9htv6SGjeNz8hCxvpqd.png",
+        "website_url": "https://www.kfw.de",
+        "status": "active",
+        "created_at": "2025-08-16 12:47:51",
+        "updated_at": "2025-08-16 12:47:51"
+    },
+    {
+        "id": 9,
+        "name": "JICA",
+        "logo": "partners/Co5pAxoyxwsZjgpuhaZAWTl8eTkuNNKDABqIMLpz.png",
+        "website_url": "https://www.jica.go.jp",
+        "status": "active",
+        "created_at": "2025-08-16 12:48:19",
+        "updated_at": "2025-08-16 12:48:19"
+    },
+    {
+        "id": 10,
+        "name": "GIZ",
+        "logo": "partners/rJyB4BJNEK8IM5YvUuFDCajgHdpTy504GmWHHllE.png",
+        "website_url": "https://www.giz.de",
+        "status": "active",
+        "created_at": "2025-08-16 12:48:37",
+        "updated_at": "2025-08-16 12:48:37"
+    },
+    {
+        "id": 11,
+        "name": "PUPR",
+        "logo": "partners/qPMJORGBFSUbQdT0TL0TYFLHGmbLB7klIgSEUqwr.jpg",
+        "website_url": "https://www.pu.go.id",
+        "status": "active",
+        "created_at": "2025-08-16 12:49:03",
+        "updated_at": "2025-08-16 12:49:03"
+    },
+    {
+        "id": 12,
+        "name": "Masdar",
+        "logo": "partners/3QXH5k99Cxr0Gigj9Wcm4JPl6Ks6cpKiRrpd8lhH.svg",
+        "website_url": "https://masdar.ae",
+        "status": "active",
+        "created_at": "2025-08-16 12:49:32",
+        "updated_at": "2025-08-16 12:49:32"
+    },
+    {
+        "id": 13,
+        "name": "Adaro Energy",
+        "logo": "partners/HY2wzW6ygoJP94AsWL9i7DX6ipKGLuSefbkLRsdh.png",
+        "website_url": "https://www.adaro.com",
+        "status": "active",
+        "created_at": "2025-08-16 12:49:50",
+        "updated_at": "2025-08-16 12:49:50"
+    },
+    {
+        "id": 14,
+        "name": "Sarawak Energy",
+        "logo": "partners/axpKeB5pqVMQYQr1uX8bBEW63Dj0h8YcQBLUowmV.png",
+        "website_url": "https://www.sarawakenergy.com",
+        "status": "active",
+        "created_at": "2025-08-16 12:50:06",
+        "updated_at": "2025-08-16 12:50:06"
+    },
+    {
+        "id": 15,
+        "name": "BPDLH",
+        "logo": "partners/moHJdiHdhJSLwXrMwaHH9FKpzxKNEPDcS5o3evd2.png",
+        "website_url": "https://bpdlh.kemenkeu.go.id",
+        "status": "active",
+        "created_at": "2025-08-16 12:51:15",
+        "updated_at": "2025-08-16 12:51:15"
+    },
+    {
+        "id": 16,
+        "name": "MEDCO",
+        "logo": "partners/fh0rZJm5kNggRzW6kjhULGaffsvFRXt3593bEMdg.png",
+        "website_url": "https://www.medcoenergi.com",
+        "status": "active",
+        "created_at": "2025-08-16 12:51:52",
+        "updated_at": "2025-08-16 12:51:52"
+    },
+    {
+        "id": 17,
+        "name": "SKK Migas",
+        "logo": "partners/xMednJcZolwtX9fcvsFrjufgZEseCTLzLyL6AoY8.png",
+        "website_url": "https://www.skkmigas.go.id",
+        "status": "active",
+        "created_at": "2025-08-16 12:52:20",
+        "updated_at": "2025-08-16 12:52:20"
+    },
+    {
+        "id": 18,
+        "name": "BAPPENAS",
+        "logo": "partners/S3L5TdBBulpAYWkyupi32Jnm8vG4Z74zIICUUm6i.png",
+        "website_url": "https://www.bappenas.go.id",
+        "status": "active",
+        "created_at": "2025-08-16 12:52:43",
+        "updated_at": "2025-08-16 12:52:43"
+    },
+    {
+        "id": 19,
+        "name": "USAID",
+        "logo": "partners/66GrXoHcy0zXjdoHCFovHDy4Sh9Y66etfZL4gP0m.png",
+        "website_url": "https://www.usaid.gov",
+        "status": "active",
+        "created_at": "2025-08-16 12:53:07",
+        "updated_at": "2025-08-16 12:53:07"
+    },
+    {
+        "id": 20,
+        "name": "Timor Leste Goverment",
+        "logo": "partners/KteQQy2QH0guwkgdkvKTJW1a6xNG8eFvb3G22Eei.svg",
+        "website_url": "https://timor-leste.gov.tl",
+        "status": "active",
+        "created_at": "2025-08-16 12:53:33",
+        "updated_at": "2025-08-16 12:53:33"
+    },
+    {
+        "id": 21,
+        "name": "SIG",
+        "logo": "partners/1e3SeV9BDEyYQClSChga1A7Q3f1fGOQ9gw48zMjL.png",
+        "website_url": "https://sig.id",
+        "status": "active",
+        "created_at": "2025-08-16 12:53:57",
+        "updated_at": "2025-08-16 12:53:57"
+    },
+    {
+        "id": 22,
+        "name": "PT EBK",
+        "logo": "partners/yKGLY7tVHENeg9KE18g9x5lmNhCGHuSDaPeM6srv.png",
+        "website_url": "https://endikathydro.com",
+        "status": "active",
+        "created_at": "2025-08-16 12:54:25",
+        "updated_at": "2025-08-16 12:54:25"
+    },
+    {
+        "id": 23,
+        "name": "PT PMSE",
+        "logo": "partners/5Pws9lzRMQ38GhCGBN9OWH3nOsChNkodwXM3KKX2.png",
+        "website_url": "https://pmse.solar",
+        "status": "active",
+        "created_at": "2025-08-16 12:54:58",
+        "updated_at": "2025-08-16 12:54:58"
+    },
+    {
+        "id": 24,
+        "name": "ARUP",
+        "logo": "partners/r3SaDOnF4M5Y9m68jyz7lz1IsYwImPY3mxV7s5mY.png",
+        "website_url": "https://arup.com",
+        "status": "active",
+        "created_at": "2025-08-16 12:55:31",
+        "updated_at": "2025-08-16 12:55:31"
+    },
+    {
+        "id": 25,
+        "name": "Pemprov Sulteng",
+        "logo": "partners/raN0SKVkzOrSY2LhZjfTBYf8jyI18IbRXylU1Umq.png",
+        "website_url": "https://sultengprov.go.id",
+        "status": "active",
+        "created_at": "2025-08-16 12:55:55",
+        "updated_at": "2025-08-16 12:55:55"
+    },
+    {
+        "id": 26,
+        "name": "SDA DK Jakarta",
+        "logo": "partners/ycVzo3l5MS0SZphiwb80JmTJ2x75gTb2vxB4JrsH.png",
+        "website_url": "https://dsda.jakarta.go.id",
+        "status": "active",
+        "created_at": "2025-08-16 12:56:53",
+        "updated_at": "2025-08-16 12:56:53"
+    },
+    {
+        "id": 27,
+        "name": "PT IHIP",
+        "logo": "partners/Dp1xOrortmgxQYVsPurAWAobCoNXB22wtE304pHq.png",
+        "website_url": "#",
+        "status": "active",
+        "created_at": "2025-08-16 12:58:31",
+        "updated_at": "2025-08-16 12:58:31"
+    },
+    {
+        "id": 28,
+        "name": "Tiran",
+        "logo": "partners/tiran-20251024103942.png",
+        "website_url": "https://tirangroup.com",
+        "status": "active",
+        "created_at": "2025-10-24 10:34:36",
+        "updated_at": "2025-10-24 10:39:42"
+    },
+    {
+        "id": 29,
+        "name": "Pemkot Semarang",
+        "logo": "partners/pemkot-semarang-20251024104029.png",
+        "website_url": "https://www.semarangkota.go.id",
+        "status": "active",
+        "created_at": "2025-10-24 10:40:29",
+        "updated_at": "2025-10-24 10:40:29"
+    }
+]
