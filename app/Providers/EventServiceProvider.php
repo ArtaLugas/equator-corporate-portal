@@ -12,6 +12,7 @@ use App\Models\KeyMetric;
 use App\Models\Partner;
 use App\Models\Project;
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use App\Models\Team;
 use App\Observers\HomeContentCacheObserver;
 use Illuminate\Support\ServiceProvider;
@@ -26,6 +27,7 @@ class EventServiceProvider extends ServiceProvider
         HeroBanner::class,
         KeyMetric::class,
         Service::class,
+        ServiceCategory::class,
         Project::class,
         CoreValue::class,
         Partner::class,

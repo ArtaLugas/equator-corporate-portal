@@ -6,23 +6,30 @@ use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ServiceController extends Controller
 {
+    /** Cache key for the stable index chrome (category rail + total). */
+    public const META_CACHE_KEY = 'public.services.meta';
+
     public function index(Request $request)
     {
-        $categories = ServiceCategory::where('status', 'active')
-            ->withCount(['services' => fn ($q) => $q->where('status', 'published')])
-            ->orderBy('display_order')->get();
+        // The category rail + total rarely change; cache them (busted by the
+        // content observer). The search/filter/paginated list stays dynamic.
+        [$categories, $totalServices] = Cache::remember(self::META_CACHE_KEY, now()->addHour(), function () {
+            $categories = ServiceCategory::where('status', 'active')
+                ->withCount(['services' => fn ($q) => $q->where('status', 'published')])
+                ->orderBy('display_order')->get();
+
+            return [$categories, Service::where('status', 'published')->count()];
+        });
 
         $activeCategory = $request->filled('category')
             ? $categories->firstWhere('slug', $request->category)
             : null;
 
         $hasSearch = $request->filled('search');
-
-        // Total published services — surfaced as a credibility metric in the discovery bar.
-        $totalServices = Service::where('status', 'published')->count();
 
         // Spotlight: featured services only on the unfiltered "All" view (no category, no search).
         // Excluded from the main index below so a service never appears twice on the same screen.

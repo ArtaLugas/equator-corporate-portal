@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\GeneratesUniqueSlug;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\ServiceCategory;
@@ -10,10 +11,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ServiceController extends Controller
 {
+    use GeneratesUniqueSlug;
+
     /*
     |--------------------------------------------------------------------------
     | Pagination
@@ -264,6 +266,7 @@ class ServiceController extends Controller
         */
 
         $validated['slug'] = $this->generateUniqueSlug(
+            Service::class,
             $validated['name']
         );
 
@@ -482,6 +485,8 @@ class ServiceController extends Controller
         if ($service->name !== $validated['name']) {
 
             $validated['slug'] = $this->generateUniqueSlug(
+
+                Service::class,
 
                 $validated['name'],
 
@@ -810,44 +815,6 @@ class ServiceController extends Controller
                 'Failed to permanently delete service.'
             );
         }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Generate Unique Slug
-    |--------------------------------------------------------------------------
-    */
-
-    private function generateUniqueSlug(
-        string $name,
-        ?int $ignoreId = null
-    ): string {
-
-        $baseSlug = Str::slug($name);
-
-        $slug = $baseSlug;
-
-        $count = 1;
-
-        while (
-
-            Service::withTrashed()
-
-                ->where('slug', $slug)
-
-                ->when(
-                    $ignoreId,
-                    fn ($query) => $query->where('id', '!=', $ignoreId)
-                )
-
-                ->exists()
-
-        ) {
-
-            $slug = $baseSlug.'-'.$count++;
-        }
-
-        return $slug;
     }
 
     /*

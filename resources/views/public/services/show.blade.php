@@ -4,6 +4,38 @@
 @section('meta_description', $service->meta_description ?:
     \Illuminate\Support\Str::limit(strip_tags($service->short_description), 150))
 
+@if ($service->image)
+    @section('og_image', asset('storage/' . $service->image))
+@endif
+
+@push('head')
+    @php
+        $svcLd = [
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                array_filter([
+                    '@type' => 'Service',
+                    'name' => $service->name,
+                    'serviceType' => $service->category?->name,
+                    'description' => \Illuminate\Support\Str::limit(strip_tags($service->short_description ?: $service->description), 200),
+                    'image' => $service->image ? asset('storage/' . $service->image) : null,
+                    'url' => route('services.show', $service->slug),
+                    'provider' => ['@type' => 'Organization', 'name' => app_setting('company_name', 'Equator Group'), 'url' => url('/')],
+                ]),
+                [
+                    '@type' => 'BreadcrumbList',
+                    'itemListElement' => [
+                        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => route('home')],
+                        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Services', 'item' => route('services.index')],
+                        ['@type' => 'ListItem', 'position' => 3, 'name' => $service->name, 'item' => route('services.show', $service->slug)],
+                    ],
+                ],
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($svcLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+@endpush
+
 @section('content')
 
     @php
@@ -69,6 +101,7 @@
                         <div
                             class="overflow-hidden rounded-3xl border border-white/10 shadow-[0_30px_60px_-25px_rgba(0,0,0,0.6)]">
                             <img src="{{ asset('storage/' . $service->image) }}" alt="{{ $service->name }}"
+                                width="800" height="600" loading="eager" fetchpriority="high" decoding="async"
                                 class="aspect-[4/3] w-full object-cover">
                         </div>
                     </div>

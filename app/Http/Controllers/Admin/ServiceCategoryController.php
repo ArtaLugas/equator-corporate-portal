@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\GeneratesUniqueSlug;
 use App\Http\Controllers\Controller;
 use App\Models\ServiceCategory;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ServiceCategoryController extends Controller
 {
+    use GeneratesUniqueSlug;
+
     /*
     |--------------------------------------------------------------------------
     | Pagination
@@ -202,6 +205,7 @@ class ServiceCategoryController extends Controller
         */
 
         $validated['slug'] = $this->generateUniqueSlug(
+            ServiceCategory::class,
             $validated['name']
         );
 
@@ -401,6 +405,8 @@ class ServiceCategoryController extends Controller
         if ($serviceCategory->name !== $validated['name']) {
 
             $validated['slug'] = $this->generateUniqueSlug(
+
+                ServiceCategory::class,
 
                 $validated['name'],
 
@@ -767,44 +773,6 @@ class ServiceCategoryController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | Generate Unique Slug
-    |--------------------------------------------------------------------------
-    */
-
-    private function generateUniqueSlug(
-        string $name,
-        ?int $ignoreId = null
-    ): string {
-
-        $baseSlug = Str::slug($name);
-
-        $slug = $baseSlug;
-
-        $count = 1;
-
-        while (
-
-            ServiceCategory::withTrashed()
-
-                ->where('slug', $slug)
-
-                ->when(
-                    $ignoreId,
-                    fn ($query) => $query->where('id', '!=', $ignoreId)
-                )
-
-                ->exists()
-
-        ) {
-
-            $slug = $baseSlug.'-'.$count++;
-        }
-
-        return $slug;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
     | Upload Image
     |--------------------------------------------------------------------------
     */
@@ -815,17 +783,6 @@ class ServiceCategoryController extends Controller
         string $name
     ): string {
 
-        $filename =
-            time().
-            '-'.
-            Str::slug($name).
-            '.'.
-            $image->getClientOriginalExtension();
-
-        return $image->storeAs(
-            $folder,
-            $filename,
-            'public'
-        );
+        return app(ImageService::class)->store($image, $folder, $name);
     }
 }

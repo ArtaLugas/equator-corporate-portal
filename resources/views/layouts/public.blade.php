@@ -11,7 +11,9 @@
     {{-- Canonical (query string excluded) to consolidate duplicate-URL signals. --}}
     <link rel="canonical" href="{{ url()->current() }}">
 
+    {{-- og:image — a page may override via @section('og_image', $url); falls back to setting/logo. --}}
     @php($ogImage = app_setting('og_image') ?: app_setting('logo'))
+    @php($ogImageUrl = trim($__env->yieldContent('og_image', $ogImage ? asset('storage/' . $ogImage) : '')))
 
     {{-- Open Graph --}}
     <meta property="og:site_name" content="{{ app_setting('company_name', 'Equator Group') }}">
@@ -19,16 +21,16 @@
     <meta property="og:description" content="@yield('meta_description', app_setting('meta_description', app_setting('tagline', '')))">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    @if ($ogImage)
-        <meta property="og:image" content="{{ asset('storage/' . $ogImage) }}">
+    @if ($ogImageUrl)
+        <meta property="og:image" content="{{ $ogImageUrl }}">
     @endif
 
     {{-- Twitter --}}
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('title', app_setting('company_name', 'Equator Group'))">
     <meta name="twitter:description" content="@yield('meta_description', app_setting('meta_description', app_setting('tagline', '')))">
-    @if ($ogImage)
-        <meta name="twitter:image" content="{{ asset('storage/' . $ogImage) }}">
+    @if ($ogImageUrl)
+        <meta name="twitter:image" content="{{ $ogImageUrl }}">
     @endif
 
     @if (app_setting('favicon'))

@@ -1,12 +1,24 @@
 @extends('layouts.public')
 
-@section('title', 'Services — ' . app_setting('company_name', 'Equator Group'))
+@section('title', $activeCategory
+    ? ($activeCategory->meta_title ?: $activeCategory->name . ' — ' . app_setting('company_name', 'Equator Group'))
+    : 'Services — ' . app_setting('company_name', 'Equator Group'))
+
+@section('meta_description', $activeCategory
+    ? ($activeCategory->meta_description ?: \Illuminate\Support\Str::limit(strip_tags($activeCategory->description), 150))
+    : 'Explore the social and environmental advisory services offered by ' . app_setting('company_name', 'Equator Group') . ' across the entire project lifecycle.')
+
+@if ($activeCategory && $activeCategory->image)
+    @section('og_image', asset('storage/' . $activeCategory->image))
+@endif
 
 @section('content')
 
     @include('public.partials.page-hero', [
-        'title' => 'Our Services',
-        'subtitle' => 'Comprehensive social and environmental consulting solutions across the entire project lifecycle.',
+        'title' => $activeCategory?->name ?: 'Our Services',
+        'subtitle' => $activeCategory
+            ? (\Illuminate\Support\Str::limit(strip_tags((string) $activeCategory->description), 160) ?: 'Specialist services within ' . $activeCategory->name . '.')
+            : 'Comprehensive social and environmental consulting solutions across the entire project lifecycle.',
     ])
 
     @php
