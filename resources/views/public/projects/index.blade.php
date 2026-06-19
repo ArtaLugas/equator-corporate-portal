@@ -2,6 +2,8 @@
 
 @section('title', 'Projects — ' . app_setting('company_name', 'Equator Group'))
 
+@section('meta_description', 'Explore selected projects and case studies delivered by ' . app_setting('company_name', 'Equator Group') . ' across environmental, social and ESG engagements worldwide.')
+
 @section('content')
 
     @php

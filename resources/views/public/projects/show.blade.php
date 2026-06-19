@@ -4,6 +4,38 @@
 @section('meta_description', $project->meta_description ?:
     \Illuminate\Support\Str::limit(strip_tags($project->short_description ?: $project->name), 150))
 
+@if ($project->featured_image)
+    @section('og_image', asset('storage/' . $project->featured_image))
+@endif
+
+@push('head')
+    @php
+        $projLd = [
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                array_filter([
+                    '@type' => 'CreativeWork',
+                    'name' => $project->name,
+                    'description' => \Illuminate\Support\Str::limit(strip_tags($project->short_description ?: $project->description), 200),
+                    'image' => $project->featured_image ? asset('storage/' . $project->featured_image) : null,
+                    'url' => route('projects.show', $project->slug),
+                    'dateCreated' => $project->start_date?->toDateString(),
+                    'creator' => ['@type' => 'Organization', 'name' => app_setting('company_name', 'Equator Group'), 'url' => url('/')],
+                ]),
+                [
+                    '@type' => 'BreadcrumbList',
+                    'itemListElement' => [
+                        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => route('home')],
+                        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Projects', 'item' => route('projects.index')],
+                        ['@type' => 'ListItem', 'position' => 3, 'name' => $project->name, 'item' => route('projects.show', $project->slug)],
+                    ],
+                ],
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($projLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+@endpush
+
 @section('content')
 
     @php
@@ -58,7 +90,8 @@ $contactUrl = route('contact', ['service' => $ctaService]);
     <section class="relative overflow-hidden bg-equator-dark text-white">
         {{-- Featured image (self-removes if the file is missing → fallback below shows) --}}
         @if ($project->featured_image)
-            <img src="{{ asset('storage/' . $project->featured_image) }}" alt="{{ $project->name }}" onerror="this.remove()"
+            <img src="{{ asset('storage/' . $project->featured_image) }}" alt="{{ $project->name }}"
+                width="1600" height="900" decoding="async" onerror="this.remove()"
                 class="absolute inset-0 h-full w-full object-cover opacity-40">
         @endif
 
@@ -205,30 +238,48 @@ $contactUrl = route('contact', ['service' => $ctaService]);
                 @if ($images->count() === 1)
                     {{-- Single image → one large immersive visual (no awkward 1-item grid) --}}
                     @php $img = $images->first(); @endphp
-                    <button type="button" @click="lightbox = '{{ asset('storage/' . $img->image) }}'"
-                        class="group block w-full overflow-hidden rounded-2xl bg-slate-100">
-                        <img src="{{ asset('storage/' . $img->image) }}" alt="{{ $img->caption }}" loading="lazy"
-                            class="aspect-[21/9] w-full object-cover transition-transform duration-700 group-hover:scale-105">
-                    </button>
+                    <figure>
+                        <button type="button" @click="lightbox = '{{ asset('storage/' . $img->image) }}'"
+                            class="group block w-full overflow-hidden rounded-2xl bg-slate-100">
+                            <img src="{{ asset('storage/' . $img->image) }}" alt="{{ $img->caption ?: $project->name }}"
+                                loading="lazy"
+                                class="aspect-[21/9] w-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        </button>
+                        @if ($img->caption)
+                            <figcaption class="mt-3 text-sm text-slate-500">{{ $img->caption }}</figcaption>
+                        @endif
+                    </figure>
                 @else
                     {{-- Lead image + supporting strip --}}
                     @php
                         $lead = $images->first();
                         $rest = $images->slice(1);
                     @endphp
-                    <button type="button" @click="lightbox = '{{ asset('storage/' . $lead->image) }}'"
-                        class="group mb-4 block w-full overflow-hidden rounded-2xl bg-slate-100">
-                        <img src="{{ asset('storage/' . $lead->image) }}" alt="{{ $lead->caption }}" loading="lazy"
-                            class="aspect-[21/9] w-full object-cover transition-transform duration-700 group-hover:scale-105">
-                    </button>
+                    <figure class="mb-4">
+                        <button type="button" @click="lightbox = '{{ asset('storage/' . $lead->image) }}'"
+                            class="group block w-full overflow-hidden rounded-2xl bg-slate-100">
+                            <img src="{{ asset('storage/' . $lead->image) }}" alt="{{ $lead->caption ?: $project->name }}"
+                                loading="lazy"
+                                class="aspect-[21/9] w-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        </button>
+                        @if ($lead->caption)
+                            <figcaption class="mt-3 text-sm text-slate-500">{{ $lead->caption }}</figcaption>
+                        @endif
+                    </figure>
                     <div
                         class="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible sm:px-0 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden">
                         @foreach ($rest as $img)
-                            <button type="button" @click="lightbox = '{{ asset('storage/' . $img->image) }}'"
-                                class="group aspect-[4/3] w-64 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:w-auto">
-                                <img src="{{ asset('storage/' . $img->image) }}" alt="{{ $img->caption }}" loading="lazy"
-                                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
-                            </button>
+                            <figure class="w-64 shrink-0 sm:w-auto">
+                                <button type="button" @click="lightbox = '{{ asset('storage/' . $img->image) }}'"
+                                    class="group block aspect-[4/3] w-full overflow-hidden rounded-xl bg-slate-100">
+                                    <img src="{{ asset('storage/' . $img->image) }}"
+                                        alt="{{ $img->caption ?: $project->name }}" loading="lazy"
+                                        class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+                                </button>
+                                @if ($img->caption)
+                                    <figcaption class="mt-2 text-xs text-slate-500">{{ $img->caption }}</figcaption>
+                                @endif
+                            </figure>
                         @endforeach
                     </div>
                 @endif
@@ -236,8 +287,13 @@ $contactUrl = route('contact', ['service' => $ctaService]);
 
             {{-- Lightbox --}}
             <div x-show="lightbox" x-cloak @click="lightbox = null" @keydown.escape.window="lightbox = null"
+                role="dialog" aria-modal="true" aria-label="Project image viewer (press Escape to close)"
                 class="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 p-4">
-                <img :src="lightbox" class="max-h-[90vh] max-w-full rounded-xl object-contain">
+                <button type="button" @click="lightbox = null" aria-label="Close image viewer"
+                    class="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                </button>
+                <img :src="lightbox" alt="Enlarged project image" class="max-h-[90vh] max-w-full rounded-xl object-contain">
             </div>
         </section>
     @endif

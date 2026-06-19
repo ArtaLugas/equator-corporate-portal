@@ -64,7 +64,7 @@ class ServiceController extends Controller
             ->with([
                 'category',
                 // Real project references (case studies) linked to this service.
-                'projects' => fn ($q) => $q->latest()->take(3),
+                'projects' => fn ($q) => $q->public()->latest()->take(3),
             ])
             ->firstOrFail();
 

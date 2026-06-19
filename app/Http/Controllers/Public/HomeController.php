@@ -54,7 +54,7 @@ class HomeController extends Controller
         // Services preview: utamakan featured; bila < limit, lengkapi dgn terbaru lain.
         $featuredServices = $this->featuredServices(4);
 
-        $featuredProjects = Project::with('services:id,name')
+        $featuredProjects = Project::public()->with('services:id,name')
             ->orderByDesc('is_featured')
             ->latest()->take(6)->get();
 

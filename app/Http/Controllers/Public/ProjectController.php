@@ -8,37 +8,48 @@ use App\Models\Service;
 use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class ProjectController extends Controller
 {
+    /** Cache key for the stable index chrome (stats + facets). */
+    public const CHROME_CACHE_KEY = 'public.projects.chrome';
+
     public function index(Request $request)
     {
-        // ── Honest proof-of-scale aggregates (computed from real data) ──
-        $minStart = Project::whereNotNull('start_date')->min('start_date');
-        $stats = [
-            'total' => Project::count(),
-            'completed' => Project::where('status', 'completed')->count(),
-            'clients' => Project::whereNotNull('client_name')->distinct()->count('client_name'),
-            'since' => $minStart ? Carbon::parse($minStart)->year : null,
-        ];
+        // Stats + discovery facets are stable across requests — cache them
+        // (busted by the content observer). The filtered list stays dynamic.
+        // All counts use scopePublic() so figures match what visitors can open.
+        [$stats, $countries, $years, $serviceGroups] = Cache::remember(
+            self::CHROME_CACHE_KEY,
+            now()->addHour(),
+            function () {
+                $minStart = Project::public()->whereNotNull('start_date')->min('start_date');
 
-        // Discovery facets — surfaced only when the data supports them.
-        $countries = Project::whereNotNull('country')->distinct()->orderBy('country')->pluck('country');
-        $years = Project::whereNotNull('start_date')
-            ->selectRaw('YEAR(start_date) as y')->distinct()->orderByDesc('y')->pluck('y');
-
-        // Capability Finder — uses existing ServiceCategory + Service only (no new schema).
-        $serviceGroups = ServiceCategory::where('status', 'active')
-            ->whereHas('services', fn ($q) => $q->where('status', 'published'))
-            ->with(['services' => fn ($q) => $q->where('status', 'published')->orderBy('name')])
-            ->orderBy('display_order')->get();
+                return [
+                    [
+                        'total' => Project::public()->count(),
+                        'completed' => Project::public()->where('status', 'completed')->count(),
+                        'clients' => Project::public()->whereNotNull('client_name')->distinct()->count('client_name'),
+                        'since' => $minStart ? Carbon::parse($minStart)->year : null,
+                    ],
+                    Project::public()->whereNotNull('country')->distinct()->orderBy('country')->pluck('country'),
+                    Project::public()->whereNotNull('start_date')
+                        ->selectRaw('YEAR(start_date) as y')->distinct()->orderByDesc('y')->pluck('y'),
+                    ServiceCategory::where('status', 'active')
+                        ->whereHas('services', fn ($q) => $q->where('status', 'published'))
+                        ->with(['services' => fn ($q) => $q->where('status', 'published')->orderBy('name')])
+                        ->orderBy('display_order')->get(),
+                ];
+            }
+        );
 
         $activeService = $request->filled('service')
             ? Service::where('status', 'published')->where('slug', $request->service)->first()
             : null;
 
-        // All projects treated equally — most recent first.
-        $projects = Project::query()
+        // All public projects treated equally — most recent first.
+        $projects = Project::query()->public()
             ->with('services')
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
             ->when($request->filled('country'), fn ($q) => $q->where('country', $request->country))
@@ -63,7 +74,7 @@ class ProjectController extends Controller
 
     public function show(string $slug)
     {
-        $project = Project::where('slug', $slug)
+        $project = Project::public()->where('slug', $slug)
             ->with(['services', 'images' => fn ($q) => $q->orderBy('display_order')])
             ->firstOrFail();
 
@@ -74,7 +85,7 @@ class ProjectController extends Controller
         $relatedByService = false;
 
         if ($serviceIds->isNotEmpty()) {
-            $related = Project::where('id', '!=', $project->id)
+            $related = Project::public()->where('id', '!=', $project->id)
                 ->whereHas('services', fn ($s) => $s->whereIn('services.id', $serviceIds))
                 ->with('services')
                 ->latest('start_date')->take(3)->get();
@@ -94,7 +105,7 @@ class ProjectController extends Controller
                 break;
             }
             $exclude = $related->pluck('id')->push($project->id)->all();
-            $rows = $filler(Project::query())
+            $rows = $filler(Project::query()->public())
                 ->whereNotIn('id', $exclude)
                 ->with('services')
                 ->latest('start_date')

@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\PageController;
+use App\Http\Controllers\Public\ProjectController;
 use App\Http\Controllers\Public\ServiceController;
 use Illuminate\Support\Facades\Cache;
 
@@ -33,5 +34,6 @@ class HomeContentCacheObserver
         Cache::forget(HomeController::CACHE_KEY);
         Cache::forget(PageController::ABOUT_CACHE_KEY);
         Cache::forget(ServiceController::META_CACHE_KEY);
+        Cache::forget(ProjectController::CHROME_CACHE_KEY);
     }
 }

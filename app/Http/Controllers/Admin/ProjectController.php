@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\GeneratesUniqueSlug;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Service;
@@ -10,10 +11,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
+    use GeneratesUniqueSlug;
+
     /*
     |--------------------------------------------------------------------------
     | Pagination
@@ -213,7 +215,7 @@ class ProjectController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $validated['slug'] = $this->generateUniqueSlug($validated['name']);
+        $validated['slug'] = $this->generateUniqueSlug(Project::class, $validated['name']);
 
         $featuredImage = null;
 
@@ -369,6 +371,7 @@ class ProjectController extends Controller
         if ($project->name !== $validated['name']) {
 
             $validated['slug'] = $this->generateUniqueSlug(
+                Project::class,
                 $validated['name'],
                 $project->id
             );
@@ -783,32 +786,6 @@ class ProjectController extends Controller
             'delete_images' => ['nullable', 'array'],
             'delete_images.*' => ['integer'],
         ]);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Helper: Generate Unique Slug
-    |--------------------------------------------------------------------------
-    */
-
-    private function generateUniqueSlug(string $name, ?int $ignoreId = null): string
-    {
-        $baseSlug = Str::slug($name);
-
-        $slug = $baseSlug;
-
-        $count = 1;
-
-        while (
-            Project::withTrashed()
-                ->where('slug', $slug)
-                ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
-                ->exists()
-        ) {
-            $slug = $baseSlug.'-'.$count++;
-        }
-
-        return $slug;
     }
 
     /*
