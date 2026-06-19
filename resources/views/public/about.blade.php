@@ -2,6 +2,39 @@
 
 @section('title', 'About Us — ' . app_setting('company_name', 'Equator Group'))
 
+@section('meta_description', 'Learn about ' . app_setting('company_name', 'Equator Group') . ' — ' . app_setting('tagline', 'a social and environmental advisory firm across sustainability, ESG, resilience and development.'))
+
+@push('head')
+    @php
+        $aboutOrg = [
+            '@type' => 'Organization',
+            'name' => app_setting('company_name', 'Equator Group'),
+            'url' => url('/'),
+        ];
+        if (app_setting('logo')) {
+            $aboutOrg['logo'] = asset('storage/' . app_setting('logo'));
+        }
+        if ($histories->first()?->year) {
+            $aboutOrg['foundingDate'] = (string) $histories->first()->year;
+        }
+        $aboutJsonLd = [
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                ['@type' => 'AboutPage', 'url' => url()->current(), 'name' => 'About — ' . app_setting('company_name', 'Equator Group')],
+                $aboutOrg,
+                [
+                    '@type' => 'BreadcrumbList',
+                    'itemListElement' => [
+                        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => route('home')],
+                        ['@type' => 'ListItem', 'position' => 2, 'name' => 'About', 'item' => url()->current()],
+                    ],
+                ],
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($aboutJsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+@endpush
+
 @section('content')
 
     {{-- HERO --}}
@@ -31,24 +64,6 @@
                     // Apakah section ini punya narasi lead? Menentukan layout 2 kolom vs 1 kolom.
                     $hasLead = filled($companyContent?->content);
                 @endphp
-
-                {{-- TEMPORARY DEBUG — hapus setelah data terverifikasi. Hanya tampil saat APP_DEBUG=true.
-                     Hanya memperingatkan ketidakkonsistenan nyata: salah satu (vision/mission) ada tapi pasangannya hilang.
-                     Section yang memang tidak punya vision/mission (mis. "Who We Are") tidak ikut diperingatkan. --}}
-                @if (config('app.debug') && (bool) $vision !== (bool) $mission)
-                    <div class="mb-8 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-                        <strong>Debug:</strong> Vision/Mission belum lengkap untuk section
-                        <code>{{ $section->name }}</code>. Konten aktif yang tersedia:
-                        <ul class="mt-2 list-disc pl-5">
-                            @forelse ($section->contents as $c)
-                                <li><code>key = {{ $c->key ?? '—' }}</code> · title = {{ $c->title ?? '—' }} ·
-                                    id = {{ $c->id }}</li>
-                            @empty
-                                <li>(section ini tidak memiliki contents aktif)</li>
-                            @endforelse
-                        </ul>
-                    </div>
-                @endif
 
                 <div @class(['border-t border-slate-200 pt-24' => !$loop->first])>
 
@@ -486,6 +501,15 @@
                                     class="prose prose-slate mt-3 max-w-none text-slate-600 prose-p:text-[0.9375rem] prose-p:leading-7">
                                     {!! $history->description !!}
                                 </div>
+
+                                {{-- Milestone image (optional) --}}
+                                @if ($history->image)
+                                    <figure class="mt-6 overflow-hidden rounded-xl border border-slate-200">
+                                        <img src="{{ asset('storage/' . $history->image) }}"
+                                            alt="{{ $history->title }}" loading="lazy" decoding="async"
+                                            class="aspect-[16/9] w-full object-cover">
+                                    </figure>
+                                @endif
 
                                 {{-- Chapter divider (between chapters, not after last) --}}
                                 @unless ($loop->last)

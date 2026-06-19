@@ -3,11 +3,12 @@
 namespace App\Observers;
 
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\PageController;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * Membersihkan cache payload homepage setiap kali konten yang ditampilkan
- * di homepage dibuat / diubah / dihapus, sehingga update CMS langsung tampil.
+ * Membersihkan cache payload halaman publik (homepage & About) setiap kali
+ * konten terkait dibuat / diubah / dihapus, sehingga update CMS langsung tampil.
  */
 class HomeContentCacheObserver
 {
@@ -21,8 +22,14 @@ class HomeContentCacheObserver
         $this->flush();
     }
 
+    public function restored($model): void
+    {
+        $this->flush();
+    }
+
     private function flush(): void
     {
         Cache::forget(HomeController::CACHE_KEY);
+        Cache::forget(PageController::ABOUT_CACHE_KEY);
     }
 }

@@ -118,7 +118,7 @@ class CoreValueController extends Controller
 
             activity_log(
                 'Core Value',
-                'Created core value'.$coreValue->title
+                'Created core value: '.$coreValue->title
             );
         });
 
