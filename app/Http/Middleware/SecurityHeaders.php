@@ -9,16 +9,41 @@ use Symfony\Component\HttpFoundation\Response;
 class SecurityHeaders
 {
     /**
-     * Attach baseline OWASP-recommended security response headers.
+     * Baseline Content-Security-Policy.
      *
-     * Notes:
-     * - HSTS is emitted here but ONLY over HTTPS ($request->secure()), so it never
-     *   poisons local/plain-HTTP development. Setting it in the app (rather than the
-     *   web server) keeps it portable across shared hosting (cPanel/Apache/LiteSpeed)
-     *   where we do not control a vhost.
-     * - A full Content-Security-Policy is deferred: the admin panel loads CKEditor 5,
-     *   ApexCharts and inline dashboard scripts, so CSP must be tuned (report-only
-     *   first) so it does not break them. The headers below are the safe baseline.
+     * `'unsafe-inline'`/`'unsafe-eval'` are required because the app uses Alpine.js
+     * (Function-constructor) plus inline <script>/<style> blocks across views — so this
+     * is a *defence-in-depth* policy (the primary XSS defence is purifying all rich
+     * text at the source). It still meaningfully locks down object/base/form-action,
+     * blocks framing (clickjacking) and restricts where scripts/styles/images may load.
+     *
+     * Allowlisted third parties:
+     * - challenges.cloudflare.com  → Turnstile CAPTCHA (script + iframe) on contact/login
+     * - cdn.jsdelivr.net           → Alpine.js on the admin login screen
+     * - data:/blob:                → inline icons + CKEditor image preview/workers
+     *
+     * If a future integration needs another origin, extend this constant (kept here,
+     * not in env(), so it stays correct under `config:cache`).
+     */
+    private const POLICY = "default-src 'self'; "
+        ."script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://cdn.jsdelivr.net; "
+        ."style-src 'self' 'unsafe-inline'; "
+        ."img-src 'self' data: blob:; "
+        ."font-src 'self' data:; "
+        ."connect-src 'self' https://challenges.cloudflare.com; "
+        .'frame-src https://challenges.cloudflare.com; '
+        ."worker-src 'self' blob:; "
+        ."object-src 'none'; "
+        ."base-uri 'self'; "
+        ."form-action 'self'; "
+        ."frame-ancestors 'self'";
+
+    /**
+     * Attach OWASP-recommended security response headers.
+     *
+     * HSTS is emitted only over HTTPS ($request->secure()) so it never poisons
+     * local/plain-HTTP development, and lives in the app (not a vhost) so it stays
+     * portable across shared hosting (cPanel/Apache/LiteSpeed).
      *
      * @see https://owasp.org/www-project-secure-headers/
      */
@@ -33,6 +58,8 @@ class SecurityHeaders
             'Permissions-Policy' => 'geolocation=(), microphone=(), camera=()',
             'X-Permitted-Cross-Domain-Policies' => 'none',
         ]);
+
+        $response->headers->set('Content-Security-Policy', self::POLICY);
 
         // HSTS only makes sense — and is only safe — over HTTPS.
         if ($request->secure()) {

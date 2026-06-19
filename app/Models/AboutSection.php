@@ -18,6 +18,12 @@ class AboutSection extends Model
         'status',
     ];
 
+    /** Consistent default with the other content tables (the column itself has none). */
+    protected $attributes = [
+        'status' => 'active',
+        'display_order' => 1,
+    ];
+
     /*
     |--------------------------------------------------------------------------
     | Relationships

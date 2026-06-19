@@ -91,6 +91,25 @@ handled at the application layer rather than by upgrading:
 releases within the Laravel 11 constraints. Re-evaluate the Laravel 12 upgrade at
 the next major maintenance window.
 
+A baseline **Content-Security-Policy** is emitted by `App\Http\Middleware\SecurityHeaders`
+(allowlists Cloudflare Turnstile + the admin-login Alpine CDN; everything else is
+self-hosted). Extend the `POLICY` constant if you add a new third-party origin.
+
+## Monitoring / observability
+
+No paid APM is required for this deployment. Error visibility relies on:
+
+- **Rotating logs** — `LOG_CHANNEL=stack`, `LOG_STACK=daily`, `LOG_DAILY_DAYS=14`
+  (`storage/logs`). Set `LOG_LEVEL=warning` in production.
+- **Critical-error alerts (optional, zero-cost)** — set `LOG_SLACK_WEBHOOK_URL`
+  and use `LOG_STACK=daily,slack`; Laravel/Monolog then pushes `critical`+ errors
+  to Slack. No extra package needed.
+
+If a hosted error tracker (Sentry/Flare) is adopted later, wire it in
+`bootstrap/app.php` `->withExceptions()`. (Adding the package currently requires the
+Laravel 12 upgrade or a temporary advisory-ignore, since Composer blocks installs
+against the open framework advisory.)
+
 ## 6. Redeploys
 
 Re-upload changed files, then via Terminal:
