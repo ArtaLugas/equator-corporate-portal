@@ -59,7 +59,13 @@ class SecurityHeaders
             'X-Permitted-Cross-Domain-Policies' => 'none',
         ]);
 
-        $response->headers->set('Content-Security-Policy', self::POLICY);
+        // Enforce CSP in production only. Local development serves assets from the
+        // cross-origin Vite dev server (http://…:5173 + HMR websocket), which a
+        // `default-src 'self'` policy would block; production serves same-origin
+        // built assets, so the policy applies cleanly there.
+        if (app()->isProduction()) {
+            $response->headers->set('Content-Security-Policy', self::POLICY);
+        }
 
         // HSTS only makes sense — and is only safe — over HTTPS.
         if ($request->secure()) {
