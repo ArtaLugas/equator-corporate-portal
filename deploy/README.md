@@ -75,6 +75,22 @@ If you prefer the very simplest setup and email volume is low, you may instead s
 `QUEUE_CONNECTION=sync` in `.env` to send mail inline and skip the queue entirely —
 at the cost of a slightly slower contact-form response.
 
+## Security — dependency advisories (Laravel 11)
+
+`composer audit` is clean except for advisories in `laravel/framework` whose
+fixes only ship in Laravel 12. We intentionally stay on Laravel 11, so these are
+handled at the application layer rather than by upgrading:
+
+- **Temporary Signed URL Path Confusion** — *not applicable*: the app uses no signed URLs.
+- **CRLF injection in the default `email` rule** (incl. the HIGH one) — *mitigated*:
+  the public contact form validates with `email:filter` + `not_regex:/[\r\n]/`
+  (rejects CR/LF), and Symfony Mailer rejects CR/LF in addresses as a second layer.
+  Admin email fields are trusted input behind auth and are likewise mailer-protected.
+
+`guzzlehttp/*` and `symfony/*` advisories were resolved by updating to patched
+releases within the Laravel 11 constraints. Re-evaluate the Laravel 12 upgrade at
+the next major maintenance window.
+
 ## 6. Redeploys
 
 Re-upload changed files, then via Terminal:

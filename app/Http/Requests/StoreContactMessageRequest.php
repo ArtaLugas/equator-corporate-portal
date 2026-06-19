@@ -18,8 +18,12 @@ class StoreContactMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:191'],
-            'email' => ['required', 'email:rfc', 'max:191'],
+            'name' => ['required', 'string', 'max:191', 'not_regex:/[\r\n]/'],
+            // `email:filter` (PHP filter_var) rejects CR/LF, mitigating the
+            // Laravel 11 "CRLF injection in default email rule" advisory at the
+            // application layer (we intentionally stay on Laravel 11). Symfony
+            // Mailer also rejects CRLF in addresses as a second line of defence.
+            'email' => ['required', 'email:filter', 'max:191', 'not_regex:/[\r\n]/'],
             'phone' => ['nullable', 'string', 'max:50'],
             'company' => ['nullable', 'string', 'max:191'],
             'subject' => ['required', 'string', 'max:191'],
