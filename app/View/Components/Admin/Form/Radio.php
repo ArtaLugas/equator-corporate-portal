@@ -16,8 +16,7 @@ class Radio extends Component
         public string $value,
         public string $label,
         public ?string $checked = null,
-    )
-    {
+    ) {
         //
     }
 

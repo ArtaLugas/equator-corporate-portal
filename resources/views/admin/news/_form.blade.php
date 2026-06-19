@@ -50,10 +50,6 @@
                     placeholder="auto-generated" readonly required />
             </div>
 
-            {{-- EXCERPT --}}
-            <x-admin.form.textarea name="excerpt" label="Excerpt" rows="3"
-                :value="old('excerpt', $news->excerpt ?? '')" placeholder="Short summary shown on listing pages..." />
-
             {{-- CONTENT --}}
             <x-admin.form.wysiwyg name="content" label="Content"
                 :value="old('content', $news->content ?? '')" />

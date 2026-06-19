@@ -20,9 +20,7 @@ class SendNewMessageNotification implements ShouldQueue
 
     public int $backoff = 30;
 
-    public function __construct(public Message $message)
-    {
-    }
+    public function __construct(public Message $message) {}
 
     public function handle(): void
     {

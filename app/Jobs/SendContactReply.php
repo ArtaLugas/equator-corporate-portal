@@ -24,8 +24,7 @@ class SendContactReply implements ShouldQueue
         public Message $message,
         public string $subject,
         public string $body,
-    ) {
-    }
+    ) {}
 
     public function handle(): void
     {

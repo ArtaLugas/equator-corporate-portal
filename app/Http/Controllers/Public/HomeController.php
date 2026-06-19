@@ -33,14 +33,23 @@ class HomeController extends Controller
      */
     private function buildPageData(): array
     {
-        $heroBanners = HeroBanner::where('status', 'active')
-            ->orderBy('display_order')->get();
+        $heroBanners = HeroBanner::active()->ordered()->get();
 
-        $keyMetrics = KeyMetric::where('status', 'active')
-            ->orderBy('display_order')->get();
+        $keyMetrics = KeyMetric::active()->orderBy('display_order')->get();
 
         // $keyMetrics sudah difilter active → cukup filter is_featured di memori.
         $featuredMetric = $keyMetrics->firstWhere('is_featured', true);
+
+        // Stat tiles: gunakan metrik CMS bila ada, jatuh ke default yang masuk akal.
+        // (Disusun di controller, bukan Blade, agar view bebas dari data/presentasi default.)
+        $stats = $keyMetrics->isNotEmpty()
+            ? $keyMetrics->map(fn ($m) => ['value' => $m->value, 'label' => $m->label])->all()
+            : [
+                ['value' => '15+', 'label' => 'Years of Experience'],
+                ['value' => '200+', 'label' => 'Projects Delivered'],
+                ['value' => '50+', 'label' => 'Expert Consultants'],
+                ['value' => '6', 'label' => 'Countries Served'],
+            ];
 
         // Services preview: utamakan featured; bila < limit, lengkapi dgn terbaru lain.
         $featuredServices = $this->featuredServices(4);
@@ -68,6 +77,7 @@ class HomeController extends Controller
         return compact(
             'heroBanners',
             'keyMetrics',
+            'stats',
             'featuredMetric',
             'featuredServices',
             'featuredProjects',

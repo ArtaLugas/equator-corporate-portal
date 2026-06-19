@@ -9,15 +9,17 @@ use App\Models\Message;
 use App\Models\OfficeLocation;
 use App\Models\SocialLink;
 use App\Notifications\NewContactMessage;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class ContactController extends Controller
 {
     /**
      * Show the public contact form.
      */
-    public function create()
+    public function create(Request $request)
     {
         // Guard defensif: bila migration belum dijalankan, halaman tetap tampil
         // (jatuh ke fallback) daripada 500 "table doesn't exist".
@@ -29,7 +31,15 @@ class ContactController extends Controller
             ? SocialLink::where('status', 'active')->orderBy('display_order')->get()
             : collect();
 
-        return view('contact', compact('offices', 'socials'));
+        // Pre-fill Subject when the visitor arrives from a service page
+        // (e.g. /contact?service=Environmental+Impact+Assessment).
+        // Guard against non-string input (?service[]=x) before trimming.
+        $serviceParam = $request->query('service');
+        $prefillSubject = is_string($serviceParam) && trim($serviceParam) !== ''
+            ? 'Service enquiry: '.Str::limit(trim($serviceParam), 120, '')
+            : null;
+
+        return view('contact', compact('offices', 'socials', 'prefillSubject'));
     }
 
     /**
@@ -48,7 +58,7 @@ class ContactController extends Controller
 
         activity_log(
             'Messages',
-            'Message Received from ' . $message->email . ' — ' . $message->subject
+            'Message Received from '.$message->email.' — '.$message->subject
         );
 
         // Notify the office inbox (queued, via Brevo SMTP from settings).

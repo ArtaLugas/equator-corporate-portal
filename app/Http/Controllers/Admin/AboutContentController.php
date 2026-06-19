@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AboutContent;
 use App\Models\AboutSection;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -269,7 +270,7 @@ class AboutContentController extends Controller
 
                 'About Content',
 
-                'Created about content: ' .
+                'Created about content: '.
                 ($content->title ?? 'Untitled')
             );
 
@@ -496,7 +497,7 @@ class AboutContentController extends Controller
 
                 'About Content',
 
-                'Updated about content: ' .
+                'Updated about content: '.
                 ($aboutContent->title ?? 'Untitled')
             );
 
@@ -553,7 +554,7 @@ class AboutContentController extends Controller
 
                 'About Content',
 
-                'Deleted about content: ' .
+                'Deleted about content: '.
                 ($aboutContent->title ?? 'Untitled')
             );
 
@@ -613,17 +614,6 @@ class AboutContentController extends Controller
         string $name
     ): string {
 
-        $filename =
-            time() .
-            '-' .
-            Str::slug($name) .
-            '.' .
-            $image->getClientOriginalExtension();
-
-        return $image->storeAs(
-            $folder,
-            $filename,
-            'public'
-        );
+        return app(ImageService::class)->store($image, $folder, $name);
     }
 }

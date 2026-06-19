@@ -1,36 +1,37 @@
 <?php
 
 use App\Http\Controllers\Admin\AboutContentController;
+use App\Http\Controllers\Admin\AboutHistoryController;
+use App\Http\Controllers\Admin\AboutSectionController;
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\CompanyDocumentController;
+use App\Http\Controllers\Admin\CoreValueController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\HeroBannerController;
+use App\Http\Controllers\Admin\KeyMetricController;
 use App\Http\Controllers\Admin\MessageController;
+use App\Http\Controllers\Admin\NewsCategoryController;
+use App\Http\Controllers\Admin\NewsController;
+use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\OfficeLocationController;
+use App\Http\Controllers\Admin\PartnerController;
+use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\Admin\ServiceCategoryController;
+use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SocialLinkController;
+use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\NewsController as PublicNewsController;
 use App\Http\Controllers\Public\PageController;
 use App\Http\Controllers\Public\ProjectController as PublicProjectController;
 use App\Http\Controllers\Public\ServiceController as PublicServiceController;
-use App\Http\Controllers\Admin\AboutHistoryController;
-use App\Http\Controllers\Admin\AboutSectionController;
-use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\CompanyDocumentController;
-use App\Http\Controllers\Admin\CoreValueController;
-use App\Http\Controllers\Admin\HeroBannerController;
-use App\Http\Controllers\Admin\KeyMetricController;
-use App\Http\Controllers\Admin\NewsCategoryController;
-use App\Http\Controllers\Admin\NewsController;
-use App\Http\Controllers\Admin\NotificationController;
-use App\Http\Controllers\Admin\PartnerController;
-use App\Http\Controllers\Admin\ProjectController;
-use App\Http\Controllers\Admin\ServiceCategoryController;
-use App\Http\Controllers\Admin\ServiceController;
-use App\Http\Controllers\Admin\OfficeLocationController;
-use App\Http\Controllers\Admin\SocialLinkController;
-use App\Http\Controllers\Admin\TeamController;
+use App\Http\Controllers\Public\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,6 +53,25 @@ Route::get('projects/{slug}', [PublicProjectController::class, 'show'])->name('p
 
 Route::get('news', [PublicNewsController::class, 'index'])->name('news.index');
 Route::get('news/{slug}', [PublicNewsController::class, 'show'])->name('news.show');
+
+/*
+|--------------------------------------------------------------------------
+| SEO — sitemap & robots (dynamic so URLs are domain-aware)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
+Route::get('robots.txt', function () {
+    $body = implode("\n", [
+        'User-agent: *',
+        'Disallow: /admin',
+        '',
+        'Sitemap: '.route('sitemap'),
+    ])."\n";
+
+    return response($body, 200)->header('Content-Type', 'text/plain');
+})->name('robots');
 
 /*
 |--------------------------------------------------------------------------
@@ -83,8 +103,10 @@ Route::prefix('admin')
         Route::get('login', [AuthController::class, 'login'])
             ->name('login');
 
+        // Coarse per-IP outer bound. Fine-grained brute-force protection
+        // (per email+IP, with lockout) lives in AuthController::authenticate.
         Route::post('login', [AuthController::class, 'authenticate'])
-            ->middleware('throttle:20,1')
+            ->middleware('throttle:10,1')
             ->name('authenticate');
 
         /*
@@ -420,4 +442,4 @@ Route::prefix('admin')
 
             Route::resource('admins', AdminController::class)->except(['show']);
         });
-});
+    });

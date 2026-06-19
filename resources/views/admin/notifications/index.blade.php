@@ -42,7 +42,7 @@
         {{-- LIST --}}
         <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
             @forelse ($notifications as $notif)
-                <a href="{{ route('admin.notifications.read', $notif->id) }}"
+                <a href="{{ route('admin.notifications.read', $notif->id) }}" rel="nofollow"
                     class="{{ is_null($notif->read_at) ? 'bg-equator-bright/[0.04]' : '' }} flex items-start gap-4 border-b border-gray-50 px-5 py-4 transition-colors hover:bg-gray-50">
                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-equator-dark/5 text-equator-dark">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"

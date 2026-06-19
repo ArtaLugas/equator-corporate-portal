@@ -45,8 +45,7 @@ class NewsController extends Controller
 
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%")
-                    ->orWhere('excerpt', 'like', "%{$search}%");
+                    ->orWhere('slug', 'like', "%{$search}%");
             });
         }
 
@@ -163,7 +162,7 @@ class NewsController extends Controller
 
             $this->syncTags($news, $request->input('tags', []));
 
-            activity_log('News', 'Created news: ' . $news->title);
+            activity_log('News', 'Created news: '.$news->title);
 
             DB::commit();
 
@@ -266,7 +265,7 @@ class NewsController extends Controller
                 Storage::disk('public')->delete($oldImage);
             }
 
-            activity_log('News', 'Updated news: ' . $news->title);
+            activity_log('News', 'Updated news: '.$news->title);
 
             return redirect()
                 ->route('admin.news.index')
@@ -300,7 +299,7 @@ class NewsController extends Controller
 
             DB::transaction(fn () => $news->delete());
 
-            activity_log('News', 'Moved news to trash: ' . $news->title);
+            activity_log('News', 'Moved news to trash: '.$news->title);
 
             return back()->with('success', 'News moved to trash.');
 
@@ -341,10 +340,11 @@ class NewsController extends Controller
             $news = DB::transaction(function () use ($id) {
                 $news = News::onlyTrashed()->findOrFail($id);
                 $news->restore();
+
                 return $news;
             });
 
-            activity_log('News', 'Restored news: ' . $news->title);
+            activity_log('News', 'Restored news: '.$news->title);
 
             return back()->with('success', 'News restored successfully.');
 
@@ -386,7 +386,7 @@ class NewsController extends Controller
                 Storage::disk('public')->delete($imagePath);
             }
 
-            activity_log('News', 'Permanently deleted news: ' . ($title ?? ''));
+            activity_log('News', 'Permanently deleted news: '.($title ?? ''));
 
             return back()->with('success', 'News permanently deleted.');
 
@@ -465,7 +465,6 @@ class NewsController extends Controller
         return $request->validate([
             'category_id' => ['required', 'exists:news_categories,id'],
             'title' => ['required', 'string', 'max:191'],
-            'excerpt' => ['nullable', 'string'],
             'content' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'meta_title' => ['nullable', 'string', 'max:191'],
@@ -499,7 +498,7 @@ class NewsController extends Controller
                 ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
                 ->exists()
         ) {
-            $slug = $baseSlug . '-' . $count++;
+            $slug = $baseSlug.'-'.$count++;
         }
 
         return $slug;
@@ -514,7 +513,7 @@ class NewsController extends Controller
     private function uploadImage(UploadedFile $image, string $folder, string $name): string
     {
         $filename =
-            time() . '-' . Str::slug($name) . '.' . $image->getClientOriginalExtension();
+            time().'-'.Str::slug($name).'.'.$image->getClientOriginalExtension();
 
         return $image->storeAs($folder, $filename, 'public');
     }

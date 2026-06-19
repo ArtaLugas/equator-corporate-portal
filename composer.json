@@ -1,12 +1,14 @@
 {
-    "name": "laravel/laravel",
+    "name": "equator/corporate-portal",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Equator Group — corporate website & content-management portal.",
     "keywords": [
-        "laravel",
-        "framework"
+        "equator",
+        "corporate",
+        "cms",
+        "laravel"
     ],
-    "license": "MIT",
+    "license": "proprietary",
     "require": {
         "php": "^8.2",
         "cviebrock/eloquent-sluggable": "^11.0",
@@ -14,7 +16,7 @@
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
         "mews/purifier": "^3.4",
-        "phpoffice/phpspreadsheet": "*"
+        "phpoffice/phpspreadsheet": "^5.7"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

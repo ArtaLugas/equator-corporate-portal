@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Partner;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class PartnerController extends Controller
@@ -190,7 +190,7 @@ class PartnerController extends Controller
 
                 'Partner',
 
-                'Created partner: ' . $partner->name
+                'Created partner: '.$partner->name
             );
 
             DB::commit();
@@ -364,7 +364,7 @@ class PartnerController extends Controller
 
                 'Partner',
 
-                'Updated partner: ' . $partner->name
+                'Updated partner: '.$partner->name
             );
 
             return redirect()
@@ -426,7 +426,7 @@ class PartnerController extends Controller
 
                 'Partner',
 
-                'Moved partner to trash: ' . $partner->name
+                'Moved partner to trash: '.$partner->name
             );
 
             return back()->with(
@@ -499,7 +499,7 @@ class PartnerController extends Controller
 
                 'Partner',
 
-                'Restored partner: ' . $partner->name
+                'Restored partner: '.$partner->name
             );
 
             return back()->with(
@@ -574,7 +574,7 @@ class PartnerController extends Controller
 
                 'Partner',
 
-                'Permanently deleted partner: ' . $partner->name
+                'Permanently deleted partner: '.$partner->name
             );
 
             return back()->with(
@@ -659,17 +659,6 @@ class PartnerController extends Controller
         string $name
     ): string {
 
-        $filename =
-            time() .
-            '-' .
-            Str::slug($name) .
-            '.' .
-            $image->getClientOriginalExtension();
-
-        return $image->storeAs(
-            $folder,
-            $filename,
-            'public'
-        );
+        return app(ImageService::class)->store($image, $folder, $name);
     }
 }

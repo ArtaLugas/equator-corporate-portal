@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\ServiceCategory;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -310,7 +311,7 @@ class ServiceController extends Controller
 
                 'Service',
 
-                'Created service: ' . $service->name
+                'Created service: '.$service->name
             );
 
             DB::commit();
@@ -574,7 +575,7 @@ class ServiceController extends Controller
 
                 'Service',
 
-                'Updated service: ' . $service->name
+                'Updated service: '.$service->name
             );
 
             return redirect()
@@ -636,7 +637,7 @@ class ServiceController extends Controller
 
                 'Service',
 
-                'Moved service to trash: ' . $service->name
+                'Moved service to trash: '.$service->name
             );
 
             return back()->with(
@@ -713,7 +714,7 @@ class ServiceController extends Controller
 
                 'Service',
 
-                'Restored service: ' . $service->name
+                'Restored service: '.$service->name
             );
 
             return back()->with(
@@ -788,7 +789,7 @@ class ServiceController extends Controller
 
                 'Service',
 
-                'Permanently deleted service: ' . $service->name
+                'Permanently deleted service: '.$service->name
             );
 
             return back()->with(
@@ -836,15 +837,14 @@ class ServiceController extends Controller
 
                 ->when(
                     $ignoreId,
-                    fn ($query) =>
-                    $query->where('id', '!=', $ignoreId)
+                    fn ($query) => $query->where('id', '!=', $ignoreId)
                 )
 
                 ->exists()
 
         ) {
 
-            $slug = $baseSlug . '-' . $count++;
+            $slug = $baseSlug.'-'.$count++;
         }
 
         return $slug;
@@ -862,17 +862,6 @@ class ServiceController extends Controller
         string $name
     ): string {
 
-        $filename =
-            time() .
-            '-' .
-            Str::slug($name) .
-            '.' .
-            $image->getClientOriginalExtension();
-
-        return $image->storeAs(
-            $folder,
-            $filename,
-            'public'
-        );
+        return app(ImageService::class)->store($image, $folder, $name);
     }
 }

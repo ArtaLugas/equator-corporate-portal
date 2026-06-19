@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AdminAuthenticate;
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\TrackVisitor;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -23,9 +24,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin.auth' => AdminAuthenticate::class,
         ]);
 
-        // Track public page views for visitor analytics (appended so it runs
-        // after the session is started).
+        // Baseline security headers on every web response, plus visitor
+        // tracking (appended so it runs after the session is started).
         $middleware->web(append: [
+            SecurityHeaders::class,
             TrackVisitor::class,
         ]);
     })

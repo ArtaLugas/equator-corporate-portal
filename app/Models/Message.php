@@ -19,9 +19,13 @@ class Message extends Model
     */
 
     public const STATUS_UNREAD = 'unread';
+
     public const STATUS_READ = 'read';
+
     public const STATUS_REPLIED = 'replied';
+
     public const STATUS_ARCHIVED = 'archived';
+
     public const STATUS_SPAM = 'spam';
 
     public const STATUSES = [

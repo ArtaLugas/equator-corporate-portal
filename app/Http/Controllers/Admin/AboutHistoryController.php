@@ -62,23 +62,23 @@ class AboutHistoryController extends Controller
 
         switch ($request->sort) {
 
-            case 'oldest' :
+            case 'oldest':
                 $query->oldest();
                 break;
 
-            case 'year_asc' :
+            case 'year_asc':
                 $query->orderBy('year');
                 break;
 
-            case 'year_desc' :
+            case 'year_desc':
                 $query->orderByDesc('year');
                 break;
 
-            case 'display_order' :
+            case 'display_order':
                 $query->orderBy('display_order');
                 break;
 
-            default :
+            default:
                 $query->latest();
                 break;
         }
@@ -111,7 +111,7 @@ class AboutHistoryController extends Controller
                     'required',
                     'integer',
                     'min:1900',
-                    'max:' . (date('Y') + 10),
+                    'max:'.(date('Y') + 10),
                 ],
 
                 'title' => [
@@ -176,7 +176,7 @@ class AboutHistoryController extends Controller
 
                 'About History',
 
-                'Created history: ' . $history->title
+                'Created history: '.$history->title
             );
 
             DB::commit();
@@ -239,7 +239,7 @@ class AboutHistoryController extends Controller
                     'required',
                     'integer',
                     'min:1900',
-                    'max:' . (date('Y') + 10),
+                    'max:'.(date('Y') + 10),
                 ],
 
                 'title' => [
@@ -331,7 +331,7 @@ class AboutHistoryController extends Controller
 
                 'About History',
 
-                'Updated history: ' . $aboutHistory->title
+                'Updated history: '.$aboutHistory->title
             );
 
             return redirect()
@@ -379,7 +379,7 @@ class AboutHistoryController extends Controller
 
                 'About History',
 
-                'Deleted history: ' . $title
+                'Deleted history: '.$title
             );
 
             DB::commit();
@@ -415,10 +415,10 @@ class AboutHistoryController extends Controller
 
         $filename =
             time()
-            . '-'
-            . Str::slug($name)
-            . '.'
-            . $image->getClientOriginalExtension();
+            .'-'
+            .Str::slug($name)
+            .'.'
+            .$image->getClientOriginalExtension();
 
         return $image->storeAs(
             $folder,

@@ -21,7 +21,7 @@ class SettingSeeder extends Seeder
 
         // Combine office addresses into a single text block.
         $addressText = collect($addresses)
-            ->map(fn ($a) => trim(($a['label'] ?? '') . ': ' . ($a['address'] ?? '')))
+            ->map(fn ($a) => trim(($a['label'] ?? '').': '.($a['address'] ?? '')))
             ->implode("\n");
 
         $settings = Setting::current();

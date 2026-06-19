@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Admin;
 use App\Models\Faq;
-use App\Models\SocialLink;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

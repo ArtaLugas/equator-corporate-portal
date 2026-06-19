@@ -1,29 +1,174 @@
 @extends('layouts.public')
 
-@section('title', 'Homepage - ' . app_setting('company_name', 'Equator Group'))
+@section('title', app_setting('meta_title') ?: app_setting('company_name', 'Equator Group') . ' — ' . app_setting('tagline', 'Environmental, Social & ESG Advisory'))
+
+@section('meta_description', app_setting('meta_description', app_setting('tagline', 'Multidisciplinary environmental, social and ESG advisory across sustainability, resilience, engineering and development sectors.')))
+
+@push('head')
+    {{-- Preload the LCP hero image for a faster Largest Contentful Paint. --}}
+    @if ($heroBanners->first()?->image)
+        <link rel="preload" as="image" href="{{ asset('storage/' . $heroBanners->first()->image) }}" fetchpriority="high">
+    @endif
+
+    {{-- Organization + WebSite structured data (rich results / knowledge panel). --}}
+    @php
+        $orgSchema = [
+            '@type' => 'Organization',
+            'name' => app_setting('company_name', 'Equator Group'),
+            'url' => url('/'),
+        ];
+        if (app_setting('logo')) {
+            $orgSchema['logo'] = asset('storage/' . app_setting('logo'));
+        }
+        $homeJsonLd = [
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                $orgSchema,
+                ['@type' => 'WebSite', 'name' => app_setting('company_name', 'Equator Group'), 'url' => url('/')],
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($homeJsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+@endpush
 
 @section('content')
 
-    {{-- Ken Burns cinematic pan untuk hero (CSS-only, otomatis nonaktif saat reduce-motion) --}}
+    {{-- Hero motion system — satu motion language (CSS-only, nonaktif saat reduce-motion) --}}
     <style>
+        :root {
+            --hero-ease: cubic-bezier(0.22, 1, 0.36, 1);
+            /* tenang, decelerate */
+            --hero-reveal: 700ms;
+            --hero-interval: 8000ms;
+            /* = durasi autoplay */
+        }
+
+        /* 3 — Ken Burns: drift halus & linier (zoom 6%, lebih lambat dari interval) */
         @keyframes heroKenBurns {
-            0% {
-                transform: scale(1.06) translate3d(0, 0, 0);
+            from {
+                transform: scale(1.04) translate3d(0, 0, 0);
             }
 
-            100% {
-                transform: scale(1.2) translate3d(-2%, -1.5%, 0);
+            to {
+                transform: scale(1.10) translate3d(-1.5%, -1%, 0);
             }
         }
 
         .hero-kenburns {
-            animation: heroKenBurns 9000ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: heroKenBurns 12000ms linear forwards;
+        }
+
+        /* 4/5/6 — Content reveal: hybrid (manual = rise+fade, autoplay = fade-only) */
+        @keyframes heroRise {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        @keyframes heroFade {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .hero-reveal.is-manual {
+            animation: heroRise var(--hero-reveal) var(--hero-ease) both;
+        }
+
+        .hero-reveal.is-auto {
+            animation: heroFade var(--hero-reveal) var(--hero-ease) both;
+        }
+
+        .hero-reveal-1 {
+            animation-delay: 120ms;
+        }
+
+        .hero-reveal-2 {
+            animation-delay: 240ms;
+        }
+
+        /* 7 — Progress indicator sinkron autoplay (pseudo-element, bukan node baru) */
+        @keyframes heroProgress {
+            from {
+                transform: scaleX(0);
+            }
+
+            to {
+                transform: scaleX(1);
+            }
+        }
+
+        .hero-dot {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-dot--active::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: #FFB74D;
+            transform-origin: left;
+            transform: scaleX(0);
+            animation: heroProgress var(--hero-interval) linear forwards;
+        }
+
+        .hero-paused .hero-dot--active::after {
+            animation-play-state: paused;
+        }
+
+        /* 9 — Scroll cue: drift tenang (bukan bounce) */
+        @keyframes heroScrollDrift {
+            0% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            35% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(200%);
+                opacity: 0;
+            }
+        }
+
+        .hero-scroll-drift {
+            animation: heroScrollDrift 2400ms var(--hero-ease) infinite;
         }
 
         @media (prefers-reduced-motion: reduce) {
+
             .hero-kenburns {
                 animation: none;
                 transform: scale(1.03);
+            }
+
+            .hero-reveal.is-manual,
+            .hero-reveal.is-auto {
+                animation: none;
+                opacity: 1;
+                transform: none;
+            }
+
+            .hero-dot--active::after {
+                animation: none;
+                transform: scaleX(1);
+            }
+
+            .hero-scroll-drift {
+                animation: none;
             }
         }
     </style>
@@ -36,29 +181,37 @@
             autoplay: null,
             paused: false,
             touchX: 0,
-            start() { if (this.total > 1 && !this.autoplay && !this.paused) this.autoplay = setInterval(() => this.next(), 8000); },
+            manual: true,
+            start() { if (this.total > 1 && !this.autoplay && !this.paused) this.autoplay = setInterval(() => this.auto(), 8000); },
             stop() {
                 clearInterval(this.autoplay);
                 this.autoplay = null;
             },
-            next() { if (this.total > 1) this.active = (this.active + 1) % this.total; },
-            prev() { if (this.total > 1) this.active = (this.active - 1 + this.total) % this.total; },
+            go(i, manual = true) {
+                if (this.total <= 1) return;
+                this.manual = manual;
+                this.active = (i + this.total) % this.total;
+            },
+            auto() { this.go(this.active + 1, false); },
+            next() { this.go(this.active + 1, true); this.restart(); },
+            prev() { this.go(this.active - 1, true); this.restart(); },
+            select(i) { this.go(i, true); this.restart(); },
+            restart() { this.stop(); this.start(); },
             toggle() {
                 this.paused = !this.paused;
                 this.paused ? this.stop() : this.start();
             },
             onTouchEnd(x) {
                 const d = x - this.touchX;
-                if (Math.abs(d) > 50) {
-                    d < 0 ? this.next() : this.prev();
-                    this.stop();
-                    this.start();
-                }
+                if (Math.abs(d) > 50) { d < 0 ? this.next() : this.prev(); }
             },
         }" x-init="start()" @mouseenter="stop()" @mouseleave="start()"
             x-on:visibilitychange.document="document.hidden ? stop() : start()"
             @touchstart.passive="touchX = $event.changedTouches[0].clientX"
             @touchend="onTouchEnd($event.changedTouches[0].clientX)"
+            :class="paused && 'hero-paused'"
+            role="region" aria-roledescription="carousel"
+            aria-label="{{ app_setting('company_name', 'Equator Group') }} highlights"
             class="relative flex h-[95vh] min-h-[700px] w-full items-center overflow-hidden bg-equator-dark">
 
             @foreach ($heroBanners as $i => $banner)
@@ -68,6 +221,7 @@
                     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="absolute inset-0 z-0">
                     @if ($banner->image)
                         <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}"
+                            width="1920" height="1080"
                             @if ($i === 0) loading="eager" fetchpriority="high" @else loading="lazy" fetchpriority="low" @endif
                             decoding="async" class="h-full w-full object-cover will-change-transform"
                             :class="active === {{ $i }} ? 'hero-kenburns' : 'scale-105'">
@@ -89,25 +243,23 @@
                 @foreach ($heroBanners as $i => $banner)
                     <div x-show="active === {{ $i }}"
                         class="{{ $i === 0 ? '' : 'absolute top-1/2 -translate-y-1/2 left-4 sm:left-6 lg:left-8 right-4' }} max-w-3xl">
-                        <div x-show="active === {{ $i }}"
-                            x-transition:enter="transition delay-300 duration-1000 ease-out"
-                            x-transition:enter-start="opacity-0 translate-y-12"
-                            x-transition:enter-end="opacity-100 translate-y-0">
+                        <div x-show="active === {{ $i }}" class="hero-reveal hero-reveal-1"
+                            :class="active === {{ $i }} ? (manual ? 'is-manual' : 'is-auto') : ''">
                             <div class="mb-6 flex items-center gap-4">
                                 <span class="h-px w-12 bg-equator-orange"></span>
                                 <span class="text-xs font-bold uppercase tracking-[0.3em] text-equator-orange">
                                     {{ app_setting('company_name', 'Equator Group') }}
                                 </span>
                             </div>
-                            <h1
+                            {{-- Only the first slide is the page <h1>; subsequent slides use
+                                 <p> so the document has exactly one H1 (SEO + a11y heading order). --}}
+                            <{{ $i === 0 ? 'h1' : 'p' }}
                                 class="font-heading text-4xl font-light leading-[1.05] tracking-tight text-white [text-shadow:0_2px_40px_rgba(0,0,0,0.35)] sm:text-6xl lg:text-[5.25rem]">
                                 {{ $banner->title }}
-                            </h1>
+                            </{{ $i === 0 ? 'h1' : 'p' }}>
                         </div>
-                        <div x-show="active === {{ $i }}"
-                            x-transition:enter="transition delay-500 duration-1000 ease-out"
-                            x-transition:enter-start="opacity-0 translate-y-6"
-                            x-transition:enter-end="opacity-100 translate-y-0">
+                        <div x-show="active === {{ $i }}" class="hero-reveal hero-reveal-2"
+                            :class="active === {{ $i }} ? (manual ? 'is-manual' : 'is-auto') : ''">
                             @if ($banner->subtitle)
                                 <p
                                     class="ml-1 mt-8 max-w-2xl border-l border-white/20 pl-6 text-lg font-light leading-relaxed text-slate-300 sm:text-xl">
@@ -141,12 +293,12 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 @foreach ($heroBanners as $i => $b)
-                                    <button @click="active = {{ $i }}; stop(); start()"
+                                    <button @click="select({{ $i }})"
                                         aria-label="Go to slide {{ $i + 1 }}"
                                         class="group flex items-center justify-center py-4 focus:outline-none">
                                         <span
                                             class="block h-[2px] transition-[width,background-color] duration-700 ease-in-out"
-                                            :class="active === {{ $i }} ? 'w-12 bg-equator-orange' :
+                                            :class="active === {{ $i }} ? 'hero-dot hero-dot--active w-12 bg-white/20' :
                                                 'w-4 bg-white/20 group-hover:bg-white/60'"></span>
                                     </button>
                                 @endforeach
@@ -164,7 +316,7 @@
                             class="hidden items-center gap-4 text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 md:flex">
                             <span>Scroll</span>
                             <div class="relative h-8 w-px overflow-hidden bg-white/20">
-                                <div class="absolute left-0 top-0 h-1/2 w-full animate-bounce bg-equator-orange"></div>
+                                <div class="absolute left-0 top-0 h-1/2 w-full hero-scroll-drift bg-equator-orange"></div>
                             </div>
                         </div>
                     </div>
@@ -174,17 +326,7 @@
     @endif
 
     {{-- ============================ KEY METRICS (annual-report on white) ============================ --}}
-    @php
-        $stats = ($keyMetrics ?? collect())->isNotEmpty()
-            ? $keyMetrics->map(fn($m) => ['value' => $m->value, 'label' => $m->label])->all()
-            : [
-                ['value' => '15+', 'label' => 'Years of Experience'],
-                ['value' => '200+', 'label' => 'Projects Delivered'],
-                ['value' => '50+', 'label' => 'Expert Consultants'],
-                ['value' => '6', 'label' => 'Countries Served'],
-            ];
-    @endphp
-
+    {{-- $stats disusun di HomeController (metrik CMS + fallback). --}}
     <section class="border-t border-slate-100 bg-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-2 gap-px bg-slate-200/70 lg:grid-cols-4">
@@ -444,9 +586,10 @@
                     class="transition duration-700 ease-out motion-reduce:transition-none lg:col-span-5"
                     :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'">
                     <div class="relative aspect-[4/5] w-full overflow-hidden bg-equator-dark shadow-sm">
-                        <div class="absolute inset-0 bg-cover bg-fixed bg-center"
-                            style="background-image: url('{{ $aboutImage ? asset('storage/' . $aboutImage) : 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1200&q=80' }}');"
-                            aria-hidden="true"></div>
+                        @if ($aboutImage)
+                            <img src="{{ asset('storage/' . $aboutImage) }}" alt="" aria-hidden="true"
+                                loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover">
+                        @endif
                         <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-equator-dark/40 to-transparent"
                             aria-hidden="true"></div>
                     </div>
@@ -590,9 +733,10 @@
         $ctaImg = optional($featuredProjects->first())->featured_image ?? optional($heroBanners->first())->image;
     @endphp
     <section class="relative isolate overflow-hidden bg-equator-dark">
-        <div class="pointer-events-none absolute inset-0 bg-cover bg-fixed bg-center"
-            style="background-image: url('{{ $ctaImg ? asset('storage/' . $ctaImg) : 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1920&q=80' }}');"
-            aria-hidden="true"></div>
+        @if ($ctaImg)
+            <div class="pointer-events-none absolute inset-0 bg-cover bg-center"
+                style="background-image: url('{{ asset('storage/' . $ctaImg) }}');" aria-hidden="true"></div>
+        @endif
         <div class="pointer-events-none absolute inset-0 bg-equator-dark/85" aria-hidden="true"></div>
         <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-equator-dark via-equator-dark/75 to-equator-dark/90"
             aria-hidden="true"></div>

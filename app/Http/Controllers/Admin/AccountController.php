@@ -104,7 +104,7 @@ class AccountController extends Controller
 
     private function uploadImage(UploadedFile $image, string $folder): string
     {
-        $filename = time() . '-' . Str::random(6) . '.' . $image->getClientOriginalExtension();
+        $filename = time().'-'.Str::random(6).'.'.$image->getClientOriginalExtension();
 
         return $image->storeAs($folder, $filename, 'public');
     }

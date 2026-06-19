@@ -49,7 +49,7 @@ class TrackVisitor
         }
 
         // Skip the admin panel and infra/asset paths.
-        if ($request->is('admin', 'admin/*', 'up', 'build/*', 'storage/*', 'favicon.ico', 'robots.txt')) {
+        if ($request->is('admin', 'admin/*', 'up', 'build/*', 'storage/*', 'favicon.ico', 'robots.txt', 'sitemap.xml')) {
             return false;
         }
 

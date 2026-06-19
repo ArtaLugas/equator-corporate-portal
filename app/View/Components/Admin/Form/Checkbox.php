@@ -15,8 +15,7 @@ class Checkbox extends Component
         public string $name,
         public ?string $label = null,
         public bool $checked = false,
-    )
-    {
+    ) {
         //
     }
 

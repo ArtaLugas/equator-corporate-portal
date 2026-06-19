@@ -59,14 +59,14 @@ return new class extends Migration
     public function down(): void
     {
         foreach ($this->standalone as $table) {
-            Schema::table($table, fn (Blueprint $t) => $t->dropUnique($table . '_display_order_unique'));
+            Schema::table($table, fn (Blueprint $t) => $t->dropUnique($table.'_display_order_unique'));
         }
         foreach ($this->softDelete as $table) {
-            Schema::table($table, fn (Blueprint $t) => $t->dropUnique($table . '_active_order_unique'));
+            Schema::table($table, fn (Blueprint $t) => $t->dropUnique($table.'_active_order_unique'));
             Schema::table($table, fn (Blueprint $t) => $t->dropColumn('active_order'));
         }
         foreach ($this->children as $table => $parent) {
-            Schema::table($table, fn (Blueprint $t) => $t->dropUnique($table . '_' . $parent . '_display_order_unique'));
+            Schema::table($table, fn (Blueprint $t) => $t->dropUnique($table.'_'.$parent.'_display_order_unique'));
         }
     }
 

@@ -7,14 +7,28 @@
     <title>@yield('title', app_setting('meta_title') ?: app_setting('company_name', 'Equator Group'))</title>
 
     <meta name="description" content="@yield('meta_description', app_setting('meta_description', app_setting('tagline', '')))">
-    <meta name="keywords" content="{{ app_setting('meta_keywords', '') }}">
+
+    {{-- Canonical (query string excluded) to consolidate duplicate-URL signals. --}}
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    @php($ogImage = app_setting('og_image') ?: app_setting('logo'))
 
     {{-- Open Graph --}}
+    <meta property="og:site_name" content="{{ app_setting('company_name', 'Equator Group') }}">
     <meta property="og:title" content="@yield('title', app_setting('company_name', 'Equator Group'))">
     <meta property="og:description" content="@yield('meta_description', app_setting('meta_description', app_setting('tagline', '')))">
     <meta property="og:type" content="website">
-    @if (app_setting('logo'))
-        <meta property="og:image" content="{{ asset('storage/' . app_setting('logo')) }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    @if ($ogImage)
+        <meta property="og:image" content="{{ asset('storage/' . $ogImage) }}">
+    @endif
+
+    {{-- Twitter --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('title', app_setting('company_name', 'Equator Group'))">
+    <meta name="twitter:description" content="@yield('meta_description', app_setting('meta_description', app_setting('tagline', '')))">
+    @if ($ogImage)
+        <meta name="twitter:image" content="{{ asset('storage/' . $ogImage) }}">
     @endif
 
     @if (app_setting('favicon'))

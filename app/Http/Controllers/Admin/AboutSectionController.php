@@ -176,7 +176,7 @@ class AboutSectionController extends Controller
 
         ) {
 
-            $slug = $baseSlug . '-' . $count++;
+            $slug = $baseSlug.'-'.$count++;
         }
 
         $validated['slug'] = $slug;
@@ -211,7 +211,7 @@ class AboutSectionController extends Controller
 
                 'About Section',
 
-                'Created about section: ' .
+                'Created about section: '.
                 $section->name
             );
 
@@ -322,7 +322,7 @@ class AboutSectionController extends Controller
 
         ) {
 
-            $slug = $baseSlug . '-' . $count++;
+            $slug = $baseSlug.'-'.$count++;
         }
 
         $validated['slug'] = $slug;
@@ -357,7 +357,7 @@ class AboutSectionController extends Controller
 
                 'About Section',
 
-                'Updated about section: ' .
+                'Updated about section: '.
                 $aboutSection->name
             );
 
@@ -437,7 +437,7 @@ class AboutSectionController extends Controller
 
                 'About Section',
 
-                'Deleted about section: ' .
+                'Deleted about section: '.
                 $aboutSection->name
             );
 

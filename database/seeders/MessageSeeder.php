@@ -38,7 +38,7 @@ class MessageSeeder extends Seeder
             if (! blank($row['reply_message'] ?? null) && $message->replies()->doesntExist()) {
                 $message->replies()->create([
                     'admin_id' => null,
-                    'subject' => 'Re: ' . ($row['subject'] ?? ''),
+                    'subject' => 'Re: '.($row['subject'] ?? ''),
                     'reply_message' => $row['reply_message'],
                     'sent_at' => $this->nullable($row['replied_at'] ?? null) ?? $message->updated_at,
                 ]);

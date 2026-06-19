@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class SettingController extends Controller
 {
@@ -59,7 +59,7 @@ class SettingController extends Controller
 
                 $validated[$field] = $newPath;
 
-            } elseif ($request->boolean('remove_' . $field)) {
+            } elseif ($request->boolean('remove_'.$field)) {
 
                 if ($settings->{$field}) {
                     Storage::disk('public')->delete($settings->{$field});
@@ -132,8 +132,6 @@ class SettingController extends Controller
 
     private function uploadImage(UploadedFile $image, string $folder): string
     {
-        $filename = time() . '-' . Str::random(6) . '.' . $image->getClientOriginalExtension();
-
-        return $image->storeAs($folder, $filename, 'public');
+        return app(ImageService::class)->store($image, $folder);
     }
 }

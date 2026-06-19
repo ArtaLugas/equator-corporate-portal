@@ -70,15 +70,46 @@ npm run dev            # Vite (HMR)
 
 ## Production build
 
+Deployment target is **cPanel shared hosting** — build assets locally (or in CI;
+the server has no Node.js) and upload the result:
+
 ```bash
 composer install --no-dev --optimize-autoloader
-npm ci && npm run build
+npm ci && npm run build      # produces public/build — upload it
 
+php artisan migrate --force
+php artisan storage:link
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
-php artisan migrate --force
 ```
+
+Before going live, set the production env values (`APP_ENV=production`,
+`APP_DEBUG=false`, `APP_URL=https://…`, `SESSION_SECURE_COOKIE=true`,
+`LOG_LEVEL=warning`) — see the checklist at the top of `.env.example`.
+
+### Scheduler + queue (one cron entry)
+
+Transactional email (contact replies, admin notifications) is **queued**
+(`QUEUE_CONNECTION=database`). Shared hosting has no worker daemon, so the queue is
+processed by the scheduler. Add a **single** cPanel cron job (every minute) — it
+runs both analytics pruning and the queue:
+
+```cron
+* * * * * /usr/local/bin/php /home/USER/your-app/artisan schedule:run >> /dev/null 2>&1
+```
+
+Full cPanel walkthrough (document root, PHP extensions, `storage:link` caveats):
+see [`deploy/README.md`](deploy/README.md). For low volume you may instead set
+`QUEUE_CONNECTION=sync` to send mail inline and skip the queue.
+
+---
+
+## CI
+
+GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs on
+every push/PR: Composer install, **Pint** code-style check, asset build, and the
+**PHPUnit** suite against a MySQL service.
 
 ---
 

@@ -191,7 +191,7 @@ class TeamController extends Controller
 
                 'Team',
 
-                'Created team member: ' . $team->name
+                'Created team member: '.$team->name
             );
 
             DB::commit();
@@ -365,7 +365,7 @@ class TeamController extends Controller
 
                 'Team',
 
-                'Updated team member: ' . $team->name
+                'Updated team member: '.$team->name
             );
 
             return redirect()
@@ -427,7 +427,7 @@ class TeamController extends Controller
 
                 'Team',
 
-                'Moved team member to trash: ' . $team->name
+                'Moved team member to trash: '.$team->name
             );
 
             return back()->with(
@@ -500,7 +500,7 @@ class TeamController extends Controller
 
                 'Team',
 
-                'Restored team member: ' . $team->name
+                'Restored team member: '.$team->name
             );
 
             return back()->with(
@@ -575,7 +575,7 @@ class TeamController extends Controller
 
                 'Team',
 
-                'Permanently deleted team member: ' . $team->name
+                'Permanently deleted team member: '.$team->name
             );
 
             return back()->with(
@@ -678,10 +678,10 @@ class TeamController extends Controller
     ): string {
 
         $filename =
-            time() .
-            '-' .
-            Str::slug($name) .
-            '.' .
+            time().
+            '-'.
+            Str::slug($name).
+            '.'.
             $image->getClientOriginalExtension();
 
         return $image->storeAs(

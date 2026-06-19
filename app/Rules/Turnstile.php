@@ -15,9 +15,7 @@ class Turnstile implements ValidationRule
 {
     private const VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
-    public function __construct(private ?string $ip = null)
-    {
-    }
+    public function __construct(private ?string $ip = null) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

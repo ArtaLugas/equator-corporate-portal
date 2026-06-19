@@ -8,9 +8,7 @@ use Illuminate\Support\Str;
 
 class NewContactMessage extends Notification
 {
-    public function __construct(public Message $message)
-    {
-    }
+    public function __construct(public Message $message) {}
 
     /**
      * Delivery channels.
@@ -29,7 +27,7 @@ class NewContactMessage extends Notification
             'type' => 'message',
             'icon' => 'mail',
             'title' => 'New contact message',
-            'body' => $this->message->name . ' — ' . Str::limit($this->message->subject ?: 'No subject', 50),
+            'body' => $this->message->name.' — '.Str::limit($this->message->subject ?: 'No subject', 50),
             'url' => route('admin.messages.show', $this->message->id),
             'message_id' => $this->message->id,
         ];

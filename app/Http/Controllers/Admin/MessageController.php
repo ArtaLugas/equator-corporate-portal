@@ -54,7 +54,7 @@ class MessageController extends Controller
         // Auto-transition unread → read on open.
         if ($message->isUnread()) {
             $message->update(['status' => Message::STATUS_READ]);
-            activity_log('Messages', 'Message Viewed: #' . $message->id . ' from ' . $message->email);
+            activity_log('Messages', 'Message Viewed: #'.$message->id.' from '.$message->email);
         }
 
         $message->load('replies.admin');
@@ -98,7 +98,7 @@ class MessageController extends Controller
                 $validated['reply_message'],
             );
 
-            activity_log('Messages', 'Message Replied: #' . $message->id . ' to ' . $message->email);
+            activity_log('Messages', 'Message Replied: #'.$message->id.' to '.$message->email);
 
             return back()->with('success', 'Reply sent successfully.');
 
@@ -125,7 +125,7 @@ class MessageController extends Controller
             'archived_at' => now(),
         ]);
 
-        activity_log('Messages', 'Message Archived: #' . $message->id);
+        activity_log('Messages', 'Message Archived: #'.$message->id);
 
         return back()->with('success', 'Message archived.');
     }
@@ -139,7 +139,7 @@ class MessageController extends Controller
             'archived_at' => null,
         ]);
 
-        activity_log('Messages', 'Message Unarchived: #' . $message->id);
+        activity_log('Messages', 'Message Unarchived: #'.$message->id);
 
         return back()->with('success', 'Message moved back to inbox.');
     }
@@ -156,7 +156,7 @@ class MessageController extends Controller
 
         $message->update(['status' => Message::STATUS_SPAM]);
 
-        activity_log('Messages', 'Marked as Spam: #' . $message->id);
+        activity_log('Messages', 'Marked as Spam: #'.$message->id);
 
         return back()->with('success', 'Message marked as spam.');
     }
@@ -167,7 +167,7 @@ class MessageController extends Controller
 
         $message->update(['status' => Message::STATUS_UNREAD]);
 
-        activity_log('Messages', 'Message restored to inbox (unread): #' . $message->id);
+        activity_log('Messages', 'Message restored to inbox (unread): #'.$message->id);
 
         return back()->with('success', 'Message restored to inbox.');
     }
@@ -184,7 +184,7 @@ class MessageController extends Controller
 
         $message->delete();
 
-        activity_log('Messages', 'Message Deleted (trashed): #' . $message->id);
+        activity_log('Messages', 'Message Deleted (trashed): #'.$message->id);
 
         return back()->with('success', 'Message moved to trash.');
     }
@@ -216,7 +216,7 @@ class MessageController extends Controller
 
         $message->restore();
 
-        activity_log('Messages', 'Message Restored: #' . $message->id);
+        activity_log('Messages', 'Message Restored: #'.$message->id);
 
         return back()->with('success', 'Message restored.');
     }
@@ -229,7 +229,7 @@ class MessageController extends Controller
 
         $message->forceDelete();
 
-        activity_log('Messages', 'Message Force Deleted: #' . $id);
+        activity_log('Messages', 'Message Force Deleted: #'.$id);
 
         return back()->with('success', 'Message permanently deleted.');
     }

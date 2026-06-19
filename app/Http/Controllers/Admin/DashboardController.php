@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Admin;
 use App\Models\Message;
+use App\Models\News;
 use App\Models\Project;
 use App\Models\Service;
 use App\Models\Visitor;
@@ -51,13 +52,13 @@ class DashboardController extends Controller
     {
         $data = $this->reportData();
 
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
 
         /* ---- Sheet 1: Summary ---- */
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Summary');
 
-        $sheet->setCellValue('A1', ($data['company'] ?? 'Equator Group') . ' — Dashboard Report');
+        $sheet->setCellValue('A1', ($data['company'] ?? 'Equator Group').' — Dashboard Report');
         $sheet->mergeCells('A1:B1');
         $sheet->setCellValue('A2', 'Generated at');
         $sheet->setCellValue('B2', $data['generated_at']);
@@ -116,7 +117,7 @@ class DashboardController extends Controller
 
         $spreadsheet->setActiveSheetIndex(0);
 
-        $filename = 'dashboard-report-' . now()->format('Ymd-His') . '.xlsx';
+        $filename = 'dashboard-report-'.now()->format('Ymd-His').'.xlsx';
 
         return response()->streamDownload(function () use ($spreadsheet) {
             (new Xlsx($spreadsheet))->save('php://output');
@@ -139,6 +140,8 @@ class DashboardController extends Controller
             'unread_messages' => Message::where('status', Message::STATUS_UNREAD)->count(),
             'projects' => Project::count(),
             'users' => Admin::count(),
+            'news' => News::count(),
+            'published_news' => News::where('status', 'published')->count(),
         ];
     }
 

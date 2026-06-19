@@ -185,7 +185,7 @@ class CompanyDocumentController extends Controller
                     ->exists()
             ) {
                 $slug =
-                    $baseSlug . '-' . $count++;
+                    $baseSlug.'-'.$count++;
             }
 
             $validated['slug'] = $slug;
@@ -207,7 +207,7 @@ class CompanyDocumentController extends Controller
                     'company_profile'
                 )
                     ->update([
-                        'status' => 'inactive'
+                        'status' => 'inactive',
                     ]);
             }
 
@@ -262,7 +262,7 @@ class CompanyDocumentController extends Controller
                 'Company Document',
 
                 'Created document: '
-                    . $document->title
+                    .$document->title
             );
 
             DB::commit();
@@ -315,7 +315,7 @@ class CompanyDocumentController extends Controller
         return view(
             'admin.company-documents.show',
             [
-                'document' => $companyDocument
+                'document' => $companyDocument,
             ]
         );
     }
@@ -331,7 +331,7 @@ class CompanyDocumentController extends Controller
     ) {
         return view(
             'admin.company-documents.edit', [
-                'document' => $companyDocument
+                'document' => $companyDocument,
             ]
         );
     }
@@ -412,7 +412,7 @@ class CompanyDocumentController extends Controller
                         $companyDocument->id
                     )
                     ->update([
-                        'status' => 'inactive'
+                        'status' => 'inactive',
                     ]);
             }
 
@@ -433,7 +433,7 @@ class CompanyDocumentController extends Controller
 
                 $validated['file_size'] =
                     $request->file('file')
-                    ->getSize();
+                        ->getSize();
             }
 
             if (
@@ -481,7 +481,7 @@ class CompanyDocumentController extends Controller
                 'Company Document',
 
                 'Updated document: '
-                    . $companyDocument->title
+                    .$companyDocument->title
             );
 
             return redirect()
@@ -531,7 +531,7 @@ class CompanyDocumentController extends Controller
 
             activity_log(
                 'Company Document',
-                'Moved document to trash: ' . $companyDocument->title
+                'Moved document to trash: '.$companyDocument->title
             );
 
             return back()->with(
@@ -588,7 +588,7 @@ class CompanyDocumentController extends Controller
         activity_log(
             'Company Document',
             'Restored document: '
-                . $document->title
+                .$document->title
         );
 
         return back()->with(
@@ -628,7 +628,7 @@ class CompanyDocumentController extends Controller
         activity_log(
             'Company Document',
             'Permanently deleted document: '
-                . $document->title
+                .$document->title
         );
 
         $document->forceDelete();
@@ -653,10 +653,10 @@ class CompanyDocumentController extends Controller
 
         $filename =
             time()
-            . '-'
-            . Str::slug($name)
-            . '.'
-            . $file->getClientOriginalExtension();
+            .'-'
+            .Str::slug($name)
+            .'.'
+            .$file->getClientOriginalExtension();
 
         return $file->storeAs(
             $folder,
@@ -673,10 +673,10 @@ class CompanyDocumentController extends Controller
 
         $filename =
             time()
-            . '-'
-            . Str::slug($name)
-            . '.'
-            . $image->getClientOriginalExtension();
+            .'-'
+            .Str::slug($name)
+            .'.'
+            .$image->getClientOriginalExtension();
 
         return $image->storeAs(
             $folder,

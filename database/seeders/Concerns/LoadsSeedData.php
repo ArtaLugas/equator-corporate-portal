@@ -9,7 +9,7 @@ trait LoadsSeedData
      */
     protected function loadData(string $file): array
     {
-        $path = database_path('seeders/data/' . $file . '.json');
+        $path = database_path('seeders/data/'.$file.'.json');
 
         if (! is_file($path)) {
             return [];

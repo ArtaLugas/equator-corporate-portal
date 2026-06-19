@@ -55,7 +55,7 @@ class AuthController extends Controller
         ]);
 
         // Rate limiting: cegah brute-force (5 percobaan / menit per email + IP).
-        $throttleKey = Str::lower($validated['email']) . '|' . $request->ip();
+        $throttleKey = Str::lower($validated['email']).'|'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);

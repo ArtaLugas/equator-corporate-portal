@@ -8,10 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
-
 class CoreValueController extends Controller
 {
     private const PAGINATION = 10;
+
     /**
      * Display a listing of the resource.
      */
@@ -114,12 +114,12 @@ class CoreValueController extends Controller
         ]);
 
         DB::transaction(function () use ($validated) {
-                $coreValue = CoreValue::create($validated);
+            $coreValue = CoreValue::create($validated);
 
-                activity_log(
-                    'Core Value',
-                    'Created core value' . $coreValue->title
-                );
+            activity_log(
+                'Core Value',
+                'Created core value'.$coreValue->title
+            );
         });
 
         return redirect()
@@ -216,7 +216,7 @@ class CoreValueController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-     public function destroy(
+    public function destroy(
         CoreValue $coreValue
     ) {
 

@@ -60,7 +60,7 @@ class SocialLinkController extends Controller
         try {
             $link = SocialLink::create($validated);
 
-            activity_log('Social Links', 'Created social link: ' . $link->platform);
+            activity_log('Social Links', 'Created social link: '.$link->platform);
 
             return redirect()
                 ->route('admin.social-links.index')
@@ -92,7 +92,7 @@ class SocialLinkController extends Controller
         try {
             $socialLink->update($validated);
 
-            activity_log('Social Links', 'Updated social link: ' . $socialLink->platform);
+            activity_log('Social Links', 'Updated social link: '.$socialLink->platform);
 
             return redirect()
                 ->route('admin.social-links.index')
@@ -116,7 +116,7 @@ class SocialLinkController extends Controller
             $platform = $socialLink->platform;
             $socialLink->delete();
 
-            activity_log('Social Links', 'Deleted social link: ' . $platform);
+            activity_log('Social Links', 'Deleted social link: '.$platform);
 
             return back()->with('success', 'Social link deleted successfully.');
         } catch (\Throwable $e) {

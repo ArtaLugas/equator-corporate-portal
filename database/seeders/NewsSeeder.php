@@ -29,7 +29,6 @@ class NewsSeeder extends Seeder
                 [
                     'category_id' => $categoryId,
                     'title' => $this->clip($row['news_title']),
-                    'excerpt' => $this->nullable($row['news_excerpt'] ?? null),
                     'content' => $this->nullable($row['news_content'] ?? null),
                     'image' => $this->nullable($row['news_image'] ?? null),
                     'status' => ($row['status'] ?? '') === 'active' ? 'published' : 'draft',

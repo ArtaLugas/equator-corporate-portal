@@ -49,7 +49,7 @@ class KeyMetricController extends Controller
 
         try {
             $metric = KeyMetric::create($validated);
-            activity_log('Key Metrics', 'Created metric: ' . $metric->label);
+            activity_log('Key Metrics', 'Created metric: '.$metric->label);
 
             return redirect()->route('admin.key-metrics.index')
                 ->with('success', 'Metric created successfully.');
@@ -72,7 +72,7 @@ class KeyMetricController extends Controller
 
         try {
             $keyMetric->update($validated);
-            activity_log('Key Metrics', 'Updated metric: ' . $keyMetric->label);
+            activity_log('Key Metrics', 'Updated metric: '.$keyMetric->label);
 
             return redirect()->route('admin.key-metrics.index')
                 ->with('success', 'Metric updated successfully.');
@@ -88,7 +88,7 @@ class KeyMetricController extends Controller
         try {
             $label = $keyMetric->label;
             $keyMetric->delete();
-            activity_log('Key Metrics', 'Deleted metric: ' . $label);
+            activity_log('Key Metrics', 'Deleted metric: '.$label);
 
             return back()->with('success', 'Metric deleted successfully.');
         } catch (\Throwable $e) {

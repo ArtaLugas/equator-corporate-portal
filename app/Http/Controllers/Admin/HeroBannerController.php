@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\HeroBanner;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class HeroBannerController extends Controller
@@ -235,7 +235,7 @@ class HeroBannerController extends Controller
 
                 'Hero Banner',
 
-                'Created hero banner: ' .
+                'Created hero banner: '.
                 ($banner->title ?? 'Untitled Banner')
             );
 
@@ -458,7 +458,7 @@ class HeroBannerController extends Controller
 
                 'Hero Banner',
 
-                'Updated hero banner: ' .
+                'Updated hero banner: '.
                 ($heroBanner->title ?? 'Untitled Banner')
             );
 
@@ -539,7 +539,7 @@ class HeroBannerController extends Controller
 
                 'Hero Banner',
 
-                'Deleted hero banner: ' .
+                'Deleted hero banner: '.
                 ($heroBanner->title ?? 'Untitled Banner')
             );
 
@@ -575,17 +575,6 @@ class HeroBannerController extends Controller
         string $name
     ): string {
 
-        $filename =
-            time() .
-            '-' .
-            Str::slug($name) .
-            '.' .
-            $image->getClientOriginalExtension();
-
-        return $image->storeAs(
-            $folder,
-            $filename,
-            'public'
-        );
+        return app(ImageService::class)->store($image, $folder, $name);
     }
 }

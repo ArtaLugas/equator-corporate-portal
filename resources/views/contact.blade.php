@@ -252,7 +252,7 @@
                                 <x-public.field name="company" label="Company" optional autocomplete="organization" />
                             </div>
 
-                            <x-public.field name="subject" label="Subject" required />
+                            <x-public.field name="subject" label="Subject" required :value="$prefillSubject ?? null" />
 
                             <x-public.field name="message" label="How can we help?" textarea rows="6" required
                                 minlength="10" hint="Please provide at least 10 characters." />

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\News;
 use App\Models\NewsCategory;
-use App\Models\Tag;
 use Illuminate\Http\Request;
 
 class NewsController extends Controller
@@ -19,20 +18,28 @@ class NewsController extends Controller
             ? $categories->firstWhere('slug', $request->category)
             : null;
 
-        $activeTag = $request->filled('tag') ? Tag::where('slug', $request->tag)->first() : null;
+        $search = trim((string) $request->search);
+        $hasFilter = $activeCategory || $search !== '';
+
+        // Editorial lead — newest article, only on the unfiltered view; excluded from the grid.
+        $lead = ! $hasFilter
+            ? News::where('status', 'published')->with('category')->latest('published_at')->first()
+            : null;
 
         $news = News::where('status', 'published')
-            ->with(['category', 'tags'])
+            ->with('category')
             ->when($activeCategory, fn ($q) => $q->where('category_id', $activeCategory->id))
-            ->when($activeTag, fn ($q) => $q->whereHas('tags', fn ($t) => $t->where('tags.id', $activeTag->id)))
-            ->when($request->filled('search'), fn ($q) => $q->where('title', 'like', '%' . trim($request->search) . '%'))
+            ->when($search !== '', fn ($q) => $q->where('title', 'like', "%{$search}%"))
+            ->when($lead, fn ($q) => $q->where('id', '!=', $lead->id))
             ->latest('published_at')
             ->paginate(9)
             ->withQueryString();
 
-        $popularTags = Tag::has('news')->take(15)->get();
+        // Most Read — rendered only when real view data exists (no dummy).
+        $mostRead = News::where('status', 'published')->where('views_count', '>', 0)
+            ->with('category')->orderByDesc('views_count')->take(5)->get();
 
-        return view('public.news.index', compact('news', 'categories', 'activeCategory', 'activeTag', 'popularTags'));
+        return view('public.news.index', compact('news', 'categories', 'activeCategory', 'lead', 'mostRead', 'search'));
     }
 
     public function show(string $slug)
@@ -45,10 +52,16 @@ class NewsController extends Controller
         // Increment view counter (without touching updated_at).
         News::where('id', $article->id)->increment('views_count');
 
+        // Sidebar — latest articles (excluding current).
         $recent = News::where('status', 'published')
             ->where('id', '!=', $article->id)
-            ->latest('published_at')->take(4)->get();
+            ->with('category')
+            ->latest('published_at')->take(5)->get();
 
-        return view('public.news.show', compact('article', 'recent'));
+        // Sidebar — all categories with published counts (active highlighted in view).
+        $categories = NewsCategory::withCount(['news' => fn ($q) => $q->where('status', 'published')])
+            ->orderBy('name')->get();
+
+        return view('public.news.show', compact('article', 'recent', 'categories'));
     }
 }

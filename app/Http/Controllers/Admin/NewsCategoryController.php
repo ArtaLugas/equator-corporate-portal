@@ -93,7 +93,7 @@ class NewsCategoryController extends Controller
 
             activity_log(
                 'News Category',
-                'Created news category: ' . $category->name
+                'Created news category: '.$category->name
             );
 
             return redirect()
@@ -147,7 +147,7 @@ class NewsCategoryController extends Controller
 
             activity_log(
                 'News Category',
-                'Updated news category: ' . $newsCategory->name
+                'Updated news category: '.$newsCategory->name
             );
 
             return redirect()
@@ -194,7 +194,7 @@ class NewsCategoryController extends Controller
 
             activity_log(
                 'News Category',
-                'Deleted news category: ' . $newsCategory->name
+                'Deleted news category: '.$newsCategory->name
             );
 
             return back()->with('success', 'News category deleted successfully.');
@@ -239,7 +239,7 @@ class NewsCategoryController extends Controller
                 ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
                 ->exists()
         ) {
-            $slug = $baseSlug . '-' . $count++;
+            $slug = $baseSlug.'-'.$count++;
         }
 
         return $slug;

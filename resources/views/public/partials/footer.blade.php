@@ -71,10 +71,9 @@
                     <div class="mt-7 flex items-center gap-2.5">
                         @foreach ($socials as $social)
                             <a href="{{ $social->url }}" target="_blank" rel="noopener"
-                               class="social-brand-btn flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 text-white/50 transition-all duration-200"
-                               data-brand-color="{{ $social->brand_color }}"
-                               aria-label="{{ $social->brand_label }}"
-                               title="{{ $social->brand_label }}">
+                                class="social-brand-btn flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 text-white/80 transition-all duration-200"
+                                data-brand-color="{{ $social->brand_color }}" aria-label="{{ $social->brand_label }}"
+                                title="{{ $social->brand_label }}">
                                 <i class="bi bi-{{ $social->icon_class ?: 'link-45deg' }} text-sm"></i>
                             </a>
                         @endforeach
@@ -239,7 +238,9 @@
                     }, delay);
                 });
                 io.disconnect();
-            }, { threshold: 0.04 });
+            }, {
+                threshold: 0.04
+            });
 
             io.observe(footer);
         }
@@ -254,23 +255,24 @@
 
             // Pre-compute derived values once — not on every mouseover
             const borderHover = color + '55'; // ~33% opacity
-            const bgHover     = color + '18'; // ~9% opacity background glow
-            const glowHover   = color + '22'; // ~13% opacity box shadow
+            const bgHover = color + '18'; // ~9% opacity background glow
+            const glowHover = color + '22'; // ~13% opacity box shadow
 
-            btn.style.transition = 'color 200ms ease, border-color 200ms ease, background-color 200ms ease, box-shadow 200ms ease';
+            btn.style.transition =
+                'color 200ms ease, border-color 200ms ease, background-color 200ms ease, box-shadow 200ms ease';
 
             btn.addEventListener('mouseenter', () => {
-                btn.style.color           = color;
-                btn.style.borderColor     = borderHover;
+                btn.style.color = color;
+                btn.style.borderColor = borderHover;
                 btn.style.backgroundColor = bgHover;
-                btn.style.boxShadow       = `0 0 14px 0 ${glowHover}`;
+                btn.style.boxShadow = `0 0 14px 0 ${glowHover}`;
             });
 
             btn.addEventListener('mouseleave', () => {
-                btn.style.color           = '';
-                btn.style.borderColor     = '';
+                btn.style.color = '';
+                btn.style.borderColor = '';
                 btn.style.backgroundColor = '';
-                btn.style.boxShadow       = '';
+                btn.style.boxShadow = '';
             });
         });
     });

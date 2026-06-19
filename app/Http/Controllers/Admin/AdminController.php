@@ -71,7 +71,7 @@ class AdminController extends Controller
 
         $admin = Admin::create($validated);
 
-        activity_log('Admins', 'Created admin: ' . $admin->email . ' (' . $admin->role . ')');
+        activity_log('Admins', 'Created admin: '.$admin->email.' ('.$admin->role.')');
 
         return redirect()
             ->route('admin.admins.index')
@@ -136,7 +136,7 @@ class AdminController extends Controller
 
         $admin->update($validated);
 
-        activity_log('Admins', 'Updated admin: ' . $admin->email);
+        activity_log('Admins', 'Updated admin: '.$admin->email);
 
         return redirect()
             ->route('admin.admins.index')
@@ -166,7 +166,7 @@ class AdminController extends Controller
 
         $admin->delete();
 
-        activity_log('Admins', 'Deleted admin: ' . $email);
+        activity_log('Admins', 'Deleted admin: '.$email);
 
         return back()->with('success', 'Admin account deleted.');
     }
@@ -185,7 +185,7 @@ class AdminController extends Controller
 
     private function uploadAvatar(UploadedFile $image): string
     {
-        $filename = time() . '-' . Str::random(6) . '.' . $image->getClientOriginalExtension();
+        $filename = time().'-'.Str::random(6).'.'.$image->getClientOriginalExtension();
 
         return $image->storeAs('avatars', $filename, 'public');
     }

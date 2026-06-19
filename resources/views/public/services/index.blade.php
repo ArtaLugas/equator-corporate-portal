@@ -36,7 +36,7 @@
                            id="service-search-input"
                            placeholder="Search our expertise…"
                            autocomplete="off"
-                           class="block w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-24 text-sm font-medium text-equator-text placeholder-slate-400 transition-colors duration-200 hover:bg-slate-100 focus:border-equator-dark focus:bg-white focus:outline-none focus:ring-2 focus:ring-equator-dark/15">
+                           class="block w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-24 text-sm font-medium text-equator-text placeholder-slate-400 transition-colors duration-200 hover:bg-slate-100 focus:border-equator-dark focus:bg-white focus:outline-none focus:ring-2 focus:ring-equator-dark/15 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none">
                     <div class="absolute inset-y-0 right-2 flex items-center gap-1">
                         @if ($searchTerm !== '')
                             <a href="{{ route('services.index', $activeSlug ? ['category' => $activeSlug] : []) }}"
@@ -210,12 +210,12 @@
                     </div>
                 @endif
 
-                <div class="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
                     @foreach ($services as $i => $service)
                         @php $index = ($services->firstItem() ?? 1) + $i; @endphp
                         <a href="{{ route('services.show', $service->slug) }}"
                            data-service-card
-                           class="index-card group relative flex flex-col rounded-2xl border border-transparent p-5 transition-all duration-300 ease-out hover:border-slate-200 hover:bg-white hover:shadow-[0_18px_40px_-20px_rgba(38,53,146,0.25)]">
+                           class="index-card group relative flex flex-col rounded-2xl border border-slate-200/80 bg-white p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_18px_40px_-20px_rgba(38,53,146,0.25)]">
 
                             {{-- Top row: index number + category --}}
                             <div class="flex items-center justify-between">

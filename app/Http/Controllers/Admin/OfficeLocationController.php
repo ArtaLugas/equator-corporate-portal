@@ -48,7 +48,7 @@ class OfficeLocationController extends Controller
             $location = OfficeLocation::create($validated);
             $this->syncPrimary($location);
 
-            activity_log('Office Locations', 'Created office location: ' . $location->name);
+            activity_log('Office Locations', 'Created office location: '.$location->name);
 
             return redirect()->route('admin.office-locations.index')
                 ->with('success', 'Office location created successfully.');
@@ -74,7 +74,7 @@ class OfficeLocationController extends Controller
             $officeLocation->update($validated);
             $this->syncPrimary($officeLocation);
 
-            activity_log('Office Locations', 'Updated office location: ' . $officeLocation->name);
+            activity_log('Office Locations', 'Updated office location: '.$officeLocation->name);
 
             return redirect()->route('admin.office-locations.index')
                 ->with('success', 'Office location updated successfully.');
@@ -91,7 +91,7 @@ class OfficeLocationController extends Controller
             $name = $officeLocation->name;
             $officeLocation->delete();
 
-            activity_log('Office Locations', 'Deleted office location: ' . $name);
+            activity_log('Office Locations', 'Deleted office location: '.$name);
 
             return back()->with('success', 'Office location deleted successfully.');
         } catch (\Throwable $e) {

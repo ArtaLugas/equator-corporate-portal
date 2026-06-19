@@ -71,7 +71,7 @@
 
                 <div class="max-h-80 overflow-y-auto">
                     @forelse ($notifItems ?? [] as $notif)
-                        <a href="{{ route('admin.notifications.read', $notif->id) }}"
+                        <a href="{{ route('admin.notifications.read', $notif->id) }}" rel="nofollow"
                             class="{{ is_null($notif->read_at) ? 'bg-equator-bright/[0.04]' : '' }} flex gap-3 border-b border-gray-50 px-4 py-3 transition-colors hover:bg-gray-50">
                             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-equator-dark/5 text-equator-dark">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"

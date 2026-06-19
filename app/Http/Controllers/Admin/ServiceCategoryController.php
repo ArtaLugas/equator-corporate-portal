@@ -249,7 +249,7 @@ class ServiceCategoryController extends Controller
 
                 'Service Category',
 
-                'Created service category: ' . $category->name
+                'Created service category: '.$category->name
             );
 
             DB::commit();
@@ -375,7 +375,7 @@ class ServiceCategoryController extends Controller
                 'nullable',
                 'integer',
                 'min:1',
-                'unique:service_categories,display_order,' . $serviceCategory->id,
+                'unique:service_categories,display_order,'.$serviceCategory->id,
             ],
 
             'status' => [
@@ -494,7 +494,7 @@ class ServiceCategoryController extends Controller
 
                 'Service Category',
 
-                'Updated service category: ' . $serviceCategory->name
+                'Updated service category: '.$serviceCategory->name
             );
 
             return redirect()
@@ -577,7 +577,7 @@ class ServiceCategoryController extends Controller
 
                 'Service Category',
 
-                'Moved category to trash: ' . $serviceCategory->name
+                'Moved category to trash: '.$serviceCategory->name
             );
 
             return back()->with(
@@ -649,7 +649,7 @@ class ServiceCategoryController extends Controller
 
                 'Service Category',
 
-                'Restored category: ' . $category->name
+                'Restored category: '.$category->name
             );
 
             return back()->with(
@@ -742,7 +742,7 @@ class ServiceCategoryController extends Controller
 
                 'Service Category',
 
-                'Permanently deleted category: ' . $category->name
+                'Permanently deleted category: '.$category->name
             );
 
             return back()->with(
@@ -790,15 +790,14 @@ class ServiceCategoryController extends Controller
 
                 ->when(
                     $ignoreId,
-                    fn ($query) =>
-                    $query->where('id', '!=', $ignoreId)
+                    fn ($query) => $query->where('id', '!=', $ignoreId)
                 )
 
                 ->exists()
 
         ) {
 
-            $slug = $baseSlug . '-' . $count++;
+            $slug = $baseSlug.'-'.$count++;
         }
 
         return $slug;
@@ -817,10 +816,10 @@ class ServiceCategoryController extends Controller
     ): string {
 
         $filename =
-            time() .
-            '-' .
-            Str::slug($name) .
-            '.' .
+            time().
+            '-'.
+            Str::slug($name).
+            '.'.
             $image->getClientOriginalExtension();
 
         return $image->storeAs(

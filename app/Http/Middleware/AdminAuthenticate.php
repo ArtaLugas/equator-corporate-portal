@@ -12,7 +12,9 @@ class AdminAuthenticate
     public function handle(Request $request, Closure $next): Response
     {
         if (! Auth::guard('admin')->check()) {
-            return redirect()->route('admin.login');
+            // guest() stores the intended URL so AuthController can redirect
+            // back to it after a successful login (->intended()).
+            return redirect()->guest(route('admin.login'));
         }
 
         return $next($request);

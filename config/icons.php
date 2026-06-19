@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 /*
 |--------------------------------------------------------------------------
 | Daftar ikon Lucide — DIBACA dari satu source of truth.
@@ -26,7 +28,7 @@ foreach ($data['icons'] ?? [] as $icon) {
     if (! $name) {
         continue;
     }
-    $label = $icon['label'] ?? \Illuminate\Support\Str::headline(str_replace('-', ' ', $name));
+    $label = $icon['label'] ?? Str::headline(str_replace('-', ' ', $name));
 
     $all[$name] = $label;
 

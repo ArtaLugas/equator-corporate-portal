@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Service;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -269,7 +270,7 @@ class ProjectController extends Controller
 
             activity_log(
                 'Project',
-                'Created project: ' . $project->name
+                'Created project: '.$project->name
             );
 
             DB::commit();
@@ -468,7 +469,7 @@ class ProjectController extends Controller
 
             activity_log(
                 'Project',
-                'Updated project: ' . $project->name
+                'Updated project: '.$project->name
             );
 
             return redirect()
@@ -514,7 +515,7 @@ class ProjectController extends Controller
 
             activity_log(
                 'Project',
-                'Moved project to trash: ' . $project->name
+                'Moved project to trash: '.$project->name
             );
 
             return back()->with('success', 'Project moved to trash.');
@@ -566,7 +567,7 @@ class ProjectController extends Controller
 
             activity_log(
                 'Project',
-                'Restored project: ' . $project->name
+                'Restored project: '.$project->name
             );
 
             return back()->with('success', 'Project restored successfully.');
@@ -631,7 +632,7 @@ class ProjectController extends Controller
 
             activity_log(
                 'Project',
-                'Permanently deleted project: ' . ($name ?? '')
+                'Permanently deleted project: '.($name ?? '')
             );
 
             return back()->with('success', 'Project permanently deleted.');
@@ -804,7 +805,7 @@ class ProjectController extends Controller
                 ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
                 ->exists()
         ) {
-            $slug = $baseSlug . '-' . $count++;
+            $slug = $baseSlug.'-'.$count++;
         }
 
         return $slug;
@@ -818,16 +819,7 @@ class ProjectController extends Controller
 
     private function uploadImage(UploadedFile $image, string $folder, string $name): string
     {
-        $filename =
-            time() .
-            '-' .
-            Str::random(6) .
-            '-' .
-            Str::slug($name) .
-            '.' .
-            $image->getClientOriginalExtension();
-
-        return $image->storeAs($folder, $filename, 'public');
+        return app(ImageService::class)->store($image, $folder, $name);
     }
 
     /*

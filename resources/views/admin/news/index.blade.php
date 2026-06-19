@@ -48,7 +48,7 @@
                     </svg>
                 </div>
                 <input type="text" name="search" value="{{ request('search') }}"
-                    placeholder="Search by title, slug or excerpt..."
+                    placeholder="Search by title or slug..."
                     class="block w-full rounded-xl border border-transparent bg-gray-50 py-2.5 pl-11 pr-4 text-sm font-medium text-equator-text placeholder-gray-400 transition-colors hover:bg-gray-100 focus:border-equator-dark focus:bg-white focus:outline-none focus:ring-1 focus:ring-equator-dark">
             </div>
 
@@ -116,13 +116,13 @@
     {{-- TABLE --}}
     <x-admin.table>
         <x-admin.table-head>
-            <x-admin.th>Image</x-admin.th>
-            <x-admin.th>Title</x-admin.th>
-            <x-admin.th>Category</x-admin.th>
-            <x-admin.th>Status</x-admin.th>
-            <x-admin.th>Views</x-admin.th>
-            <x-admin.th>Published</x-admin.th>
-            <x-admin.th>Action</x-admin.th>
+            <x-admin.th class="w-px whitespace-nowrap">Image</x-admin.th>
+            <x-admin.th class="whitespace-normal">Title</x-admin.th>
+            <x-admin.th class="w-px whitespace-nowrap">Category</x-admin.th>
+            <x-admin.th class="w-px whitespace-nowrap">Status</x-admin.th>
+            <x-admin.th class="w-px whitespace-nowrap">Views</x-admin.th>
+            <x-admin.th class="w-px whitespace-nowrap">Published</x-admin.th>
+            <x-admin.th class="w-px whitespace-nowrap">Action</x-admin.th>
         </x-admin.table-head>
 
         <x-admin.table-body>
@@ -147,8 +147,8 @@
                         @endif
                     </x-admin.td>
 
-                    <x-admin.td>
-                        <div>
+                    <x-admin.td class="whitespace-normal">
+                        <div class="max-w-md">
                             <p class="font-bold text-gray-900">
                                 {{ $item->title }}
                                 @if ($item->is_featured)

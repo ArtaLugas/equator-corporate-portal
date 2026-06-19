@@ -3,8 +3,8 @@
 namespace App\View\Components\Admin\Form;
 
 use Closure;
-use Illuminate\View\Component;
 use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
 
 class Wysiwyg extends Component
 {

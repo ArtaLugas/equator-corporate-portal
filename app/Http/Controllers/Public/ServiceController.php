@@ -39,7 +39,7 @@ class ServiceController extends Controller
         $services = Service::where('status', 'published')
             ->with('category')
             ->when($activeCategory, fn ($q) => $q->where('category_id', $activeCategory->id))
-            ->when($hasSearch, fn ($q) => $q->where('name', 'like', '%' . trim($request->search) . '%'))
+            ->when($hasSearch, fn ($q) => $q->where('name', 'like', '%'.trim($request->search).'%'))
             ->when($featured->isNotEmpty(), fn ($q) => $q->whereNotIn('id', $featured->pluck('id')))
             ->latest()
             ->paginate(9)
@@ -54,14 +54,13 @@ class ServiceController extends Controller
     {
         $service = Service::where('status', 'published')
             ->where('slug', $slug)
-            ->with('category')
+            ->with([
+                'category',
+                // Real project references (case studies) linked to this service.
+                'projects' => fn ($q) => $q->latest()->take(3),
+            ])
             ->firstOrFail();
 
-        $related = Service::where('status', 'published')
-            ->where('category_id', $service->category_id)
-            ->where('id', '!=', $service->id)
-            ->take(3)->get();
-
-        return view('public.services.show', compact('service', 'related'));
+        return view('public.services.show', compact('service'));
     }
 }

@@ -58,7 +58,7 @@ class FaqController extends Controller
         try {
             $faq = Faq::create($validated);
 
-            activity_log('FAQ', 'Created FAQ: #' . $faq->id);
+            activity_log('FAQ', 'Created FAQ: #'.$faq->id);
 
             return redirect()
                 ->route('admin.faqs.index')
@@ -90,7 +90,7 @@ class FaqController extends Controller
         try {
             $faq->update($validated);
 
-            activity_log('FAQ', 'Updated FAQ: #' . $faq->id);
+            activity_log('FAQ', 'Updated FAQ: #'.$faq->id);
 
             return redirect()
                 ->route('admin.faqs.index')
@@ -114,7 +114,7 @@ class FaqController extends Controller
             $id = $faq->id;
             $faq->delete();
 
-            activity_log('FAQ', 'Deleted FAQ: #' . $id);
+            activity_log('FAQ', 'Deleted FAQ: #'.$id);
 
             return back()->with('success', 'FAQ deleted successfully.');
         } catch (\Throwable $e) {

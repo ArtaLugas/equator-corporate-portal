@@ -15,9 +15,7 @@ class NewContactMessageMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public Message $message)
-    {
-    }
+    public function __construct(public Message $message) {}
 
     public function envelope(): Envelope
     {
@@ -27,7 +25,7 @@ class NewContactMessageMail extends Mailable
             from: new Address($from['address'], $from['name']),
             // Office can reply directly to the visitor from their inbox.
             replyTo: [new Address($this->message->email, $this->message->name ?? '')],
-            subject: 'New Contact Message - ' . ($this->message->subject ?: 'No subject'),
+            subject: 'New Contact Message - '.($this->message->subject ?: 'No subject'),
         );
     }
 

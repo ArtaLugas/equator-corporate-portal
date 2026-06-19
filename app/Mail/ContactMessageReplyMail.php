@@ -19,8 +19,7 @@ class ContactMessageReplyMail extends Mailable
         public Message $message,
         public string $replySubject,
         public string $replyBody,
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

@@ -36,7 +36,7 @@ class SocialLink extends Model
     protected function brandColor(): Attribute
     {
         return Attribute::get(
-            fn () => config('social_platforms.' . strtolower(trim($this->platform)) . '.color', '#ffffff')
+            fn () => config('social_platforms.'.strtolower(trim($this->platform)).'.color', '#ffffff')
         );
     }
 
@@ -47,7 +47,7 @@ class SocialLink extends Model
     protected function brandLabel(): Attribute
     {
         return Attribute::get(
-            fn () => config('social_platforms.' . strtolower(trim($this->platform)) . '.label', $this->platform)
+            fn () => config('social_platforms.'.strtolower(trim($this->platform)).'.label', $this->platform)
         );
     }
 

@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Mews\Purifier\Facades\Purifier;
 
 class AboutContent extends Model
 {
@@ -20,6 +22,18 @@ class AboutContent extends Model
         'display_order',
         'status',
     ];
+
+    /**
+     * Sanitize the rich-text body on write. Content is admin-authored via
+     * CKEditor and rendered to the public with {!! !!}, so purifying at the
+     * source keeps stored HTML trustworthy and closes the stored-XSS vector.
+     */
+    protected function content(): Attribute
+    {
+        return Attribute::set(
+            fn (?string $value) => $value === null ? null : Purifier::clean($value)
+        );
+    }
 
     /*
     |--------------------------------------------------------------------------

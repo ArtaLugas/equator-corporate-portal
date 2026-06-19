@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\ActivityLog;
+use App\Models\OfficeLocation;
 use App\Models\Setting;
+use Illuminate\Support\Facades\Schema;
 
 if (! function_exists('activity_log')) {
 
@@ -19,7 +21,7 @@ if (! function_exists('activity_log')) {
                 'ip_address' => request()?->ip(),
             ]);
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
 
             report($e);
 
@@ -47,7 +49,7 @@ if (! function_exists('primary_office')) {
      * info (address, phone, email, map). Returns the primary OfficeLocation, or the
      * first active one if none is flagged primary. Resolved once per request.
      */
-    function primary_office(): ?\App\Models\OfficeLocation
+    function primary_office(): ?OfficeLocation
     {
         static $resolved = false;
         static $office = null;
@@ -58,12 +60,11 @@ if (! function_exists('primary_office')) {
 
         $resolved = true;
 
-        if (! \Illuminate\Support\Facades\Schema::hasTable('office_locations')) {
+        if (! Schema::hasTable('office_locations')) {
             return $office;
         }
 
         // ordered() sorts is_primary DESC first, so first() is the primary office.
-        return $office = \App\Models\OfficeLocation::active()->ordered()->first();
+        return $office = OfficeLocation::active()->ordered()->first();
     }
 }
-
