@@ -76,30 +76,6 @@
 
     @include('public.partials.footer')
 
-    {{-- Sticky Mobile CTA — muncul setelah user men-scroll (di luar halaman Contact). --}}
-    @unless (request()->routeIs('contact'))
-        <div x-data="{ show: false }" @scroll.window.passive="show = window.scrollY > 480" x-show="show" x-cloak
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="translate-y-full opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
-            x-transition:leave="transition ease-in duration-200" x-transition:leave-start="translate-y-0 opacity-100"
-            x-transition:leave-end="translate-y-full opacity-0"
-            class="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 pb-[calc(0.7rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-8px_24px_-12px_rgba(15,23,42,0.25)] backdrop-blur lg:hidden">
-            <div class="flex items-center gap-3">
-                <a href="{{ route('contact') }}" data-track="cta" data-track-label="sticky_contact"
-                    class="flex flex-1 items-center justify-center gap-2 bg-equator-orange px-5 py-3.5 text-xs font-bold uppercase tracking-[0.15em] text-white transition-colors hover:bg-equator-dark">
-                    {{ __('common.contact_team') }}
-                    <i class="bi bi-arrow-right text-sm" aria-hidden="true"></i>
-                </a>
-                @if (primary_office()?->phone)
-                    <a href="tel:{{ primary_office()->phone }}" aria-label="{{ __('common.call_us') }}"
-                        class="flex h-12 w-12 shrink-0 items-center justify-center border border-slate-200 text-equator-dark transition-colors hover:border-equator-dark hover:bg-equator-dark hover:text-white">
-                        <i class="bi bi-telephone-fill text-base" aria-hidden="true"></i>
-                    </a>
-                @endif
-            </div>
-        </div>
-    @endunless
-
     {{-- Cookie consent banner (necessary cookie only; stores the visitor's choice). --}}
     <x-public.cookie-consent />
 
