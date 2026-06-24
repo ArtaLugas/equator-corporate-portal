@@ -136,9 +136,19 @@
     </div>
 
     {{-- TABLE --}}
-    <x-admin.table>
+    <form method="POST" action="{{ route('admin.projects.bulk-destroy') }}"
+        x-data="{ selected: [] }"
+        @submit="if (!selected.length) $event.preventDefault()">
+        @csrf
+
+        <x-admin.bulk-trash-bar noun="project" />
+
+        <x-admin.table>
 
         <x-admin.table-head>
+            <x-admin.th class="w-px"><input type="checkbox"
+                    @change="selected = $event.target.checked ? [...$root.querySelectorAll('[data-row-check]')].map(c => c.value) : []"
+                    class="rounded border-gray-300"></x-admin.th>
             <x-admin.th>Image</x-admin.th>
             <x-admin.th>Name Project</x-admin.th>
             <x-admin.th class="hidden md:table-cell">Status</x-admin.th>
@@ -155,6 +165,11 @@
                     $metaText = $servicesText ?: ($project->location ?: $project->country);
                 @endphp
                 <tr class="group transition-colors hover:bg-gray-50/50">
+
+                    <x-admin.td>
+                        <input type="checkbox" name="ids[]" value="{{ $project->id }}" data-row-check
+                            x-model="selected" class="rounded border-gray-300">
+                    </x-admin.td>
 
                     {{-- IMAGE --}}
                     <x-admin.td>
@@ -260,7 +275,7 @@
             @empty
 
                 <tr>
-                    <td colspan="5" class="px-6 py-16">
+                    <td colspan="6" class="px-6 py-16">
                         <div class="mx-auto flex max-w-md flex-col items-center justify-center text-center">
                             <div
                                 class="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50/50">
@@ -282,7 +297,8 @@
 
         </x-admin.table-body>
 
-    </x-admin.table>
+        </x-admin.table>
+    </form>
 
     {{-- PAGINATION --}}
     @if ($projects->hasPages())

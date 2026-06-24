@@ -136,15 +136,25 @@
     </div>
 
     {{-- TABLE --}}
-    <x-admin.table>
+    <form method="POST" action="{{ route('admin.teams.bulk-destroy') }}"
+        x-data="{ selected: [] }"
+        @submit="if (!selected.length) $event.preventDefault()">
+        @csrf
+
+        <x-admin.bulk-trash-bar noun="member" />
+
+        <x-admin.table>
 
         <x-admin.table-head>
+            <x-admin.th class="w-px"><input type="checkbox"
+                    @change="selected = $event.target.checked ? [...$root.querySelectorAll('[data-row-check]')].map(c => c.value) : []"
+                    class="rounded border-gray-300"></x-admin.th>
             <x-admin.th>Photo</x-admin.th>
             <x-admin.th>Name</x-admin.th>
-            <x-admin.th>Position</x-admin.th>
-            <x-admin.th>Order</x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">Position</x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">Order</x-admin.th>
             <x-admin.th>Status</x-admin.th>
-            <x-admin.th>Translation</x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">Translation</x-admin.th>
             <x-admin.th>Action</x-admin.th>
         </x-admin.table-head>
 
@@ -152,6 +162,11 @@
 
             @forelse($teams as $team)
                 <tr class="group transition-colors hover:bg-gray-50/50">
+
+                    <x-admin.td>
+                        <input type="checkbox" name="ids[]" value="{{ $team->id }}" data-row-check
+                            x-model="selected" class="rounded border-gray-300">
+                    </x-admin.td>
 
                     {{-- PHOTO --}}
                     <x-admin.td>
@@ -186,7 +201,7 @@
                     </x-admin.td>
 
                     {{-- POSITION --}}
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
                         <span
                             class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">
                             {{ $team->position }}
@@ -194,7 +209,7 @@
                     </x-admin.td>
 
                     {{-- ORDER --}}
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
                         <span class="text-sm font-bold text-gray-700">
                             {{ $team->display_order }}
                         </span>
@@ -206,7 +221,7 @@
                     </x-admin.td>
 
                     {{-- TRANSLATION STATUS --}}
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
                         <x-admin.translation-status :model="$team" />
                     </x-admin.td>
 
@@ -251,7 +266,7 @@
             @empty
 
                 <tr>
-                    <td colspan="7" class="px-6 py-16">
+                    <td colspan="8" class="px-6 py-16">
                         <div class="mx-auto flex max-w-md flex-col items-center justify-center text-center">
 
                             <div
@@ -281,7 +296,8 @@
 
         </x-admin.table-body>
 
-    </x-admin.table>
+        </x-admin.table>
+    </form>
 
     {{-- PAGINATION --}}
     @if ($teams->hasPages())

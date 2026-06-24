@@ -99,8 +99,18 @@
     </div>
 
     {{-- TABLE --}}
-    <x-admin.table>
+    <form method="POST" action="{{ route('admin.messages.bulk-destroy') }}"
+        x-data="{ selected: [] }"
+        @submit="if (!selected.length) $event.preventDefault()">
+        @csrf
+
+        <x-admin.bulk-trash-bar noun="message" />
+
+        <x-admin.table>
         <x-admin.table-head>
+            <x-admin.th class="w-px"><input type="checkbox"
+                    @change="selected = $event.target.checked ? [...$root.querySelectorAll('[data-row-check]')].map(c => c.value) : []"
+                    class="rounded border-gray-300"></x-admin.th>
             <x-admin.th>Name</x-admin.th>
             <x-admin.th>Email</x-admin.th>
             <x-admin.th>Subject</x-admin.th>
@@ -113,6 +123,10 @@
             @forelse($messages as $message)
                 <tr
                     class="{{ $message->isUnread() ? 'bg-equator-bright/[0.03]' : '' }} group transition-colors hover:bg-gray-50/50">
+                    <x-admin.td>
+                        <input type="checkbox" name="ids[]" value="{{ $message->id }}" data-row-check
+                            x-model="selected" class="rounded border-gray-300">
+                    </x-admin.td>
                     <x-admin.td>
                         <div class="flex items-center gap-2">
                             @if ($message->isUnread())
@@ -154,7 +168,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="px-6 py-16">
+                    <td colspan="7" class="px-6 py-16">
                         <div class="mx-auto flex max-w-md flex-col items-center justify-center text-center">
                             <div
                                 class="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50/50">
@@ -173,7 +187,8 @@
                 </tr>
             @endforelse
         </x-admin.table-body>
-    </x-admin.table>
+        </x-admin.table>
+    </form>
 
     @if ($messages->hasPages())
         <div class="mt-6">{{ $messages->links() }}</div>

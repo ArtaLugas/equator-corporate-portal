@@ -158,7 +158,7 @@
                 Section
             </x-admin.th>
 
-            <x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">
                 Slug
             </x-admin.th>
 
@@ -166,7 +166,7 @@
                 Status
             </x-admin.th>
 
-            <x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">
                 Translation
             </x-admin.th>
 
@@ -174,7 +174,7 @@
                 Order
             </x-admin.th>
 
-            <x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">
                 Created
             </x-admin.th>
 
@@ -205,7 +205,7 @@
                     </x-admin.td>
 
                     {{-- SLUG --}}
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
 
                         <code class="rounded-lg bg-gray-100 px-2 py-1 text-xs font-bold text-gray-700">
 
@@ -223,7 +223,7 @@
                     </x-admin.td>
 
                     {{-- TRANSLATION STATUS --}}
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
 
                         <x-admin.translation-status :model="$section" />
 
@@ -242,7 +242,7 @@
                     </x-admin.td>
 
                     {{-- CREATED --}}
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
 
                         <div class="text-sm text-gray-500">
 

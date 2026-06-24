@@ -21,6 +21,10 @@
             @csrf
             @method('PUT')
 
+            {{-- Preserve the list page (pagination + filters) the admin came from. --}}
+            <input type="hidden" name="return_url"
+                value="{{ old('return_url', guarded_list_url(url()->previous(), route('admin.news-categories.index'))) }}">
+
             <x-admin.form.input name="name" label="Category Name" x-model="name"
                 placeholder="e.g. Company Updates" required />
 

@@ -114,14 +114,24 @@
     </div>
 
     {{-- TABLE --}}
-    <x-admin.table>
+    <form method="POST" action="{{ route('admin.news.bulk-destroy') }}"
+        x-data="{ selected: [] }"
+        @submit="if (!selected.length) $event.preventDefault()">
+        @csrf
+
+        <x-admin.bulk-trash-bar noun="article" />
+
+        <x-admin.table>
         <x-admin.table-head>
+            <x-admin.th class="w-px"><input type="checkbox"
+                    @change="selected = $event.target.checked ? [...$root.querySelectorAll('[data-row-check]')].map(c => c.value) : []"
+                    class="rounded border-gray-300"></x-admin.th>
             <x-admin.th class="w-px whitespace-nowrap">Image</x-admin.th>
             <x-admin.th class="whitespace-normal">Title</x-admin.th>
-            <x-admin.th class="w-px whitespace-nowrap">Category</x-admin.th>
+            <x-admin.th class="w-px whitespace-nowrap hidden xl:table-cell">Category</x-admin.th>
             <x-admin.th class="w-px whitespace-nowrap">Status</x-admin.th>
-            <x-admin.th class="w-px whitespace-nowrap">Translation</x-admin.th>
-            <x-admin.th class="w-px whitespace-nowrap">Views</x-admin.th>
+            <x-admin.th class="w-px whitespace-nowrap hidden xl:table-cell">Translation</x-admin.th>
+            <x-admin.th class="w-px whitespace-nowrap hidden xl:table-cell">Views</x-admin.th>
             <x-admin.th class="w-px whitespace-nowrap">Published</x-admin.th>
             <x-admin.th class="w-px whitespace-nowrap">Action</x-admin.th>
         </x-admin.table-head>
@@ -129,6 +139,11 @@
         <x-admin.table-body>
             @forelse($news as $item)
                 <tr class="group transition-colors hover:bg-gray-50/50">
+
+                    <x-admin.td>
+                        <input type="checkbox" name="ids[]" value="{{ $item->id }}" data-row-check
+                            x-model="selected" class="rounded border-gray-300">
+                    </x-admin.td>
 
                     <x-admin.td>
                         @if ($item->image)
@@ -175,7 +190,7 @@
                         </div>
                     </x-admin.td>
 
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
                         @if ($item->category)
                             <span
                                 class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">{{ $item->category->name }}</span>
@@ -188,11 +203,11 @@
                         <x-admin.status-badge :dot="true" :status="$item->status" />
                     </x-admin.td>
 
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
                         <x-admin.translation-status :model="$item" />
                     </x-admin.td>
 
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
                         <span class="text-sm font-bold text-gray-700">{{ number_format($item->views_count) }}</span>
                     </x-admin.td>
 
@@ -232,7 +247,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" class="px-6 py-16 text-center">
+                    <td colspan="9" class="px-6 py-16 text-center">
                         <h3 class="text-sm font-extrabold text-gray-900">No news found</h3>
                         <p class="mt-1.5 text-sm font-medium text-gray-500">Create your first article, or adjust your
                             filters.</p>
@@ -240,7 +255,8 @@
                 </tr>
             @endforelse
         </x-admin.table-body>
-    </x-admin.table>
+        </x-admin.table>
+    </form>
 
     @if ($news->hasPages())
         <div class="mt-6">{{ $news->links() }}</div>

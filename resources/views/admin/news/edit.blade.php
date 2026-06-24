@@ -13,6 +13,10 @@
             @csrf
             @method('PUT')
 
+            {{-- Preserve the list page (pagination + filters) the admin came from. --}}
+            <input type="hidden" name="return_url"
+                value="{{ old('return_url', guarded_list_url(url()->previous(), route('admin.news.index'))) }}">
+
             @include('admin.news._form')
 
             <div class="flex flex-col-reverse justify-end gap-3 border-t border-gray-100 pt-6 sm:flex-row">

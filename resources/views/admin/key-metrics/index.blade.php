@@ -59,11 +59,11 @@
 
     <x-admin.table>
         <x-admin.table-head>
-            <x-admin.th>Order</x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">Order</x-admin.th>
             <x-admin.th>Icon</x-admin.th>
-            <x-admin.th>Value</x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">Value</x-admin.th>
             <x-admin.th>Label</x-admin.th>
-            <x-admin.th>Featured</x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">Featured</x-admin.th>
             <x-admin.th>Status</x-admin.th>
             <x-admin.th class="text-right">Action</x-admin.th>
         </x-admin.table-head>
@@ -71,7 +71,7 @@
         <x-admin.table-body>
             @forelse($metrics as $metric)
                 <tr class="group transition-colors hover:bg-gray-50/50">
-                    <x-admin.td><span
+                    <x-admin.td class="hidden xl:table-cell"><span
                             class="inline-flex h-7 min-w-7 items-center justify-center rounded-lg bg-gray-100 px-2 text-xs font-bold text-gray-600">{{ $metric->display_order }}</span></x-admin.td>
                     <x-admin.td>
                         @if ($metric->icon)
@@ -80,9 +80,9 @@
                             <span class="text-xs italic text-gray-400">—</span>
                         @endif
                     </x-admin.td>
-                    <x-admin.td><span class="font-extrabold text-equator-dark">{{ $metric->value }}</span></x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell"><span class="font-extrabold text-equator-dark">{{ $metric->value }}</span></x-admin.td>
                     <x-admin.td><span class="text-sm font-medium text-gray-700">{{ $metric->label }}</span></x-admin.td>
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
                         @if ($metric->is_featured)
                             <span
                                 class="inline-flex items-center gap-1 rounded-full bg-equator-orange/10 px-2.5 py-1 text-xs font-bold text-equator-orange">

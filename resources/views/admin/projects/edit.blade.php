@@ -13,6 +13,9 @@
 
             @csrf
             @method('PUT')
+            {{-- Preserve the list page (pagination + filters) the admin came from. --}}
+            <input type="hidden" name="return_url"
+                value="{{ old('return_url', guarded_list_url(url()->previous(), route('admin.projects.index'))) }}">
 
             @include('admin.projects._form')
 

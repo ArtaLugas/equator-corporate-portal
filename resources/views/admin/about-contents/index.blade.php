@@ -32,11 +32,11 @@
         <x-admin.table-head>
 
             <x-admin.th>Image</x-admin.th>
-            <x-admin.th>Section</x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">Section</x-admin.th>
             <x-admin.th>Title</x-admin.th>
             <x-admin.th>Status</x-admin.th>
-            <x-admin.th>Translation</x-admin.th>
-            <x-admin.th>Order</x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">Translation</x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">Order</x-admin.th>
             <x-admin.th>Action</x-admin.th>
 
         </x-admin.table-head>
@@ -55,7 +55,7 @@
 
                     </x-admin.td>
 
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
 
                         {{ $content->section?->name }}
 
@@ -73,13 +73,13 @@
 
                     </x-admin.td>
 
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
 
                         <x-admin.translation-status :model="$content" />
 
                     </x-admin.td>
 
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
 
                         {{ $content->display_order }}
 

@@ -145,9 +145,20 @@
     </div>
 
     {{-- TABLE --}}
-    <x-admin.table>
+    <form method="POST" action="{{ route('admin.company-documents.bulk-destroy') }}"
+        x-data="{ selected: [] }"
+        @submit="if (!selected.length) $event.preventDefault()">
+        @csrf
+
+        <x-admin.bulk-trash-bar noun="document" />
+
+        <x-admin.table>
 
         <x-admin.table-head>
+
+            <x-admin.th class="w-px"><input type="checkbox"
+                    @change="selected = $event.target.checked ? [...$root.querySelectorAll('[data-row-check]')].map(c => c.value) : []"
+                    class="rounded border-gray-300"></x-admin.th>
 
             <x-admin.th>
                 Thumbnail
@@ -161,11 +172,11 @@
                 Type
             </x-admin.th>
 
-            <x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">
                 Size
             </x-admin.th>
 
-            <x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">
                 Downloads
             </x-admin.th>
 
@@ -173,7 +184,7 @@
                 Status
             </x-admin.th>
 
-            <x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">
                 Order
             </x-admin.th>
 
@@ -187,6 +198,11 @@
 
             @forelse($documents as $document)
                 <tr class="group transition-colors hover:bg-gray-50/50">
+
+                    <x-admin.td>
+                        <input type="checkbox" name="ids[]" value="{{ $document->id }}" data-row-check
+                            x-model="selected" class="rounded border-gray-300">
+                    </x-admin.td>
 
                     {{-- THUMBNAIL --}}
                     <x-admin.td>
@@ -239,14 +255,14 @@
                     </x-admin.td>
 
                     {{-- FILE SIZE --}}
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
 
                         {{ $document->file_size ? number_format($document->file_size / 1024 / 1024, 2) . ' MB' : '-' }}
 
                     </x-admin.td>
 
                     {{-- DOWNLOADS --}}
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
 
                         <span class="inline-flex rounded-md bg-gray-100 px-2 py-1 text-xs font-bold text-gray-700">
 
@@ -264,7 +280,7 @@
                     </x-admin.td>
 
                     {{-- ORDER --}}
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
                         {{ $document->display_order }}
                     </x-admin.td>
 
@@ -307,7 +323,7 @@
 
             @empty
                 <tr>
-                    <td colspan="8" class="px-6 py-16">
+                    <td colspan="9" class="px-6 py-16">
                         <div class="mx-auto flex max-w-md flex-col items-center justify-center text-center">
 
                             {{-- Ikon Empty State (Gaya Flat Premium dengan Border Halus) --}}
@@ -341,7 +357,8 @@
 
         </x-admin.table-body>
 
-    </x-admin.table>
+        </x-admin.table>
+    </form>
 
     {{-- PAGINATION --}}
     <div class="mt-6">

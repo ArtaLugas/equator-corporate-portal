@@ -126,9 +126,20 @@
     </div>
 
     {{-- TABLE --}}
-    <x-admin.table>
+    <form method="POST" action="{{ route('admin.service-categories.bulk-destroy') }}"
+        x-data="{ selected: [] }"
+        @submit="if (!selected.length) $event.preventDefault()">
+        @csrf
+
+        <x-admin.bulk-trash-bar noun="category" />
+
+        <x-admin.table>
 
         <x-admin.table-head>
+
+            <x-admin.th class="w-px"><input type="checkbox"
+                    @change="selected = $event.target.checked ? [...$root.querySelectorAll('[data-row-check]')].map(c => c.value) : []"
+                    class="rounded border-gray-300"></x-admin.th>
 
             <x-admin.th>
                 Image
@@ -156,6 +167,11 @@
 
             @forelse($categories as $category)
                 <tr>
+
+                    <x-admin.td>
+                        <input type="checkbox" name="ids[]" value="{{ $category->id }}" data-row-check
+                            x-model="selected" class="rounded border-gray-300">
+                    </x-admin.td>
 
                     <x-admin.td>
 
@@ -252,7 +268,7 @@
             @empty
 
                 <tr>
-                    <td colspan="5" class="px-6 py-16">
+                    <td colspan="6" class="px-6 py-16">
                         <div class="mx-auto flex max-w-md flex-col items-center justify-center text-center">
 
                             {{-- Ikon Empty State (Gaya Flat Premium dengan Border Halus) --}}
@@ -284,7 +300,8 @@
 
         </x-admin.table-body>
 
-    </x-admin.table>
+        </x-admin.table>
+    </form>
 
     {{-- PAGINATION --}}
     <div class="mt-6">

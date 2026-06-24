@@ -90,15 +90,10 @@
     {{-- BULK + TABLE --}}
     <form method="POST" action="{{ route('admin.company-credentials.bulk-destroy') }}"
         x-data="{ selected: [] }"
-        @submit="if (!selected.length || !confirm('Move ' + selected.length + ' credential(s) to trash?')) $event.preventDefault()">
+        @submit="if (!selected.length) $event.preventDefault()">
         @csrf
 
-        <div x-show="selected.length" x-cloak class="mb-3 flex items-center gap-3 rounded-xl bg-amber-50 px-4 py-2.5">
-            <span class="text-sm font-semibold text-amber-800"><span x-text="selected.length"></span> selected</span>
-            <button type="submit"
-                class="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700">Move to
-                Trash</button>
-        </div>
+        <x-admin.bulk-trash-bar noun="credential" />
 
         <x-admin.table>
             <x-admin.table-head>
@@ -107,10 +102,10 @@
                         class="rounded border-gray-300"></x-admin.th>
                 <x-admin.th class="w-px whitespace-nowrap">Image</x-admin.th>
                 <x-admin.th class="whitespace-normal">Title</x-admin.th>
-                <x-admin.th class="w-px whitespace-nowrap">Category</x-admin.th>
-                <x-admin.th class="w-px whitespace-nowrap">Issuer</x-admin.th>
+                <x-admin.th class="w-px whitespace-nowrap hidden xl:table-cell">Category</x-admin.th>
+                <x-admin.th class="w-px whitespace-nowrap hidden xl:table-cell">Issuer</x-admin.th>
                 <x-admin.th class="w-px whitespace-nowrap">Validity</x-admin.th>
-                <x-admin.th class="w-px whitespace-nowrap">Translation</x-admin.th>
+                <x-admin.th class="w-px whitespace-nowrap hidden xl:table-cell">Translation</x-admin.th>
                 <x-admin.th class="w-px whitespace-nowrap">Status</x-admin.th>
                 <x-admin.th class="w-px whitespace-nowrap">Action</x-admin.th>
             </x-admin.table-head>
@@ -158,12 +153,12 @@
                             @endif
                         </x-admin.td>
 
-                        <x-admin.td>
+                        <x-admin.td class="hidden xl:table-cell">
                             <span
                                 class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">{{ $item->categoryLabel() }}</span>
                         </x-admin.td>
 
-                        <x-admin.td>
+                        <x-admin.td class="hidden xl:table-cell">
                             <span class="text-xs font-medium text-gray-600">{{ $item->issuer ?: '—' }}</span>
                         </x-admin.td>
 
@@ -176,7 +171,7 @@
                             </div>
                         </x-admin.td>
 
-                        <x-admin.td>
+                        <x-admin.td class="hidden xl:table-cell">
                             <x-admin.translation-status :model="$item" />
                         </x-admin.td>
 

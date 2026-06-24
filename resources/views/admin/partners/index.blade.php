@@ -137,9 +137,19 @@
     </div>
 
     {{-- TABLE --}}
-    <x-admin.table>
+    <form method="POST" action="{{ route('admin.partners.bulk-destroy') }}"
+        x-data="{ selected: [] }"
+        @submit="if (!selected.length) $event.preventDefault()">
+        @csrf
+
+        <x-admin.bulk-trash-bar noun="partner" />
+
+        <x-admin.table>
 
         <x-admin.table-head>
+            <x-admin.th class="w-px"><input type="checkbox"
+                    @change="selected = $event.target.checked ? [...$root.querySelectorAll('[data-row-check]')].map(c => c.value) : []"
+                    class="rounded border-gray-300"></x-admin.th>
             <x-admin.th>Logo</x-admin.th>
             <x-admin.th>Name</x-admin.th>
             <x-admin.th>Website</x-admin.th>
@@ -152,6 +162,11 @@
 
             @forelse($partners as $partner)
                 <tr class="group transition-colors hover:bg-gray-50/50">
+
+                    <x-admin.td>
+                        <input type="checkbox" name="ids[]" value="{{ $partner->id }}" data-row-check
+                            x-model="selected" class="rounded border-gray-300">
+                    </x-admin.td>
 
                     {{-- LOGO --}}
                     <x-admin.td>
@@ -254,7 +269,7 @@
             @empty
 
                 <tr>
-                    <td colspan="6" class="px-6 py-16">
+                    <td colspan="7" class="px-6 py-16">
                         <div class="mx-auto flex max-w-md flex-col items-center justify-center text-center">
 
                             <div
@@ -285,7 +300,8 @@
 
         </x-admin.table-body>
 
-    </x-admin.table>
+        </x-admin.table>
+    </form>
 
     {{-- PAGINATION --}}
     @if ($partners->hasPages())

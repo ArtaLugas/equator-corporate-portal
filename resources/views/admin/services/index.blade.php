@@ -120,15 +120,25 @@
     </div>
 
     {{-- TABLE --}}
-    <x-admin.table>
+    <form method="POST" action="{{ route('admin.services.bulk-destroy') }}"
+        x-data="{ selected: [] }"
+        @submit="if (!selected.length) $event.preventDefault()">
+        @csrf
+
+        <x-admin.bulk-trash-bar noun="service" />
+
+        <x-admin.table>
 
         <x-admin.table-head>
+            <x-admin.th class="w-px"><input type="checkbox"
+                    @change="selected = $event.target.checked ? [...$root.querySelectorAll('[data-row-check]')].map(c => c.value) : []"
+                    class="rounded border-gray-300"></x-admin.th>
             <x-admin.th>Image</x-admin.th>
             <x-admin.th>Service Name</x-admin.th>
-            <x-admin.th>Category</x-admin.th>
-            <x-admin.th>Translation</x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">Category</x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">Translation</x-admin.th>
             <x-admin.th>Status</x-admin.th>
-            <x-admin.th>Featured</x-admin.th>
+            <x-admin.th class="hidden xl:table-cell">Featured</x-admin.th>
             <x-admin.th class="text-right">Action</x-admin.th>
         </x-admin.table-head>
 
@@ -136,6 +146,11 @@
 
             @forelse($services as $service)
                 <tr class="group transition-colors hover:bg-gray-50/50">
+
+                    <x-admin.td>
+                        <input type="checkbox" name="ids[]" value="{{ $service->id }}" data-row-check
+                            x-model="selected" class="rounded border-gray-300">
+                    </x-admin.td>
 
                     {{-- IMAGE --}}
                     <x-admin.td>
@@ -169,7 +184,7 @@
                     </x-admin.td>
 
                     {{-- CATEGORY RELATIONSHIP --}}
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
                         @if ($service->category)
                             <span
                                 class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">
@@ -181,7 +196,7 @@
                     </x-admin.td>
 
                     {{-- TRANSLATION STATUS --}}
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
                         <x-admin.translation-status :model="$service" />
                     </x-admin.td>
 
@@ -191,7 +206,7 @@
                     </x-admin.td>
 
                     {{-- FEATURED STAR --}}
-                    <x-admin.td>
+                    <x-admin.td class="hidden xl:table-cell">
                         @if ($service->is_featured)
                             <div class="flex items-center gap-1.5 text-amber-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -263,7 +278,7 @@
             @empty
 
                 <tr>
-                    <td colspan="7" class="px-6 py-16">
+                    <td colspan="8" class="px-6 py-16">
                         <div class="mx-auto flex max-w-md flex-col items-center justify-center text-center">
 
                             {{-- Ikon Empty State (Gaya Flat Premium dengan Border Halus) --}}
@@ -299,7 +314,8 @@
 
         </x-admin.table-body>
 
-    </x-admin.table>
+        </x-admin.table>
+    </form>
 
     {{-- PAGINATION --}}
     @if ($services->hasPages())

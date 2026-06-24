@@ -9,6 +9,10 @@
         @csrf
         @method('PUT')
 
+        {{-- Preserve the list page (pagination + filters) the admin came from. --}}
+        <input type="hidden" name="return_url"
+            value="{{ old('return_url', guarded_list_url(url()->previous(), route('admin.office-locations.index'))) }}">
+
         @include('admin.office-locations._form')
 
         <div class="flex flex-col-reverse justify-end gap-3 sm:flex-row">
