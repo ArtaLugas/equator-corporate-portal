@@ -18,32 +18,74 @@ class SitemapController extends Controller
         return response($xml, 200)->header('Content-Type', 'application/xml');
     }
 
+    /**
+     * robots.txt — a controller action (not a route closure) so the route set
+     * remains serializable by `route:cache`.
+     */
+    public function robots()
+    {
+        $body = implode("\n", [
+            'User-agent: *',
+            'Disallow: /admin',
+            '',
+            'Sitemap: '.route('sitemap'),
+        ])."\n";
+
+        return response($body, 200)->header('Content-Type', 'text/plain');
+    }
+
     private function build(): string
     {
-        $urls = collect();
+        $locales = array_keys(config('locales.supported', []));
+        $default = config('locales.default');
 
-        foreach (['home', 'about', 'services.index', 'projects.index', 'news.index', 'faq', 'contact'] as $name) {
-            $urls->push(['loc' => route($name), 'lastmod' => null]);
+        // Each entry: [routeName, params, lastmod].
+        $entries = [];
+
+        foreach (['home', 'about', 'services.index', 'projects.index', 'news.index', 'faq', 'contact', 'privacy', 'cookies'] as $name) {
+            $entries[] = [$name, [], null];
         }
 
-        Service::where('status', 'published')->get(['slug', 'updated_at'])
-            ->each(fn ($s) => $urls->push(['loc' => route('services.show', $s->slug), 'lastmod' => $s->updated_at]));
+        foreach (Service::where('status', 'published')->get(['slug', 'updated_at']) as $s) {
+            $entries[] = ['services.show', ['slug' => $s->slug], $s->updated_at];
+        }
 
-        Project::get(['slug', 'updated_at'])
-            ->each(fn ($p) => $urls->push(['loc' => route('projects.show', $p->slug), 'lastmod' => $p->updated_at]));
+        foreach (Project::public()->get(['slug', 'updated_at']) as $p) {
+            $entries[] = ['projects.show', ['slug' => $p->slug], $p->updated_at];
+        }
 
-        News::where('status', 'published')->get(['slug', 'updated_at'])
-            ->each(fn ($n) => $urls->push(['loc' => route('news.show', $n->slug), 'lastmod' => $n->updated_at]));
+        foreach (News::where('status', 'published')->get(['slug', 'updated_at']) as $n) {
+            $entries[] = ['news.show', ['slug' => $n->slug], $n->updated_at];
+        }
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
 
-        foreach ($urls as $u) {
-            $xml .= '  <url><loc>'.e($u['loc']).'</loc>';
-            if ($u['lastmod']) {
-                $xml .= '<lastmod>'.$u['lastmod']->toAtomString().'</lastmod>';
+        foreach ($entries as [$name, $params, $lastmod]) {
+            // Canonical default-locale URL stays unprefixed; others are /{locale}/…
+            $urls = [];
+            foreach ($locales as $loc) {
+                $urls[$loc] = $loc === $default
+                    ? route($name, $params)
+                    : route($name, ['locale' => $loc] + $params);
             }
-            $xml .= '</url>'."\n";
+
+            // Shared hreflang alternates (each locale version lists them all).
+            $alts = '';
+            foreach ($locales as $loc) {
+                $alts .= '    <xhtml:link rel="alternate" hreflang="'.$loc.'" href="'.e($urls[$loc]).'"/>'."\n";
+            }
+            $alts .= '    <xhtml:link rel="alternate" hreflang="x-default" href="'.e($urls[$default]).'"/>'."\n";
+
+            foreach ($locales as $loc) {
+                $xml .= '  <url>'."\n";
+                $xml .= '    <loc>'.e($urls[$loc]).'</loc>'."\n";
+                $xml .= $alts;
+                if ($lastmod) {
+                    $xml .= '    <lastmod>'.$lastmod->toAtomString().'</lastmod>'."\n";
+                }
+                $xml .= '  </url>'."\n";
+            }
         }
 
         return $xml.'</urlset>'."\n";
