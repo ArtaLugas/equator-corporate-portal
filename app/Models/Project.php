@@ -25,6 +25,7 @@ class Project extends Model
     protected $fillable = [
         'slug',
         'client_name',
+        'partner',
         'location',
         'country',
         'start_date',

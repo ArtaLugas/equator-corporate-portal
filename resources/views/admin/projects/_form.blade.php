@@ -251,10 +251,12 @@
             <x-admin.form.input name="slug" label="URL Slug" x-model="slug"
                 placeholder="e.g. coastal-mapping-survey" readonly required />
 
-            {{-- CLIENT + LOCATION + COUNTRY (not translated) --}}
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {{-- CLIENT + PARTNER + LOCATION + COUNTRY (not translated) --}}
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <x-admin.form.input name="client_name" label="Client Name"
                     :value="old('client_name', $project->client_name ?? '')" placeholder="e.g. PT Maju Jaya" />
+                <x-admin.form.input name="partner" label="Partner"
+                    :value="old('partner', $project->partner ?? '')" placeholder="e.g. KfW Development Bank" />
                 <x-admin.form.input name="location" label="Location"
                     :value="old('location', $project->location ?? '')" placeholder="e.g. Surabaya" />
                 <x-admin.form.input name="country" label="Country"

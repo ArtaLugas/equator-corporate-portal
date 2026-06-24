@@ -271,6 +271,11 @@
                     </div>
 
                     <div>
+                        <p class="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Partner</p>
+                        <p class="mt-1.5 text-sm font-bold text-gray-900">{{ $project->partner ?: '—' }}</p>
+                    </div>
+
+                    <div>
                         <p class="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Location</p>
                         <p class="mt-1.5 text-sm font-medium text-gray-900">
                             {{ $project->location ?: '—' }}@if ($project->country)

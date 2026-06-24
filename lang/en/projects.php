@@ -57,13 +57,10 @@ return [
 
     // Show — snapshot facts
     'fact_client' => 'Client',
+    'fact_partner' => 'Partner',
     'fact_location' => 'Location',
     'fact_status' => 'Status',
     'fact_period' => 'Period',
-
-    // Show — scope of work
-    'scope_eyebrow' => 'Scope of Work',
-    'scope_title' => 'Services proven by this engagement',
 
     // Show — narrative
     'overview_eyebrow' => 'Overview',

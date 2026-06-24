@@ -48,6 +48,7 @@ class ProjectRequest extends FormRequest
 
             // Project meta (not translated)
             'client_name' => ['nullable', 'string', 'max:191'],
+            'partner' => ['nullable', 'string', 'max:191'],
             'location' => ['nullable', 'string', 'max:191'],
             'country' => ['nullable', 'string', 'max:100'],
             'start_date' => ['nullable', 'date'],

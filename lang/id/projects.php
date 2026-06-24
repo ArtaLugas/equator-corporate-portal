@@ -57,13 +57,10 @@ return [
 
     // Show — snapshot facts
     'fact_client' => 'Klien',
+    'fact_partner' => 'Mitra',
     'fact_location' => 'Lokasi',
     'fact_status' => 'Status',
     'fact_period' => 'Periode',
-
-    // Show — scope of work
-    'scope_eyebrow' => 'Lingkup Pekerjaan',
-    'scope_title' => 'Layanan yang terbukti melalui penugasan ini',
 
     // Show — narrative
     'overview_eyebrow' => 'Ikhtisar',

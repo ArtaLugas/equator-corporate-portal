@@ -62,9 +62,10 @@
             ->filter()
             ->implode(', ');
 
-        // Snapshot facts — project facts only (no services; those live in Scope of Work).
+        // Snapshot facts — project facts only (services have their own section below).
         $facts = collect([
             ['label' => __('projects.fact_client'), 'value' => $project->client_name],
+            ['label' => __('projects.fact_partner'), 'value' => $project->partner],
             ['label' => __('projects.fact_location'), 'value' => $locationLine ?: null],
             ['label' => __('projects.fact_status'), 'value' => $statusMeta['label'], 'dot' => $statusMeta['dot']],
             ['label' => __('projects.fact_period'), 'value' => $period],
@@ -76,6 +77,7 @@
 $factCols = match ($facts->count()) {
     2 => 'sm:grid-cols-2',
     3 => 'sm:grid-cols-3',
+    5 => 'sm:grid-cols-3 md:grid-cols-5',
     default => 'md:grid-cols-4',
 };
 
@@ -174,33 +176,6 @@ $contactUrl = route('contact', ['service' => $ctaService]);
                         </div>
                     @endforeach
                 </dl>
-            </div>
-        </section>
-    @endif
-
-    {{-- ════════════════════════════════════════════════════════════
-         4 — SCOPE OF WORK (only when services exist)
-    ════════════════════════════════════════════════════════════ --}}
-    @if ($services->isNotEmpty())
-        <section class="bg-slate-50 py-14 sm:py-16">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="mb-6 flex items-center gap-3">
-                    <span class="h-px w-8 bg-equator-orange"></span>
-                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">{{ __('projects.scope_eyebrow') }}</span>
-                </div>
-                <p class="mb-6 max-w-2xl font-heading text-xl font-semibold tracking-tight text-equator-dark">
-                    {{ __('projects.scope_title') }}
-                </p>
-                <div class="flex flex-wrap gap-2.5">
-                    @foreach ($services as $svc)
-                        <a href="{{ route('services.show', $svc->slug) }}"
-                            class="group inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-equator-dark transition-all duration-200 hover:border-equator-dark hover:shadow-sm">
-                            {{ $svc->name }}
-                            <i
-                                class="bi bi-arrow-right text-xs text-slate-400 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-equator-bright"></i>
-                        </a>
-                    @endforeach
-                </div>
             </div>
         </section>
     @endif
