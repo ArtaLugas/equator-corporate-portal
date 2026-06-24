@@ -229,7 +229,7 @@ class TeamController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to create team member.'
+                    friendly_error($e)
                 );
         }
     }
@@ -373,7 +373,7 @@ class TeamController extends Controller
             );
 
             return redirect()
-                ->route('admin.teams.index')
+                ->to(guarded_list_url($request->input('return_url'), route('admin.teams.index')))
                 ->with(
                     'success',
                     'Team member updated successfully.'
@@ -401,7 +401,7 @@ class TeamController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to update team member.'
+                    friendly_error($e)
                 );
         }
     }
@@ -449,9 +449,24 @@ class TeamController extends Controller
 
                 'error',
 
-                'Failed to delete team member.'
+                friendly_error($e)
             );
         }
+    }
+
+    public function bulkDestroy()
+    {
+        $ids = array_map('intval', (array) request()->input('ids', []));
+
+        if (empty($ids)) {
+            return back()->with('error', __('flash.none_selected'));
+        }
+
+        $count = Team::whereIn('id', $ids)->get()->each->delete()->count();
+
+        activity_log('Team', "Bulk moved {$count} member(s) to trash.");
+
+        return back()->with('success', "{$count} member(s) moved to trash.");
     }
 
     /*
@@ -522,7 +537,7 @@ class TeamController extends Controller
 
                 'error',
 
-                'Failed to restore team member.'
+                friendly_error($e)
             );
         }
     }
@@ -597,7 +612,7 @@ class TeamController extends Controller
 
                 'error',
 
-                'Failed to permanently delete team member.'
+                friendly_error($e)
             );
         }
     }

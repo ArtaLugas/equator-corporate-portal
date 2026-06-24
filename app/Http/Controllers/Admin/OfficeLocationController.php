@@ -56,7 +56,7 @@ class OfficeLocationController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->withInput()->with('error', 'Failed to create office location.');
+            return back()->withInput()->with('error', friendly_error($e));
         }
     }
 
@@ -77,12 +77,12 @@ class OfficeLocationController extends Controller
 
             activity_log('Office Locations', 'Updated office location: '.$officeLocation->name);
 
-            return redirect()->route('admin.office-locations.index')
+            return redirect()->to(guarded_list_url($request->input('return_url'), route('admin.office-locations.index')))
                 ->with('success', 'Office location updated successfully.');
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->withInput()->with('error', 'Failed to update office location.');
+            return back()->withInput()->with('error', friendly_error($e));
         }
     }
 
@@ -98,7 +98,7 @@ class OfficeLocationController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->with('error', 'Failed to delete office location.');
+            return back()->with('error', friendly_error($e));
         }
     }
 

@@ -240,7 +240,7 @@ class CompanyDocumentController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to create document.'
+                    friendly_error($e)
                 );
         }
     }
@@ -416,9 +416,7 @@ class CompanyDocumentController extends Controller
             );
 
             return redirect()
-                ->route(
-                    'admin.company-documents.index'
-                )
+                ->to(guarded_list_url($request->input('return_url'), route('admin.company-documents.index')))
                 ->with(
                     'success',
                     'Document updated successfully.'
@@ -434,7 +432,7 @@ class CompanyDocumentController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to update document.'
+                    friendly_error($e)
                 );
         }
     }
@@ -476,9 +474,24 @@ class CompanyDocumentController extends Controller
 
             return back()->with(
                 'error',
-                'Failed to delete document.'
+                friendly_error($e)
             );
         }
+    }
+
+    public function bulkDestroy()
+    {
+        $ids = array_map('intval', (array) request()->input('ids', []));
+
+        if (empty($ids)) {
+            return back()->with('error', __('flash.none_selected'));
+        }
+
+        $count = CompanyDocument::whereIn('id', $ids)->get()->each->delete()->count();
+
+        activity_log('Company Document', "Bulk moved {$count} document(s) to trash.");
+
+        return back()->with('success', "{$count} document(s) moved to trash.");
     }
 
     /*

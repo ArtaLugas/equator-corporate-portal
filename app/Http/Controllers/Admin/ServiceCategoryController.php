@@ -245,7 +245,7 @@ class ServiceCategoryController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to create service category.'
+                    friendly_error($e)
                 );
         }
     }
@@ -423,7 +423,7 @@ class ServiceCategoryController extends Controller
             );
 
             return redirect()
-                ->route('admin.service-categories.index')
+                ->to(guarded_list_url($request->input('return_url'), route('admin.service-categories.index')))
                 ->with(
                     'success',
                     'Service category updated successfully.'
@@ -451,7 +451,7 @@ class ServiceCategoryController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to update service category.'
+                    friendly_error($e)
                 );
         }
     }
@@ -483,7 +483,7 @@ class ServiceCategoryController extends Controller
 
                     'error',
 
-                    'Cannot delete category with related services.'
+                    __('flash.in_use')
                 );
             }
 
@@ -520,9 +520,24 @@ class ServiceCategoryController extends Controller
 
                 'error',
 
-                'Failed to delete service category.'
+                friendly_error($e)
             );
         }
+    }
+
+    public function bulkDestroy()
+    {
+        $ids = array_map('intval', (array) request()->input('ids', []));
+
+        if (empty($ids)) {
+            return back()->with('error', __('flash.none_selected'));
+        }
+
+        $count = ServiceCategory::whereIn('id', $ids)->get()->each->delete()->count();
+
+        activity_log('Service Category', "Bulk moved {$count} category(s) to trash.");
+
+        return back()->with('success', "{$count} category(s) moved to trash.");
     }
 
     /*
@@ -592,7 +607,7 @@ class ServiceCategoryController extends Controller
 
                 'error',
 
-                'Failed to restore service category.'
+                friendly_error($e)
             );
         }
     }
@@ -685,7 +700,7 @@ class ServiceCategoryController extends Controller
 
                 'error',
 
-                'Failed to permanently delete service category.'
+                friendly_error($e)
             );
         }
     }

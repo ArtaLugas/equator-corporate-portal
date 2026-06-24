@@ -139,7 +139,7 @@ class AdminController extends Controller
         activity_log('Admins', 'Updated admin: '.$admin->email);
 
         return redirect()
-            ->route('admin.admins.index')
+            ->to(guarded_list_url($request->input('return_url'), route('admin.admins.index')))
             ->with('success', 'Admin account updated successfully.');
     }
 
@@ -155,7 +155,7 @@ class AdminController extends Controller
 
         // Guard: never delete the last super admin.
         if ($admin->role === 'super_admin' && $this->isLastSuperAdmin($admin)) {
-            return back()->with('error', 'Cannot delete the last super admin account.');
+            return back()->with('error', __('flash.last_super_admin'));
         }
 
         $email = $admin->email;

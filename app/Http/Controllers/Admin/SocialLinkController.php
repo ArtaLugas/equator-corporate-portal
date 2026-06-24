@@ -68,7 +68,7 @@ class SocialLinkController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->withInput()->with('error', 'Failed to create social link.');
+            return back()->withInput()->with('error', friendly_error($e));
         }
     }
 
@@ -95,12 +95,12 @@ class SocialLinkController extends Controller
             activity_log('Social Links', 'Updated social link: '.$socialLink->platform);
 
             return redirect()
-                ->route('admin.social-links.index')
+                ->to(guarded_list_url($request->input('return_url'), route('admin.social-links.index')))
                 ->with('success', 'Social link updated successfully.');
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->withInput()->with('error', 'Failed to update social link.');
+            return back()->withInput()->with('error', friendly_error($e));
         }
     }
 
@@ -122,7 +122,7 @@ class SocialLinkController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->with('error', 'Failed to delete social link.');
+            return back()->with('error', friendly_error($e));
         }
     }
 

@@ -244,7 +244,7 @@ class AboutContentController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to create about content.'
+                    friendly_error($e)
                 );
         }
     }
@@ -389,7 +389,7 @@ class AboutContentController extends Controller
             );
 
             return redirect()
-                ->route('admin.about-contents.index')
+                ->to(guarded_list_url($request->input('return_url'), route('admin.about-contents.index')))
                 ->with(
                     'success',
                     'About content updated successfully.'
@@ -411,7 +411,7 @@ class AboutContentController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to update about content.'
+                    friendly_error($e)
                 );
         }
     }
@@ -460,7 +460,7 @@ class AboutContentController extends Controller
 
                 'error',
 
-                'Failed to delete about content.'
+                friendly_error($e)
             );
         }
     }

@@ -309,7 +309,7 @@ class ProjectController extends Controller
 
             return back()
                 ->withInput()
-                ->with('error', 'Failed to create project.');
+                ->with('error', friendly_error($e));
         }
     }
 
@@ -491,8 +491,10 @@ class ProjectController extends Controller
                 'Updated project: '.$project->name
             );
 
+            // Return to the exact list page the admin came from (preserves the
+            // pagination page + filters); guarded so it can't be an open redirect.
             return redirect()
-                ->route('admin.projects.index')
+                ->to(guarded_list_url($request->input('return_url'), route('admin.projects.index')))
                 ->with('success', 'Project updated successfully.');
 
         } catch (\Throwable $e) {
@@ -514,7 +516,7 @@ class ProjectController extends Controller
 
             return back()
                 ->withInput()
-                ->with('error', 'Failed to update project.');
+                ->with('error', friendly_error($e));
         }
     }
 
@@ -543,8 +545,29 @@ class ProjectController extends Controller
 
             report($e);
 
-            return back()->with('error', 'Failed to delete project.');
+            return back()->with('error', friendly_error($e));
         }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | BULK DESTROY (soft delete)
+    |--------------------------------------------------------------------------
+    */
+
+    public function bulkDestroy()
+    {
+        $ids = array_map('intval', (array) request()->input('ids', []));
+
+        if (empty($ids)) {
+            return back()->with('error', __('flash.none_selected'));
+        }
+
+        $count = Project::whereIn('id', $ids)->get()->each->delete()->count();
+
+        activity_log('Project', "Bulk moved {$count} project(s) to trash.");
+
+        return back()->with('success', "{$count} project(s) moved to trash.");
     }
 
     /*
@@ -595,7 +618,7 @@ class ProjectController extends Controller
 
             report($e);
 
-            return back()->with('error', 'Failed to restore project.');
+            return back()->with('error', friendly_error($e));
         }
     }
 
@@ -660,7 +683,7 @@ class ProjectController extends Controller
 
             report($e);
 
-            return back()->with('error', 'Failed to permanently delete project.');
+            return back()->with('error', friendly_error($e));
         }
     }
 

@@ -161,7 +161,7 @@ class AboutHistoryController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to create history.'
+                    friendly_error($e)
                 );
         }
     }
@@ -243,7 +243,7 @@ class AboutHistoryController extends Controller
             );
 
             return redirect()
-                ->route('admin.about-histories.index')
+                ->to(guarded_list_url($request->input('return_url'), route('admin.about-histories.index')))
                 ->with(
                     'success',
                     'History updated successfully.'
@@ -265,7 +265,7 @@ class AboutHistoryController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to update history.'
+                    friendly_error($e)
                 );
         }
     }
@@ -307,7 +307,7 @@ class AboutHistoryController extends Controller
 
             return back()->with(
                 'error',
-                'Failed to delete history.'
+                friendly_error($e)
             );
         }
     }

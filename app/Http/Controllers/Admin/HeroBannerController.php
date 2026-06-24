@@ -228,7 +228,7 @@ class HeroBannerController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to create hero banner.'
+                    friendly_error($e)
                 );
         }
     }
@@ -377,7 +377,7 @@ class HeroBannerController extends Controller
             );
 
             return redirect()
-                ->route('admin.hero-banners.index')
+                ->to(guarded_list_url($request->input('return_url'), route('admin.hero-banners.index')))
                 ->with(
                     'success',
                     'Hero banner updated successfully.'
@@ -405,7 +405,7 @@ class HeroBannerController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to update hero banner.'
+                    friendly_error($e)
                 );
         }
     }
@@ -472,7 +472,7 @@ class HeroBannerController extends Controller
 
                 'error',
 
-                'Failed to delete hero banner.'
+                friendly_error($e)
             );
         }
     }

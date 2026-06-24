@@ -224,7 +224,7 @@ class PartnerController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to create partner.'
+                    friendly_error($e)
                 );
         }
     }
@@ -368,7 +368,7 @@ class PartnerController extends Controller
             );
 
             return redirect()
-                ->route('admin.partners.index')
+                ->to(guarded_list_url($request->input('return_url'), route('admin.partners.index')))
                 ->with(
                     'success',
                     'Partner updated successfully.'
@@ -396,7 +396,7 @@ class PartnerController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to update partner.'
+                    friendly_error($e)
                 );
         }
     }
@@ -444,9 +444,30 @@ class PartnerController extends Controller
 
                 'error',
 
-                'Failed to delete partner.'
+                friendly_error($e)
             );
         }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | BULK DESTROY
+    |--------------------------------------------------------------------------
+    */
+
+    public function bulkDestroy()
+    {
+        $ids = array_map('intval', (array) request()->input('ids', []));
+
+        if (empty($ids)) {
+            return back()->with('error', __('flash.none_selected'));
+        }
+
+        $count = Partner::whereIn('id', $ids)->get()->each->delete()->count();
+
+        activity_log('Partner', "Bulk moved {$count} partner(s) to trash.");
+
+        return back()->with('success', "{$count} partner(s) moved to trash.");
     }
 
     /*
@@ -517,7 +538,7 @@ class PartnerController extends Controller
 
                 'error',
 
-                'Failed to restore partner.'
+                friendly_error($e)
             );
         }
     }
@@ -592,7 +613,7 @@ class PartnerController extends Controller
 
                 'error',
 
-                'Failed to permanently delete partner.'
+                friendly_error($e)
             );
         }
     }

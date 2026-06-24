@@ -218,6 +218,8 @@ Route::prefix('admin')
                 [ServiceCategoryController::class, 'forceDelete']
             )->name('service-categories.force-delete');
 
+            Route::post('service-categories/bulk-destroy', [ServiceCategoryController::class, 'bulkDestroy'])->name('service-categories.bulk-destroy');
+
             Route::resource(
                 'service-categories',
                 ServiceCategoryController::class
@@ -234,6 +236,8 @@ Route::prefix('admin')
             Route::patch('services/{id}/restore', [ServiceController::class, 'restore'])->name('services.restore');
 
             Route::delete('services/{id}/force-delete', [ServiceController::class, 'forceDelete'])->name('services.force-delete');
+
+            Route::post('services/bulk-destroy', [ServiceController::class, 'bulkDestroy'])->name('services.bulk-destroy');
 
             Route::resource(
                 'services',
@@ -286,6 +290,8 @@ Route::prefix('admin')
                 [CompanyDocumentController::class, 'forceDelete']
             )->name('company-documents.force-delete');
 
+            Route::post('company-documents/bulk-destroy', [CompanyDocumentController::class, 'bulkDestroy'])->name('company-documents.bulk-destroy');
+
             Route::resource(
                 'company-documents',
                 CompanyDocumentController::class
@@ -325,6 +331,8 @@ Route::prefix('admin')
                 [TeamController::class, 'forceDelete']
             )->name('teams.force-delete');
 
+            Route::post('teams/bulk-destroy', [TeamController::class, 'bulkDestroy'])->name('teams.bulk-destroy');
+
             Route::resource(
                 'teams',
                 TeamController::class
@@ -351,6 +359,8 @@ Route::prefix('admin')
                 [PartnerController::class, 'forceDelete']
             )->name('partners.force-delete');
 
+            Route::post('partners/bulk-destroy', [PartnerController::class, 'bulkDestroy'])->name('partners.bulk-destroy');
+
             Route::resource(
                 'partners',
                 PartnerController::class
@@ -376,6 +386,8 @@ Route::prefix('admin')
                 'projects/{id}/force-delete',
                 [ProjectController::class, 'forceDelete']
             )->name('projects.force-delete');
+
+            Route::post('projects/bulk-destroy', [ProjectController::class, 'bulkDestroy'])->name('projects.bulk-destroy');
 
             Route::resource(
                 'projects',
@@ -412,6 +424,8 @@ Route::prefix('admin')
                 [NewsController::class, 'forceDelete']
             )->name('news.force-delete');
 
+            Route::post('news/bulk-destroy', [NewsController::class, 'bulkDestroy'])->name('news.bulk-destroy');
+
             Route::resource(
                 'news',
                 NewsController::class
@@ -426,6 +440,7 @@ Route::prefix('admin')
             Route::get('messages/trash', [MessageController::class, 'trash'])->name('messages.trash');
             Route::patch('messages/{id}/restore', [MessageController::class, 'restore'])->name('messages.restore');
             Route::delete('messages/{id}/force-delete', [MessageController::class, 'forceDelete'])->name('messages.force-delete');
+            Route::post('messages/bulk-destroy', [MessageController::class, 'bulkDestroy'])->name('messages.bulk-destroy');
 
             // Lead analytics (mini-CRM) — before the {message} wildcard.
             Route::get('messages/analytics', [MessageController::class, 'analytics'])->name('messages.analytics');

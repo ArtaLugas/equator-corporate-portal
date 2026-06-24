@@ -106,7 +106,7 @@ class NewsCategoryController extends Controller
 
             return back()
                 ->withInput()
-                ->with('error', 'Failed to create news category.');
+                ->with('error', friendly_error($e));
         }
     }
 
@@ -151,7 +151,7 @@ class NewsCategoryController extends Controller
             );
 
             return redirect()
-                ->route('admin.news-categories.index')
+                ->to(guarded_list_url($request->input('return_url'), route('admin.news-categories.index')))
                 ->with('success', 'News category updated successfully.');
 
         } catch (\Throwable $e) {
@@ -160,7 +160,7 @@ class NewsCategoryController extends Controller
 
             return back()
                 ->withInput()
-                ->with('error', 'Failed to update news category.');
+                ->with('error', friendly_error($e));
         }
     }
 
@@ -186,7 +186,7 @@ class NewsCategoryController extends Controller
 
             return back()->with(
                 'error',
-                'Cannot delete: this category is still used by one or more news articles (including any in Trash). Permanently delete those articles first.'
+                __('flash.in_use')
             );
         }
 
@@ -207,7 +207,7 @@ class NewsCategoryController extends Controller
 
             report($e);
 
-            return back()->with('error', 'Failed to delete news category.');
+            return back()->with('error', friendly_error($e));
         }
     }
 

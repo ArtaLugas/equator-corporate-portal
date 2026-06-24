@@ -57,7 +57,7 @@ class KeyMetricController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->withInput()->with('error', 'Failed to create metric.');
+            return back()->withInput()->with('error', friendly_error($e));
         }
     }
 
@@ -76,12 +76,12 @@ class KeyMetricController extends Controller
             $keyMetric->update($validated);
             activity_log('Key Metrics', 'Updated metric: '.$keyMetric->label);
 
-            return redirect()->route('admin.key-metrics.index')
+            return redirect()->to(guarded_list_url($request->input('return_url'), route('admin.key-metrics.index')))
                 ->with('success', 'Metric updated successfully.');
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->withInput()->with('error', 'Failed to update metric.');
+            return back()->withInput()->with('error', friendly_error($e));
         }
     }
 
@@ -96,7 +96,7 @@ class KeyMetricController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->with('error', 'Failed to delete metric.');
+            return back()->with('error', friendly_error($e));
         }
     }
 }

@@ -217,7 +217,7 @@ class AboutSectionController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to create about section.'
+                    friendly_error($e)
                 );
         }
     }
@@ -337,7 +337,7 @@ class AboutSectionController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('admin.about-sections.index')
+                ->to(guarded_list_url($request->input('return_url'), route('admin.about-sections.index')))
                 ->with(
                     'success',
                     'About section updated successfully.'
@@ -353,7 +353,7 @@ class AboutSectionController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to update about section.'
+                    friendly_error($e)
                 );
         }
     }
@@ -429,7 +429,7 @@ class AboutSectionController extends Controller
 
                 'error',
 
-                'Failed to delete about section.'
+                friendly_error($e)
             );
         }
     }

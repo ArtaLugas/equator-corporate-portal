@@ -140,7 +140,7 @@ class CoreValueController extends Controller
         });
 
         return redirect()
-            ->route('admin.core-values.index')
+            ->to(guarded_list_url($request->input('return_url'), route('admin.core-values.index')))
             ->with(
                 'success',
                 'Core value updated successfully.'

@@ -193,7 +193,7 @@ class NewsController extends Controller
 
             return back()
                 ->withInput()
-                ->with('error', 'Failed to create news.');
+                ->with('error', friendly_error($e));
         }
     }
 
@@ -288,7 +288,7 @@ class NewsController extends Controller
             activity_log('News', 'Updated news: '.$news->title);
 
             return redirect()
-                ->route('admin.news.index')
+                ->to(guarded_list_url($request->input('return_url'), route('admin.news.index')))
                 ->with('success', 'News updated successfully.');
 
         } catch (\Throwable $e) {
@@ -303,7 +303,7 @@ class NewsController extends Controller
 
             return back()
                 ->withInput()
-                ->with('error', 'Failed to update news.');
+                ->with('error', friendly_error($e));
         }
     }
 
@@ -327,8 +327,23 @@ class NewsController extends Controller
 
             report($e);
 
-            return back()->with('error', 'Failed to delete news.');
+            return back()->with('error', friendly_error($e));
         }
+    }
+
+    public function bulkDestroy()
+    {
+        $ids = array_map('intval', (array) request()->input('ids', []));
+
+        if (empty($ids)) {
+            return back()->with('error', __('flash.none_selected'));
+        }
+
+        $count = News::whereIn('id', $ids)->get()->each->delete()->count();
+
+        activity_log('News', "Bulk moved {$count} article(s) to trash.");
+
+        return back()->with('success', "{$count} article(s) moved to trash.");
     }
 
     /*
@@ -372,7 +387,7 @@ class NewsController extends Controller
 
             report($e);
 
-            return back()->with('error', 'Failed to restore news.');
+            return back()->with('error', friendly_error($e));
         }
     }
 
@@ -414,7 +429,7 @@ class NewsController extends Controller
 
             report($e);
 
-            return back()->with('error', 'Failed to permanently delete news.');
+            return back()->with('error', friendly_error($e));
         }
     }
 

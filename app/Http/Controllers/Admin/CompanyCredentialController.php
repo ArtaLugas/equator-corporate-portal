@@ -103,7 +103,7 @@ class CompanyCredentialController extends Controller
             $this->deleteFiles([$imagePath, $attachmentPath]);
             report($e);
 
-            return back()->withInput()->with('error', 'Failed to create credential.');
+            return back()->withInput()->with('error', friendly_error($e));
         }
     }
 
@@ -191,14 +191,14 @@ class CompanyCredentialController extends Controller
                 $this->deleteFiles([$oldAttachment]);
             }
 
-            return redirect()->route('admin.company-credentials.index')
+            return redirect()->to(guarded_list_url($request->input('return_url'), route('admin.company-credentials.index')))
                 ->with('success', 'Credential updated successfully.');
         } catch (\Throwable $e) {
             DB::rollBack();
             $this->deleteFiles([$newImage, $newAttachment]);
             report($e);
 
-            return back()->withInput()->with('error', 'Failed to update credential.');
+            return back()->withInput()->with('error', friendly_error($e));
         }
     }
 
@@ -219,7 +219,7 @@ class CompanyCredentialController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->with('error', 'Failed to delete credential.');
+            return back()->with('error', friendly_error($e));
         }
     }
 
@@ -249,7 +249,7 @@ class CompanyCredentialController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->with('error', 'Failed to restore credential.');
+            return back()->with('error', friendly_error($e));
         }
     }
 
@@ -275,7 +275,7 @@ class CompanyCredentialController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->with('error', 'Failed to permanently delete credential.');
+            return back()->with('error', friendly_error($e));
         }
     }
 
@@ -286,7 +286,7 @@ class CompanyCredentialController extends Controller
         $ids = array_map('intval', (array) $request->input('ids', []));
 
         if (empty($ids)) {
-            return back()->with('error', 'No credentials selected.');
+            return back()->with('error', __('flash.none_selected'));
         }
 
         $count = CompanyCredential::whereIn('id', $ids)->get()->each->delete()->count();

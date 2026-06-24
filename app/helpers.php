@@ -29,6 +29,52 @@ if (! function_exists('activity_log')) {
     }
 }
 
+if (! function_exists('guarded_list_url')) {
+
+    /**
+     * Resolve a safe "return to the list" URL that preserves the admin's current
+     * pagination page + filters after a successful save.
+     *
+     * The candidate (a submitted `return_url`, or `url()->previous()`) is only
+     * honoured when it points at the given index URL (optionally with a query
+     * string); otherwise it falls back to that index. This makes "stay on the
+     * page you edited from" work without ever allowing an open redirect to an
+     * arbitrary URL.
+     */
+    function guarded_list_url(?string $candidate, string $indexUrl): string
+    {
+        $candidate = (string) $candidate;
+
+        return $candidate === $indexUrl || str_starts_with($candidate, $indexUrl.'?')
+            ? $candidate
+            : $indexUrl;
+    }
+}
+
+if (! function_exists('friendly_error')) {
+
+    /**
+     * Turn a caught exception into a user-friendly, multilingual flash message
+     * that states the likely CAUSE and how to RESOLVE it — instead of a generic
+     * "Failed to …". Used by the admin controllers' catch blocks. Common database
+     * failures are mapped to actionable guidance; anything else falls back to a
+     * safe generic message. The full exception is still logged via report().
+     */
+    function friendly_error(\Throwable $e): string
+    {
+        if ($e instanceof \Illuminate\Database\QueryException) {
+            return match ((int) ($e->errorInfo[1] ?? 0)) {
+                1451 => __('flash.error_fk'),          // FK restrict — still referenced
+                1062 => __('flash.error_duplicate'),   // unique constraint
+                1264, 1406 => __('flash.error_too_long'), // out of range / data too long
+                default => __('flash.error_db'),
+            };
+        }
+
+        return __('flash.error_generic');
+    }
+}
+
 if (! function_exists('app_setting')) {
 
     /**

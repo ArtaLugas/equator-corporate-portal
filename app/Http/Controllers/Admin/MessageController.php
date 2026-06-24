@@ -122,7 +122,7 @@ class MessageController extends Controller
 
             report($e);
 
-            return back()->with('error', 'Failed to send reply. Please try again.');
+            return back()->with('error', friendly_error($e));
         }
     }
 
@@ -203,6 +203,35 @@ class MessageController extends Controller
         activity_log('Messages', 'Message Deleted (trashed): #'.$message->id);
 
         return back()->with('success', 'Message moved to trash.');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | BULK DESTROY
+    |--------------------------------------------------------------------------
+    */
+
+    public function bulkDestroy()
+    {
+        $ids = array_map('intval', (array) request()->input('ids', []));
+
+        if (empty($ids)) {
+            return back()->with('error', __('flash.none_selected'));
+        }
+
+        // Authorize each message exactly like single-delete (Super Admin gate),
+        // so a non-permitted admin is blocked (403) before anything is trashed.
+        $messages = Message::whereIn('id', $ids)->get();
+        $count = 0;
+        foreach ($messages as $message) {
+            $this->authorize('delete', $message);
+            $message->delete();
+            $count++;
+        }
+
+        activity_log('Message', "Bulk moved {$count} message(s) to trash.");
+
+        return back()->with('success', "{$count} message(s) moved to trash.");
     }
 
     /*

@@ -66,7 +66,7 @@ class FaqController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->withInput()->with('error', 'Failed to create FAQ.');
+            return back()->withInput()->with('error', friendly_error($e));
         }
     }
 
@@ -93,12 +93,12 @@ class FaqController extends Controller
             activity_log('FAQ', 'Updated FAQ: #'.$faq->id);
 
             return redirect()
-                ->route('admin.faqs.index')
+                ->to(guarded_list_url($request->input('return_url'), route('admin.faqs.index')))
                 ->with('success', 'FAQ updated successfully.');
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->withInput()->with('error', 'Failed to update FAQ.');
+            return back()->withInput()->with('error', friendly_error($e));
         }
     }
 
@@ -120,7 +120,7 @@ class FaqController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->with('error', 'Failed to delete FAQ.');
+            return back()->with('error', friendly_error($e));
         }
     }
 }

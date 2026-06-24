@@ -305,7 +305,7 @@ class ServiceController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to create service.'
+                    friendly_error($e)
                 );
         }
     }
@@ -493,7 +493,7 @@ class ServiceController extends Controller
             );
 
             return redirect()
-                ->route('admin.services.index')
+                ->to(guarded_list_url($request->input('return_url'), route('admin.services.index')))
                 ->with(
                     'success',
                     'Service updated successfully.'
@@ -521,7 +521,7 @@ class ServiceController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Failed to update service.'
+                    friendly_error($e)
                 );
         }
     }
@@ -569,9 +569,30 @@ class ServiceController extends Controller
 
                 'error',
 
-                'Failed to delete service.'
+                friendly_error($e)
             );
         }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | BULK DESTROY
+    |--------------------------------------------------------------------------
+    */
+
+    public function bulkDestroy()
+    {
+        $ids = array_map('intval', (array) request()->input('ids', []));
+
+        if (empty($ids)) {
+            return back()->with('error', __('flash.none_selected'));
+        }
+
+        $count = Service::whereIn('id', $ids)->get()->each->delete()->count();
+
+        activity_log('Service', "Bulk moved {$count} service(s) to trash.");
+
+        return back()->with('success', "{$count} service(s) moved to trash.");
     }
 
     /*
@@ -646,7 +667,7 @@ class ServiceController extends Controller
 
                 'error',
 
-                'Failed to restore service.'
+                friendly_error($e)
             );
         }
     }
@@ -721,7 +742,7 @@ class ServiceController extends Controller
 
                 'error',
 
-                'Failed to permanently delete service.'
+                friendly_error($e)
             );
         }
     }
