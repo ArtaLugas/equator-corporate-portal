@@ -128,17 +128,22 @@
             <div x-show="locale === '{{ $code }}'" x-cloak class="space-y-6">
 
                 {{-- NAME --}}
-                <x-admin.form.input
-                    name="name_{{ $code }}"
-                    label="Service Name ({{ strtoupper($code) }})"
-                    placeholder="e.g. Topographic Survey"
-                    :required="$code === $default"
-                    @if ($code === $default)
+                @if ($code === $default)
+                    <x-admin.form.input
+                        name="name_{{ $code }}"
+                        label="Service Name ({{ strtoupper($code) }})"
+                        placeholder="e.g. Topographic Survey"
+                        required
                         x-model="nameEn"
-                    @else
+                    />
+                @else
+                    <x-admin.form.input
+                        name="name_{{ $code }}"
+                        label="Service Name ({{ strtoupper($code) }})"
+                        placeholder="e.g. Topographic Survey"
                         value="{{ old('name_' . $code, $service->{'name_' . $code} ?? '') }}"
-                    @endif
-                />
+                    />
+                @endif
 
                 {{-- SHORT DESCRIPTION --}}
                 <x-admin.form.textarea

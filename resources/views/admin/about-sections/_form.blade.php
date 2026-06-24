@@ -75,17 +75,22 @@
             {{-- NAME — one panel per locale --}}
             @foreach ($locales as $code => $meta)
                 <div x-show="locale === '{{ $code }}'" x-cloak>
-                    <x-admin.form.input
-                        name="name_{{ $code }}"
-                        label="Section Name ({{ strtoupper($code) }})"
-                        placeholder="e.g. Company Profile"
-                        :required="$code === $default"
-                        @if ($code === $default)
+                    @if ($code === $default)
+                        <x-admin.form.input
+                            name="name_{{ $code }}"
+                            label="Section Name ({{ strtoupper($code) }})"
+                            placeholder="e.g. Company Profile"
+                            required
                             x-model="nameEn"
-                        @else
+                        />
+                    @else
+                        <x-admin.form.input
+                            name="name_{{ $code }}"
+                            label="Section Name ({{ strtoupper($code) }})"
+                            placeholder="e.g. Company Profile"
                             value="{{ old('name_' . $code, $aboutSection->{'name_' . $code} ?? '') }}"
-                        @endif
-                    />
+                        />
+                    @endif
                 </div>
             @endforeach
 

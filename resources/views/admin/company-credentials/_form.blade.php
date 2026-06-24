@@ -101,10 +101,14 @@
             @foreach ($locales as $code => $meta)
                 <div x-show="locale === '{{ $code }}'" x-cloak class="space-y-6">
 
-                    <x-admin.form.input name="title_{{ $code }}" label="Title ({{ strtoupper($code) }})"
-                        placeholder="e.g. ISO 9001:2015" :required="$code === $default"
-                        @if ($code === $default) x-model="titleEn"
-                        @else value="{{ old('title_' . $code, $credential->{'title_' . $code} ?? '') }}" @endif />
+                    @if ($code === $default)
+                        <x-admin.form.input name="title_{{ $code }}" label="Title ({{ strtoupper($code) }})"
+                            placeholder="e.g. ISO 9001:2015" required x-model="titleEn" />
+                    @else
+                        <x-admin.form.input name="title_{{ $code }}" label="Title ({{ strtoupper($code) }})"
+                            placeholder="e.g. ISO 9001:2015"
+                            value="{{ old('title_' . $code, $credential->{'title_' . $code} ?? '') }}" />
+                    @endif
 
                     <x-admin.form.input name="issuer_{{ $code }}" label="Issuer ({{ strtoupper($code) }})"
                         placeholder="e.g. TÜV Rheinland"

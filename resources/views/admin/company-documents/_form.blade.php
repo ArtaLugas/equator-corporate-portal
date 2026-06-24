@@ -77,16 +77,20 @@
                 @foreach ($locales as $code => $meta)
                     <div x-show="locale === '{{ $code }}'" x-cloak class="space-y-6">
 
-                        <x-admin.form.input
-                            name="title_{{ $code }}"
-                            label="Document Title ({{ strtoupper($code) }})"
-                            :required="$code === $default"
-                            @if ($code === $default)
+                        @if ($code === $default)
+                            <x-admin.form.input
+                                name="title_{{ $code }}"
+                                label="Document Title ({{ strtoupper($code) }})"
+                                required
                                 x-model="titleEn"
-                            @else
+                            />
+                        @else
+                            <x-admin.form.input
+                                name="title_{{ $code }}"
+                                label="Document Title ({{ strtoupper($code) }})"
                                 value="{{ old('title_' . $code, $document->{'title_' . $code} ?? '') }}"
-                            @endif
-                        />
+                            />
+                        @endif
 
                         <x-admin.form.wysiwyg
                             name="description_{{ $code }}"

@@ -215,17 +215,22 @@
             @foreach ($locales as $code => $meta)
                 <div x-show="locale === '{{ $code }}'" x-cloak class="space-y-6">
 
-                    <x-admin.form.input
-                        name="name_{{ $code }}"
-                        label="Project Name ({{ strtoupper($code) }})"
-                        placeholder="e.g. Coastal Mapping Survey"
-                        :required="$code === $default"
-                        @if ($code === $default)
+                    @if ($code === $default)
+                        <x-admin.form.input
+                            name="name_{{ $code }}"
+                            label="Project Name ({{ strtoupper($code) }})"
+                            placeholder="e.g. Coastal Mapping Survey"
+                            required
                             x-model="nameEn"
-                        @else
+                        />
+                    @else
+                        <x-admin.form.input
+                            name="name_{{ $code }}"
+                            label="Project Name ({{ strtoupper($code) }})"
+                            placeholder="e.g. Coastal Mapping Survey"
                             value="{{ old('name_' . $code, $project->{'name_' . $code} ?? '') }}"
-                        @endif
-                    />
+                        />
+                    @endif
 
                     <x-admin.form.textarea
                         name="short_description_{{ $code }}"
