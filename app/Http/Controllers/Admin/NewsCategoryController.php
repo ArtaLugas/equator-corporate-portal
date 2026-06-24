@@ -178,11 +178,15 @@ class NewsCategoryController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        if ($newsCategory->news()->exists()) {
+        // Count trashed articles too: News soft-deletes, but the DB foreign key
+        // (restrictOnDelete) still references the category from trashed rows — so
+        // without withTrashed() the guard would pass and the delete would then fail
+        // with a raw FK violation. Mirrors ServiceCategoryController::destroy().
+        if ($newsCategory->news()->withTrashed()->exists()) {
 
             return back()->with(
                 'error',
-                'Cannot delete: this category is still used by one or more news articles.'
+                'Cannot delete: this category is still used by one or more news articles (including any in Trash). Permanently delete those articles first.'
             );
         }
 
