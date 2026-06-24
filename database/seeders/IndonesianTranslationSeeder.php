@@ -51,46 +51,55 @@ class IndonesianTranslationSeeder extends Seeder
 
     private function faqs(): void
     {
+        // Keys match FaqSeeder's question_en (compiled from the Company Profile).
         $this->apply(Faq::class, 'question_en', [
-            'What services does Equator Group offer?' => [
-                'question_id' => 'Layanan apa saja yang ditawarkan Equator Group?',
-                'answer_id' => 'Kami menyediakan layanan konsultasi geospasial dan lingkungan yang terintegrasi, meliputi survei topografi dan hidrografi, pemetaan LiDAR dan udara, manajemen data spasial dan GIS, serta Analisis Dampak Lingkungan dan Sosial (ESIA). Tim multidisiplin kami mendukung proyek mulai dari studi kelayakan awal hingga kepatuhan dan pemantauan.',
+            'What is Equator and what does it do?' => [
+                'question_id' => 'Apa itu Equator dan apa yang dikerjakannya?',
+                'answer_id' => 'Equator adalah firma konsultan sosial dan lingkungan yang telah beroperasi sejak 1999, menghadirkan solusi berdampak tinggi, inklusif, dan berkelanjutan bagi proyek-proyek pembangunan di seluruh Indonesia dan sekitarnya. Kami berspesialisasi dalam perencanaan pengadaan tanah dan permukiman kembali, pelibatan pemangku kepentingan, analisis dampak lingkungan dan sosial, serta program berbasis komunitas — memadukan pengetahuan lokal dengan praktik terbaik global agar pembangunan menghormati hak asasi manusia, nilai-nilai masyarakat adat, dan integritas lingkungan.',
             ],
-            'Which industries and sectors do you typically work with?' => [
-                'question_id' => 'Industri dan sektor apa saja yang biasanya Anda tangani?',
-                'answer_id' => 'Klien kami mencakup infrastruktur, pertambangan dan energi, pembangunan kelautan dan pesisir, perkebunan dan agribisnis, instansi pemerintah, serta kontraktor rekayasa berskala besar. Setiap penugasan disusun sesuai dengan persyaratan regulasi dan teknis pada sektor terkait.',
+            'What services does Equator provide?' => [
+                'question_id' => 'Layanan apa saja yang disediakan Equator?',
+                'answer_id' => 'Kami menyediakan layanan konsultasi menyeluruh (end-to-end) sepanjang siklus proyek, yang tersusun dalam tiga tahap: Penilaian dan Perencanaan (seperti LARAP, ESIA, perizinan lingkungan, dan studi kelayakan), Implementasi dan Pendampingan (seperti pendampingan pengadaan tanah, dukungan perizinan, resolusi konflik, dan pengembangan kapasitas), serta Pemantauan dan Evaluasi (seperti pemantauan pengamanan internal dan eksternal, audit kepatuhan, dan evaluasi dampak). Pekerjaan kami mencakup konsultansi, riset, dan pengembangan kapasitas di bidang sosial maupun lingkungan.',
             ],
-            'How do I request a proposal or quotation?' => [
-                'question_id' => 'Bagaimana cara meminta proposal atau penawaran harga?',
-                'answer_id' => 'Cara tercepat adalah mengajukan permintaan melalui halaman Kontak kami disertai deskripsi singkat mengenai lingkup, lokasi, dan jadwal proyek Anda. Konsultan kami umumnya merespons dalam satu hari kerja untuk mengatur diskusi lingkup pekerjaan dan menyiapkan proposal yang disesuaikan.',
+            'Do you prepare LARAP and land acquisition documents?' => [
+                'question_id' => 'Apakah Anda menyusun LARAP dan dokumen pengadaan tanah?',
+                'answer_id' => 'Ya. Land Acquisition and Resettlement Action Plan (LARAP) merupakan salah satu spesialisasi inti kami. Kami menyusun dan membantu mengimplementasikan perencanaan pengadaan tanah dan permukiman kembali — termasuk Program Pemulihan Penghidupan (LRP), Rencana Pelibatan Pemangku Kepentingan (SEP), Mekanisme Penanganan Keluhan (GRM), serta dokumen nasional seperti DPPT — untuk proyek infrastruktur dan pembangunan, baik berdasarkan regulasi nasional maupun standar internasional.',
             ],
-            'How long does a typical survey or assessment take?' => [
-                'question_id' => 'Berapa lama waktu yang dibutuhkan untuk survei atau kajian pada umumnya?',
-                'answer_id' => 'Jangka waktu bergantung pada luas area, kondisi lapangan, dan keluaran yang dibutuhkan. Survei topografi yang terfokus dapat memakan waktu satu hingga dua minggu, sementara ESIA lengkap bisa berlangsung beberapa bulan karena adanya pengumpulan data dasar, konsultasi pemangku kepentingan, dan peninjauan regulasi. Kami menyertakan jadwal indikatif dalam setiap proposal.',
+            'Do you handle ESIA, AMDAL, and environmental permitting?' => [
+                'question_id' => 'Apakah Anda menangani ESIA, AMDAL, dan perizinan lingkungan?',
+                'answer_id' => 'Ya. Kami menyusun Analisis Dampak Lingkungan dan Sosial (ESIA), Analisis Dampak Sosial (SIA), serta dokumen perizinan lingkungan Indonesia seperti AMDAL/EIA, UKL-UPL, dan SPPL, bersama Rencana Pengelolaan Lingkungan dan Sosial (ESMP) serta kajian terkait. Kami mendampingi klien sepanjang proses perizinan dan persetujuan.',
             ],
-            'Do you handle permits and regulatory compliance?' => [
-                'question_id' => 'Apakah Anda menangani perizinan dan kepatuhan regulasi?',
-                'answer_id' => 'Ya. Tim lingkungan kami menyiapkan dokumentasi yang selaras dengan regulasi nasional dan standar pengamanan internasional (seperti persyaratan AIIB dan Bank Dunia), serta mendampingi klien sepanjang proses perizinan dan persetujuan, termasuk koordinasi dengan instansi yang berwenang.',
+            'Which standards and safeguard frameworks do you work with?' => [
+                'question_id' => 'Standar dan kerangka pengamanan (safeguard) apa yang Anda gunakan?',
+                'answer_id' => 'Kami menyelaraskan pekerjaan kami dengan regulasi nasional Indonesia sekaligus standar pengamanan internasional, termasuk Equator Principles, IFC Performance Standards, serta persyaratan lembaga pemberi pinjaman multilateral seperti Bank Dunia, ADB, AIIB, JICA, dan KfW. Hal ini memastikan proyek memenuhi kewajiban kepatuhan lokal sekaligus praktik baik internasional.',
             ],
-            'What areas or regions do you operate in?' => [
-                'question_id' => 'Di wilayah atau daerah mana saja Anda beroperasi?',
-                'answer_id' => 'Kami beroperasi di seluruh Indonesia dan kawasan sekitarnya melalui jaringan kantor regional kami. Untuk proyek di lokasi terpencil atau lepas pantai, kami memobilisasi tim dan peralatan lapangan khusus sesuai kebutuhan. Lokasi kantor kami dapat ditemukan pada halaman Kontak.',
+            'Which sectors and clients do you typically work with?' => [
+                'question_id' => 'Sektor dan klien apa saja yang biasanya Anda tangani?',
+                'answer_id' => 'Kami bermitra dengan pemerintah, klien sektor swasta, lembaga pembangunan internasional, dan komunitas akar rumput. Pengalaman proyek kami mencakup energi (pembangkit listrik tenaga air dan panas bumi), pertambangan, sumber daya air dan bendungan, transportasi dan jalan tol, fasilitas kesehatan, serta kawasan industri — bekerja dengan klien seperti PT PLN, kementerian pemerintah, dan program-program berpendanaan internasional.',
             ],
-            'What technology and equipment do you use?' => [
-                'question_id' => 'Teknologi dan peralatan apa yang Anda gunakan?',
-                'answer_id' => 'Kami menggunakan penerima GNSS kelas survei, total station, echosounder multibeam dan singlebeam, LiDAR teristrial dan udara, serta platform UAV/drone untuk citra udara. Data diproses dan disampaikan menggunakan perangkat lunak GIS dan CAD berstandar industri untuk memastikan akurasi dan interoperabilitas.',
+            'Where does Equator operate, and where are your offices?' => [
+                'question_id' => 'Di mana Equator beroperasi, dan di mana kantor Anda?',
+                'answer_id' => 'Kami beroperasi di seluruh Indonesia dan kawasan sekitarnya. Kantor kami berada di Bogor (Jl. Letjen. Ibrahim Adjie 197, Bogor 16117) dan Jakarta Selatan (Centennial Tower, Jl. Jend. Gatot Subroto Kav. 24-25, Jakarta Selatan 12930). Melalui LPM Equator — jaringan cabang lokal yang dibentuk sejak 1999 — kami memiliki kehadiran dan kapasitas lapangan di seluruh provinsi di Indonesia.',
             ],
-            'In what formats are the final deliverables provided?' => [
-                'question_id' => 'Dalam format apa keluaran akhir disampaikan?',
-                'answer_id' => 'Keluaran disesuaikan dengan kebutuhan Anda dan umumnya mencakup gambar CAD (DWG/DXF), layer GIS (SHP/GeoPackage), point cloud, ortofoto, model kontur dan terrain digital, serta laporan teknis lengkap dalam format PDF. Kami dapat menyelaraskan keluaran dengan sistem koordinat dan standar data yang Anda inginkan.',
+            'What certifications and credentials does Equator hold?' => [
+                'question_id' => 'Sertifikasi dan kredensial apa yang dimiliki Equator?',
+                'answer_id' => 'Equator adalah penyedia jasa profesional terdaftar (LPJP Registered) dan tersertifikasi ISO 9001:2015 (Manajemen Mutu) serta ISO 14001:2015 (Manajemen Lingkungan). Kami juga memiliki Sertifikat Badan Usaha Jasa Konsultansi Non-Konstruksi pada beragam klasifikasi layanan (KBLI), yang mencerminkan komitmen kami terhadap mutu, keselamatan, dan lingkungan.',
             ],
-            'Can you support ongoing monitoring after a project is completed?' => [
-                'question_id' => 'Apakah Anda dapat mendukung pemantauan berkelanjutan setelah proyek selesai?',
-                'answer_id' => 'Tentu. Kami menawarkan pemantauan lingkungan secara berkala, pemantauan deformasi dan penurunan tanah, serta pembaruan data dalam skema pemeliharaan atau retainer, sehingga membantu Anda tetap patuh dan memantau perubahan sepanjang umur aset Anda.',
+            'Do you provide training and capacity building?' => [
+                'question_id' => 'Apakah Anda menyediakan pelatihan dan pengembangan kapasitas?',
+                'answer_id' => 'Ya. Melalui Network of Learning Center for Environmental and Social Sustainability (NLC), kami menyelenggarakan program pengembangan kapasitas dan pelatihan yang terstruktur — termasuk pelatihan Analisis Dampak Lingkungan dan Sosial, pelatihan Land Acquisition and Resettlement Action Plan, pelatihan Rencana Masyarakat Adat (Indigenous Peoples Plan), dan pelatihan Rencana Pengelolaan Keanekaragaman Hayati — untuk memperkuat implementasi pengamanan (safeguard).',
             ],
-            'How can I get in touch with your team?' => [
-                'question_id' => 'Bagaimana cara menghubungi tim Anda?',
-                'answer_id' => 'Anda dapat menghubungi kami melalui formulir kontak di situs web kami, melalui telepon, atau email — detailnya tercantum di bagian Lokasi Kantor pada halaman Kontak. Untuk proyek baru, formulir kontak adalah jalur tercepat menuju spesialis yang tepat.',
+            'Can you support monitoring and evaluation after a project is implemented?' => [
+                'question_id' => 'Apakah Anda dapat mendukung pemantauan dan evaluasi setelah proyek diimplementasikan?',
+                'answer_id' => 'Ya. Kami menyediakan layanan pemantauan dan evaluasi yang andal, meliputi pemantauan pengamanan internal dan eksternal, audit kepatuhan lingkungan, evaluasi dampak program, dan pemantauan emisi karbon — membantu klien menjaga akuntabilitas dan mempertahankan dampak jangka panjang.',
+            ],
+            'Do you manage stakeholder engagement, grievances, and indigenous peoples plans?' => [
+                'question_id' => 'Apakah Anda menangani pelibatan pemangku kepentingan, penanganan keluhan, dan rencana masyarakat adat?',
+                'answer_id' => 'Ya. Pelibatan yang inklusif merupakan inti dari pendekatan kami. Kami menyusun Rencana Pelibatan Pemangku Kepentingan (SEP), Mekanisme Penanganan Keluhan (GRM), dan Rencana Masyarakat Adat (IPP), serta memfasilitasi resolusi konflik — memastikan masyarakat terdampak didengar dan pembangunan menghormati hak asasi manusia serta nilai-nilai masyarakat adat.',
+            ],
+            'How do I get in touch or request a proposal?' => [
+                'question_id' => 'Bagaimana cara menghubungi atau meminta proposal?',
+                'answer_id' => 'Cara tercepat adalah menghubungi kami melalui situs web (www.equatorgroup.id) atau formulir kontak, melalui email di office@equatorgroup.id, atau telepon di +62 819-1111-7109. Sampaikan deskripsi singkat mengenai lingkup dan lokasi proyek Anda, dan tim kami akan mengatur diskusi lingkup pekerjaan serta menyiapkan proposal yang disesuaikan.',
             ],
         ]);
     }
