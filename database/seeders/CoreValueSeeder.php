@@ -14,9 +14,9 @@ class CoreValueSeeder extends Seeder
     {
         foreach ($this->loadData('core_values') as $row) {
             CoreValue::updateOrCreate(
-                ['title' => $row['value']],
+                ['title_en' => $row['value']],
                 [
-                    'description' => $this->nullable($row['description'] ?? null),
+                    'description_en' => $this->nullable($row['description'] ?? null),
                     'icon' => $this->nullable($row['icon_class'] ?? null),
                     'display_order' => (int) ($row['display_order'] ?? 0),
                     'status' => 'active',

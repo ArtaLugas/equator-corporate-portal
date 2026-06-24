@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\AboutSection;
+use App\Models\CompanyCredential;
 use App\Models\CompanyDocument;
-use App\Models\CoreValue;
 use App\Models\HeroBanner;
 use App\Models\KeyMetric;
 use App\Models\Partner;
@@ -25,6 +25,12 @@ class HomeController extends Controller
         // (lihat App\Observers\HomeContentCacheObserver), dengan TTL pengaman 1 jam.
         $data = Cache::remember(self::CACHE_KEY, now()->addHour(), fn () => $this->buildPageData());
 
+        // Stat tiles disusun DI LUAR cache: `label` KeyMetric bersifat translatable,
+        // sedangkan payload di-cache satu kali (lintas-locale). Membangunnya per-request
+        // dari $keyMetrics — objek model yang me-resolve locale secara lazy — menjaga
+        // label mengikuti locale pembaca, bukan locale yang pertama mengisi cache (H-02.1).
+        $data['stats'] = $this->buildStats($data['keyMetrics']);
+
         return view('public.home', $data);
     }
 
@@ -37,28 +43,12 @@ class HomeController extends Controller
 
         $keyMetrics = KeyMetric::active()->orderBy('display_order')->get();
 
-        // $keyMetrics sudah difilter active → cukup filter is_featured di memori.
-        $featuredMetric = $keyMetrics->firstWhere('is_featured', true);
-
-        // Stat tiles: gunakan metrik CMS bila ada, jatuh ke default yang masuk akal.
-        // (Disusun di controller, bukan Blade, agar view bebas dari data/presentasi default.)
-        $stats = $keyMetrics->isNotEmpty()
-            ? $keyMetrics->map(fn ($m) => ['value' => $m->value, 'label' => $m->label])->all()
-            : [
-                ['value' => '15+', 'label' => 'Years of Experience'],
-                ['value' => '200+', 'label' => 'Projects Delivered'],
-                ['value' => '50+', 'label' => 'Expert Consultants'],
-                ['value' => '6', 'label' => 'Countries Served'],
-            ];
-
         // Services preview: utamakan featured; bila < limit, lengkapi dgn terbaru lain.
         $featuredServices = $this->featuredServices(4);
 
         $featuredProjects = Project::public()->with('services:id,name')
             ->orderByDesc('is_featured')
             ->latest()->take(6)->get();
-
-        $coreValues = CoreValue::where('status', 'active')->orderBy('display_order')->get();
 
         $partners = Partner::where('status', 'active')->orderBy('display_order')->get();
 
@@ -74,19 +64,38 @@ class HomeController extends Controller
         $companyProfilePath = CompanyDocument::where('status', 'active')
             ->orderBy('display_order')->first()?->file;
 
+        // Trusted Credentials: featured credentials for the homepage trust band.
+        $featuredCredentials = CompanyCredential::active()->featured()->ordered()->take(6)->get();
+
         return compact(
             'heroBanners',
             'keyMetrics',
-            'stats',
-            'featuredMetric',
             'featuredServices',
             'featuredProjects',
-            'coreValues',
             'partners',
             'aboutSection',
             'aboutContents',
             'companyProfilePath',
+            'featuredCredentials',
         );
+    }
+
+    /**
+     * Stat tiles: gunakan metrik CMS bila ada, jatuh ke default yang masuk akal.
+     * Dibangun per-request (DI LUAR cache) karena `label` translatable — lihat index().
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\KeyMetric>  $keyMetrics
+     */
+    private function buildStats($keyMetrics): array
+    {
+        return $keyMetrics->isNotEmpty()
+            ? $keyMetrics->map(fn ($m) => ['value' => $m->value, 'label' => $m->label])->all()
+            : [
+                ['value' => '15+', 'label' => __('home.stat_fallback_experience')],
+                ['value' => '200+', 'label' => __('home.stat_fallback_projects')],
+                ['value' => '50+', 'label' => __('home.stat_fallback_consultants')],
+                ['value' => '6', 'label' => __('home.stat_fallback_countries')],
+            ];
     }
 
     /**

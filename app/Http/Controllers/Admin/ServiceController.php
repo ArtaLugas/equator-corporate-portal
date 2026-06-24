@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Concerns\GeneratesUniqueSlug;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ServiceRequest;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Services\ImageService;
@@ -50,8 +51,20 @@ class ServiceController extends Controller
 
             $query->where(function ($q) use ($search) {
 
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%");
+                // Translatable name across every locale column, plus slug, status,
+                // and the (non-translatable) category name — a complete admin search.
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $q->orWhere("name_{$locale}", 'like', "%{$search}%");
+                }
+
+                $q->orWhere('slug', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
+                    ->orWhereHas('category', function ($c) use ($search) {
+                        // Category name is translatable — search every locale column.
+                        foreach (array_keys(config('locales.supported', [])) as $locale) {
+                            $c->orWhere("name_{$locale}", 'like', "%{$search}%");
+                        }
+                    });
             });
         }
 
@@ -113,13 +126,13 @@ class ServiceController extends Controller
 
             case 'name_asc':
 
-                $query->orderBy('name');
+                $query->orderBy('name_'.config('locales.default'));
 
                 break;
 
             case 'name_desc':
 
-                $query->orderByDesc('name');
+                $query->orderByDesc('name_'.config('locales.default'));
 
                 break;
 
@@ -148,7 +161,7 @@ class ServiceController extends Controller
 
         $categories = ServiceCategory::query()
             ->where('status', 'active')
-            ->orderBy('name')
+            ->orderBy('name_'.config('locales.default'))
             ->get();
 
         return view(
@@ -172,7 +185,7 @@ class ServiceController extends Controller
 
             ->where('status', 'active')
 
-            ->orderBy('name')
+            ->orderBy('name_'.config('locales.default'))
 
             ->get();
 
@@ -188,67 +201,9 @@ class ServiceController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function store(Request $request)
+    public function store(ServiceRequest $request)
     {
-        $validated = $request->validate([
-
-            'category_id' => [
-                'required',
-                'exists:service_categories,id',
-            ],
-
-            'name' => [
-                'required',
-                'string',
-                'max:191',
-            ],
-
-            'short_description' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'description' => [
-                'nullable',
-                'string',
-            ],
-
-            'image' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048',
-            ],
-
-            'meta_title' => [
-                'nullable',
-                'string',
-                'max:191',
-            ],
-
-            'meta_description' => [
-                'nullable',
-                'string',
-                'max:320',
-            ],
-
-            'meta_keywords' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'status' => [
-                'required',
-                'in:draft,published',
-            ],
-
-            'is_featured' => [
-                'nullable',
-                'boolean',
-            ],
-        ]);
+        $validated = $request->validated();
 
         /*
         |--------------------------------------------------------------------------
@@ -261,13 +216,15 @@ class ServiceController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Generate Slug
+        | Generate Slug (from the default-locale name)
         |--------------------------------------------------------------------------
         */
 
+        $defaultName = $validated['name_'.config('locales.default')];
+
         $validated['slug'] = $this->generateUniqueSlug(
             Service::class,
-            $validated['name']
+            $defaultName
         );
 
         $imagePath = null;
@@ -290,7 +247,7 @@ class ServiceController extends Controller
 
                     'services',
 
-                    $validated['name']
+                    $defaultName
                 );
 
                 $validated['image'] = $imagePath;
@@ -383,7 +340,7 @@ class ServiceController extends Controller
 
             ->where('status', 'active')
 
-            ->orderBy('name')
+            ->orderBy('name_'.config('locales.default'))
 
             ->get();
 
@@ -403,69 +360,11 @@ class ServiceController extends Controller
     */
 
     public function update(
-        Request $request,
+        ServiceRequest $request,
         Service $service
     ) {
 
-        $validated = $request->validate([
-
-            'category_id' => [
-                'required',
-                'exists:service_categories,id',
-            ],
-
-            'name' => [
-                'required',
-                'string',
-                'max:191',
-            ],
-
-            'short_description' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'description' => [
-                'nullable',
-                'string',
-            ],
-
-            'image' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048',
-            ],
-
-            'meta_title' => [
-                'nullable',
-                'string',
-                'max:191',
-            ],
-
-            'meta_description' => [
-                'nullable',
-                'string',
-                'max:320',
-            ],
-
-            'meta_keywords' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'status' => [
-                'required',
-                'in:draft,published',
-            ],
-
-            'is_featured' => [
-                'nullable',
-                'boolean',
-            ],
-        ]);
+        $validated = $request->validated();
 
         /*
         |--------------------------------------------------------------------------
@@ -478,17 +377,27 @@ class ServiceController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Preserve Slug
+        | Preserve Slug (regenerate only when the default-locale name changes)
         |--------------------------------------------------------------------------
         */
 
-        if ($service->name !== $validated['name']) {
+        $defaultLocale = config('locales.default');
+
+        $defaultName = $validated['name_'.$defaultLocale];
+
+        // Regenerate the slug only when enabled (config) AND the default-locale
+        // name actually changed — keeps it efficient and lets permalinks be
+        // frozen after go-live by flipping cms.auto_regenerate_slug to false.
+        if (
+            config('cms.auto_regenerate_slug', true)
+            && $service->{'name_'.$defaultLocale} !== $defaultName
+        ) {
 
             $validated['slug'] = $this->generateUniqueSlug(
 
                 Service::class,
 
-                $validated['name'],
+                $defaultName,
 
                 $service->id
             );
@@ -516,7 +425,7 @@ class ServiceController extends Controller
 
                     'services',
 
-                    $validated['name']
+                    $defaultName
                 );
 
                 $validated['image'] = $newImage;

@@ -1,32 +1,38 @@
-<div x-data="{
+@php
+    $locales = config('locales.supported', []);
+    $default = config('locales.default');
 
-    title: '{{ old('title', $document->title ?? '') }}',
-
-    slug: '{{ old('slug', $document->slug ?? '') }}',
-
-    isEdit: {{ isset($document) ? 'true' : 'false' }},
-
-    generateSlug() {
-
-        if (this.isEdit) return;
-
-        this.slug = this.title
-
-            .toString()
-
-            .toLowerCase()
-
-            .trim()
-
-            .replace(/\s+/g, '-')
-            .replace(/[^\w\-]+/g, '')
-            .replace(/\-\-+/g, '-')
-            .replace(/^-+/, '')
-            .replace(/-+$/, '');
-
+    $activeTab = $default;
+    foreach (array_keys($locales) as $lc) {
+        foreach (['title', 'description'] as $f) {
+            if ($errors->has("{$f}_{$lc}")) {
+                $activeTab = $lc;
+                break 2;
+            }
+        }
     }
 
-}" class="space-y-8">
+    // Slug auto-regeneration: always on for new records; on edit it follows config.
+    $editing = isset($document) && $document->exists;
+    $autoSlug = ! $editing || config('cms.auto_regenerate_slug', true);
+
+    $translationSummaries = collect(array_keys($locales))
+        ->reject(fn ($l) => $l === $default)
+        ->filter(fn ($l) => $errors->has("translation_{$l}"));
+@endphp
+
+<div x-data="{
+    locale: @js($activeTab),
+    autoSlug: @js($autoSlug),
+    titleEn: @js(old('title_' . $default, $document->{'title_' . $default} ?? '')),
+    slug: @js(old('slug', $document->slug ?? '')),
+    generateSlug() {
+        if (! this.autoSlug) return; // permalink frozen — keep the existing slug
+        this.slug = this.titleEn.toString().toLowerCase().trim()
+            .replace(/\s+/g, '-').replace(/[^\w\-]+/g, '')
+            .replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
+    }
+}" x-effect="generateSlug()" class="space-y-8">
 
     <div class="space-y-8">
         {{-- GENERAL INFORMATION --}}
@@ -46,15 +52,53 @@
 
             <div class="space-y-6">
 
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {{-- ALL-OR-NOTHING TRANSLATION SUMMARY --}}
+                @if ($translationSummaries->isNotEmpty())
+                    <div class="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="mt-0.5 shrink-0 text-amber-500">
+                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                            <line x1="12" x2="12" y1="9" y2="13" />
+                            <line x1="12" x2="12.01" y1="17" y2="17" />
+                        </svg>
+                        <div class="space-y-1">
+                            @foreach ($translationSummaries as $l)
+                                <p class="text-sm font-semibold text-amber-800">{{ $errors->first("translation_{$l}") }}</p>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
 
-                    <x-admin.form.input name="title" label="Document Title" :value="old('title', $document->title ?? '')" x-model="title"
-                        @input="generateSlug" required />
+                {{-- LANGUAGE TABS (control title + description) --}}
+                <x-admin.lang-tabs />
 
-                    <x-admin.form.input name="slug" label="Slug" :value="old('slug', $document->slug ?? '')" x-model="slug" readonly
-                        class="cursor-not-allowed bg-gray-50" />
+                {{-- TRANSLATABLE FIELDS — one panel per locale --}}
+                @foreach ($locales as $code => $meta)
+                    <div x-show="locale === '{{ $code }}'" x-cloak class="space-y-6">
 
-                </div>
+                        <x-admin.form.input
+                            name="title_{{ $code }}"
+                            label="Document Title ({{ strtoupper($code) }})"
+                            :required="$code === $default"
+                            @if ($code === $default)
+                                x-model="titleEn"
+                            @else
+                                value="{{ old('title_' . $code, $document->{'title_' . $code} ?? '') }}"
+                            @endif
+                        />
+
+                        <x-admin.form.wysiwyg
+                            name="description_{{ $code }}"
+                            label="Description ({{ strtoupper($code) }})"
+                            :value="old('description_' . $code, $document->{'description_' . $code} ?? '')" />
+
+                    </div>
+                @endforeach
+
+                {{-- SLUG (not translated, read-only) --}}
+                <x-admin.form.input name="slug" label="Slug" :value="old('slug', $document->slug ?? '')" x-model="slug" readonly
+                    class="cursor-not-allowed bg-gray-50" />
 
                 <x-admin.form.select name="document_type" label="Document Type">
 
@@ -86,8 +130,6 @@
                     </option>
 
                 </x-admin.form.select>
-
-                <x-admin.form.wysiwyg name="description" label="Description" :value="old('description', $document->description ?? '')" />
 
                 <x-admin.form.file name="file" label="PDF Document" accept=".pdf" :currentFile="$document->file ?? null"
                     helpText="PDF only. Max 20MB." />
@@ -133,3 +175,6 @@
             </div>
 
         </div>
+    </div>
+
+</div>

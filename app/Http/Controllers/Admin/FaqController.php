@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\FaqRequest;
 use App\Models\Faq;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class FaqController extends Controller
 {
@@ -49,9 +49,9 @@ class FaqController extends Controller
         return view('admin.faqs.create');
     }
 
-    public function store(Request $request)
+    public function store(FaqRequest $request)
     {
-        $validated = $this->validateData($request);
+        $validated = $request->validated();
 
         $validated['display_order'] ??= 0;
 
@@ -81,9 +81,9 @@ class FaqController extends Controller
         return view('admin.faqs.edit', compact('faq'));
     }
 
-    public function update(Request $request, Faq $faq)
+    public function update(FaqRequest $request, Faq $faq)
     {
-        $validated = $this->validateData($request);
+        $validated = $request->validated();
 
         $validated['display_order'] ??= 0;
 
@@ -122,23 +122,5 @@ class FaqController extends Controller
 
             return back()->with('error', 'Failed to delete FAQ.');
         }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Helper: Validate
-    |--------------------------------------------------------------------------
-    */
-
-    private function validateData(Request $request): array
-    {
-        return $request->validate([
-            'question' => ['required', 'string', 'max:1000'],
-            'answer' => ['required', 'string', 'max:10000'],
-            'display_order' => [
-                'nullable', 'integer', 'min:0',
-                Rule::unique('faqs', 'display_order')->ignore($request->route('faq')?->id),
-            ],
-        ]);
     }
 }

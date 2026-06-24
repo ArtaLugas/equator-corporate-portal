@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Contact Us — ' . app_setting('company_name', 'Equator Group'))
+@section('title', __('contact.page_title', ['company' => app_setting('company_name', 'Equator Group')]))
 
 @push('head')
     {{-- Cloudflare Turnstile API Core --}}
@@ -37,8 +37,8 @@
 
     {{-- HERO BLOCK INTEGRATION --}}
     @include('public.partials.page-hero', [
-        'title' => 'Contact Us',
-        'subtitle' => 'Tell us about your project, and our consultants will respond within one business day.',
+        'title' => __('contact.hero_title'),
+        'subtitle' => __('contact.hero_subtitle'),
     ])
 
     <section class="relative bg-white py-24 sm:py-32">
@@ -53,14 +53,13 @@
                     <div class="max-w-md">
                         <div class="flex items-center gap-4">
                             <span class="h-px w-8 bg-equator-orange"></span>
-                            <span class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Our offices</span>
+                            <span class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">{{ __('contact.offices_eyebrow') }}</span>
                         </div>
                         <h2 class="mt-6 font-heading text-2xl font-light tracking-tight text-slate-900 sm:text-3xl">
-                            Reach our team
+                            {{ __('contact.offices_heading') }}
                         </h2>
                         <p class="mt-4 text-sm leading-relaxed text-slate-600 sm:text-base">
-                            Contact a regional office directly, or use the form and we'll route your message to the
-                            right team.
+                            {{ __('contact.offices_intro') }}
                         </p>
                     </div>
 
@@ -71,7 +70,7 @@
                             {{-- Tab Selector minimalis (underline) — hanya muncul jika kantor > 1 --}}
                             @if ($offices->count() > 1)
                                 <nav class="js-dependent-nav -mb-px flex flex-wrap gap-x-6 border-b border-slate-200"
-                                    role="tablist" aria-label="Office locations"
+                                    role="tablist" aria-label="{{ __('contact.offices_tablist_label') }}"
                                     @keydown.arrow-right.prevent="activeOffice = (activeOffice + 1) % {{ $offices->count() }}; $refs['tab' + activeOffice].focus()"
                                     @keydown.arrow-left.prevent="activeOffice = (activeOffice - 1 + {{ $offices->count() }}) % {{ $offices->count() }}; $refs['tab' + activeOffice].focus()">
                                     @foreach ($offices as $index => $office)
@@ -168,8 +167,7 @@
                         {{-- CASE 2: Belum ada Office Location aktif. --}}
                     @else
                         <div class="mt-10 border border-slate-200/70 bg-white p-6 text-sm text-slate-500 lg:p-8">
-                            Office details will appear here once a location is added. Meanwhile, please reach us using
-                            the form.
+                            {{ __('contact.offices_empty') }}
                         </div>
                     @endif
 
@@ -177,7 +175,7 @@
                          menghindari Tailwind purging untuk warna dinamis). Light background. --}}
                     @if ($socials->isNotEmpty())
                         <div class="mt-10 border-t border-slate-100 pt-6">
-                            <p class="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Connect with us
+                            <p class="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">{{ __('contact.socials_heading') }}
                             </p>
                             <div class="flex flex-wrap gap-2" id="contact-socials">
                                 @foreach ($socials as $social)
@@ -200,13 +198,13 @@
                     <div class="max-w-xl">
                         <div class="flex items-center gap-4">
                             <span class="h-px w-8 bg-equator-orange"></span>
-                            <span class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Get in touch</span>
+                            <span class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">{{ __('common.get_in_touch') }}</span>
                         </div>
                         <h2 class="mt-6 font-heading text-2xl font-light tracking-tight text-slate-900 sm:text-3xl">
-                            Send us a message
+                            {{ __('contact.form_heading') }}
                         </h2>
                         <p class="mt-4 text-sm leading-relaxed text-slate-600 sm:text-base">
-                            Tell us briefly what you need, and the right team will get back to you.
+                            {{ __('contact.form_intro') }}
                         </p>
                     </div>
 
@@ -223,14 +221,14 @@
                                     <x-icon name="check" class="h-3.5 w-3.5" stroke-width="3" />
                                 </span>
                                 <div>
-                                    <p class="text-sm font-semibold text-slate-900">Message sent</p>
+                                    <p class="text-sm font-semibold text-slate-900">{{ __('contact.success_title') }}</p>
                                     <p class="mt-0.5 text-sm leading-relaxed text-slate-600">{{ session('success') }}</p>
                                 </div>
                             </div>
                         @endif
 
                         <form action="{{ route('contact.store') }}" method="POST" @submit="submitting = true"
-                            class="space-y-6">
+                            data-track-form="contact" class="space-y-6">
                             @csrf
 
                             {{-- High-Integrity Honeypot Fields --}}
@@ -241,26 +239,26 @@
                             </div>
 
                             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                <x-public.field name="name" label="Full Name" required autocomplete="name" />
-                                <x-public.field name="email" label="Work Email" type="email" required
+                                <x-public.field name="name" :label="__('contact.field_name')" required autocomplete="name" />
+                                <x-public.field name="email" :label="__('contact.field_email')" type="email" required
                                     autocomplete="email" />
                             </div>
 
                             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                <x-public.field name="phone" label="Phone Number" type="tel" optional
+                                <x-public.field name="phone" :label="__('contact.field_phone')" type="tel" optional
                                     autocomplete="tel" />
-                                <x-public.field name="company" label="Company" optional autocomplete="organization" />
+                                <x-public.field name="company" :label="__('contact.field_company')" optional autocomplete="organization" />
                             </div>
 
-                            <x-public.field name="subject" label="Subject" required :value="$prefillSubject ?? null" />
+                            <x-public.field name="subject" :label="__('contact.field_subject')" required :value="$prefillSubject ?? null" />
 
-                            <x-public.field name="message" label="How can we help?" textarea rows="6" required
-                                minlength="10" hint="Please provide at least 10 characters." />
+                            <x-public.field name="message" :label="__('contact.field_message')" textarea rows="6" required
+                                minlength="10" :hint="__('contact.field_message_hint')" />
 
                             {{-- Cloudflare Turnstile CAPTCHA --}}
                             <div class="relative py-2">
                                 <div class="cf-turnstile" data-sitekey="{{ config('services.turnstile.site_key') }}"
-                                    data-theme="light" data-language="en"></div>
+                                    data-theme="light" data-language="{{ app()->getLocale() }}"></div>
                                 @error('cf-turnstile-response')
                                     <p class="mt-2 text-xs font-medium text-red-600">{{ $message }}</p>
                                 @enderror
@@ -270,7 +268,7 @@
                             <div class="pt-2">
                                 <button type="submit" :disabled="submitting"
                                     class="group inline-flex w-full items-center justify-center gap-3 bg-equator-dark px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-white transition-colors duration-300 hover:bg-equator-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-equator-dark/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-400">
-                                    <span x-text="submitting ? 'Sending…' : 'Send Message'">Send Message</span>
+                                    <span x-text="submitting ? '{{ __('contact.submitting') }}' : '{{ __('contact.submit') }}'">{{ __('contact.submit') }}</span>
 
                                     {{-- Ikon Lucide harus ada di DOM saat load → pakai x-show (bukan x-if) --}}
                                     <span x-show="!submitting" class="inline-flex">
@@ -291,16 +289,17 @@
 
                                 {{-- What happens next (versi ringkas) --}}
                                 <p class="mt-5 text-center text-xs leading-relaxed text-slate-500">
-                                    Submit <span class="text-slate-300" aria-hidden="true">&rarr;</span> routed to the
-                                    right team <span class="text-slate-300" aria-hidden="true">&rarr;</span> reply within
-                                    one business day
+                                    {{ __('contact.next_step_1') }} <span class="text-slate-300" aria-hidden="true">&rarr;</span> {{ __('contact.next_step_2') }} <span class="text-slate-300" aria-hidden="true">&rarr;</span> {{ __('contact.next_step_3') }}
                                 </p>
 
-                                {{-- Privacy reassurance --}}
+                                {{-- Data-use notice + Privacy Policy link --}}
                                 <p class="mt-2 flex items-center justify-center gap-2 text-center text-xs text-slate-500">
                                     <x-icon name="shield-check" class="h-3.5 w-3.5 shrink-0 text-slate-400"
                                         stroke-width="1.75" />
-                                    <span>Your details stay confidential and are never shared.</span>
+                                    <span>{{ __('contact.privacy') }}
+                                        <a href="{{ route('privacy') }}"
+                                            class="font-medium text-equator-dark underline-offset-2 hover:underline">{{ __('footer.privacy') }}</a>.
+                                    </span>
                                 </p>
                             </div>
                         </form>

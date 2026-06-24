@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\GeneratesUniqueSlug;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\CompanyDocumentRequest;
 use App\Models\CompanyDocument;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class CompanyDocumentController extends Controller
 {
+    use GeneratesUniqueSlug;
+
     private const PAGINATION = 10;
 
     /*
@@ -32,8 +34,13 @@ class CompanyDocumentController extends Controller
 
             $query->where(function ($q) use ($search) {
 
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('document_type', 'like', "%{$search}%");
+                // Translatable title across every locale column, plus the
+                // (non-translatable) document_type.
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $q->orWhere("title_{$locale}", 'like', "%{$search}%");
+                }
+
+                $q->orWhere('document_type', 'like', "%{$search}%");
             });
         }
 
@@ -52,11 +59,11 @@ class CompanyDocumentController extends Controller
                 break;
 
             case 'title_asc':
-                $query->orderBy('title');
+                $query->orderBy('title_'.config('locales.default'));
                 break;
 
             case 'title_desc':
-                $query->orderByDesc('title');
+                $query->orderByDesc('title_'.config('locales.default'));
                 break;
 
             case 'display_order':
@@ -101,63 +108,22 @@ class CompanyDocumentController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function store(Request $request)
+    public function store(CompanyDocumentRequest $request)
     {
-        $validated = Validator::make(
+        $validated = $request->validated();
 
-            $request->all(),
+        /*
+        |--------------------------------------------------------------------------
+        | Auto Slug (from the default-locale title)
+        |--------------------------------------------------------------------------
+        */
 
-            [
+        $defaultTitle = $validated['title_'.config('locales.default')];
 
-                'title' => [
-                    'required',
-                    'string',
-                    'max:191',
-                ],
-
-                'document_type' => [
-                    'required',
-                    'string',
-                    'max:100',
-                ],
-
-                'description' => [
-                    'nullable',
-                    'string',
-                ],
-
-                'file' => [
-                    'required',
-                    'mimes:pdf',
-                    'max:20480',
-                ],
-
-                'thumbnail' => [
-                    'nullable',
-                    'image',
-                    'mimes:jpg,jpeg,png,webp',
-                    'max:2048',
-                ],
-
-                'display_order' => [
-                    'required',
-                    'integer',
-                    'min:1',
-                    Rule::unique('company_documents', 'display_order')
-                        ->ignore($request->route('company_document')?->id)
-                        ->whereNull('deleted_at'),
-                ],
-
-                'status' => [
-                    'required',
-                    Rule::in([
-                        'active',
-                        'inactive',
-                    ]),
-                ],
-            ]
-
-        )->validate();
+        $validated['slug'] = $this->generateUniqueSlug(
+            CompanyDocument::class,
+            $defaultTitle
+        );
 
         $filePath = null;
         $thumbnailPath = null;
@@ -168,36 +134,12 @@ class CompanyDocumentController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | Auto Slug
-            |--------------------------------------------------------------------------
-            */
-
-            $baseSlug = Str::slug(
-                $validated['title']
-            );
-
-            $slug = $baseSlug;
-            $count = 1;
-
-            while (
-                CompanyDocument::withTrashed()
-                    ->where('slug', $slug)
-                    ->exists()
-            ) {
-                $slug =
-                    $baseSlug.'-'.$count++;
-            }
-
-            $validated['slug'] = $slug;
-
-            /*
-            |--------------------------------------------------------------------------
             | Single Active Company Profile
             |--------------------------------------------------------------------------
             */
 
             if (
-                $validated['document_type'] === 'company_profile'
+                ($validated['document_type'] ?? null) === 'company_profile'
                 &&
                 $validated['status'] === 'active'
             ) {
@@ -223,7 +165,7 @@ class CompanyDocumentController extends Controller
 
                 'company-documents',
 
-                $validated['title']
+                $defaultTitle
             );
 
             $validated['file'] = $filePath;
@@ -245,7 +187,7 @@ class CompanyDocumentController extends Controller
 
                     'company-documents/thumbnails',
 
-                    $validated['title']
+                    $defaultTitle
                 );
 
                 $validated['thumbnail'] =
@@ -343,46 +285,35 @@ class CompanyDocumentController extends Controller
     */
 
     public function update(
-        Request $request,
+        CompanyDocumentRequest $request,
         CompanyDocument $companyDocument
     ) {
 
-        $validated = $request->validate([
+        $validated = $request->validated();
 
-            'title' => 'required|max:191',
+        /*
+        |--------------------------------------------------------------------------
+        | Preserve Slug (regenerate only when the default-locale title changes)
+        |--------------------------------------------------------------------------
+        */
 
-            'document_type' => 'required|max:100',
+        $defaultLocale = config('locales.default');
 
-            'description' => 'nullable',
+        $defaultTitle = $validated['title_'.$defaultLocale];
 
-            'file' => 'nullable|mimes:pdf|max:20480',
+        // Regenerate the slug only when enabled (config) AND the default-locale
+        // title actually changed — keeps permalinks freezable after go-live.
+        if (
+            config('cms.auto_regenerate_slug', true)
+            && $companyDocument->{'title_'.$defaultLocale} !== $defaultTitle
+        ) {
 
-            'thumbnail' => 'nullable|image|max:2048',
-
-            'display_order' => [
-
-                'required',
-
-                'integer',
-
-                'min:1',
-
-                Rule::unique(
-                    'company_documents',
-                    'display_order'
-                )->ignore(
-                    $companyDocument->id
-                )->whereNull('deleted_at'),
-            ],
-
-            'status' => [
-                'required',
-                Rule::in([
-                    'active',
-                    'inactive',
-                ]),
-            ],
-        ]);
+            $validated['slug'] = $this->generateUniqueSlug(
+                CompanyDocument::class,
+                $defaultTitle,
+                $companyDocument->id
+            );
+        }
 
         $oldFile = $companyDocument->file;
         $oldThumbnail = $companyDocument->thumbnail;
@@ -395,7 +326,7 @@ class CompanyDocumentController extends Controller
             DB::beginTransaction();
 
             if (
-                $validated['document_type']
+                ($validated['document_type'] ?? null)
                 === 'company_profile'
                 &&
                 $validated['status']
@@ -425,7 +356,7 @@ class CompanyDocumentController extends Controller
 
                         'company-documents',
 
-                        $validated['title']
+                        $defaultTitle
                     );
 
                 $validated['file'] =
@@ -447,7 +378,7 @@ class CompanyDocumentController extends Controller
 
                         'company-documents/thumbnails',
 
-                        $validated['title']
+                        $defaultTitle
                     );
 
                 $validated['thumbnail']

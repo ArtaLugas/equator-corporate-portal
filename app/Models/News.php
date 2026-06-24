@@ -2,23 +2,25 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class News extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasTranslations, SoftDeletes;
 
+    /**
+     * Only NON-translatable columns. The HasTranslations trait appends the
+     * localized columns (title_en, title_id, content_en, …) from
+     * config/translatable.php and Purifier-sanitizes the HTML field (content)
+     * for every locale on write.
+     */
     protected $fillable = [
         'category_id',
-        'title',
         'slug',
-        'content',
         'image',
-        'meta_title',
-        'meta_description',
-        'meta_keywords',
         'status',
         'published_at',
         'views_count',

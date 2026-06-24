@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\CoreValueRequest;
 use App\Models\CoreValue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 
 class CoreValueController extends Controller
 {
@@ -23,8 +23,11 @@ class CoreValueController extends Controller
             $search = trim($request->search);
 
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $q->orWhere("title_{$locale}", 'like', "%{$search}%")
+                        ->orWhere("description_{$locale}", 'like', "%{$search}%");
+                }
+                $q->orWhere('status', 'like', "%{$search}%");
             });
         }
 
@@ -39,11 +42,11 @@ class CoreValueController extends Controller
                 break;
 
             case 'title_asc':
-                $query->orderBy('title');
+                $query->orderBy('title_'.config('locales.default'));
                 break;
 
             case 'title_desc':
-                $query->orderByDesc('title');
+                $query->orderByDesc('title_'.config('locales.default'));
                 break;
 
             case 'display_order':
@@ -76,42 +79,9 @@ class CoreValueController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CoreValueRequest $request)
     {
-        $validated = $request->validate([
-
-            'title' => [
-                'required',
-                'string',
-                'max:191',
-            ],
-
-            'description' => [
-                'nullable',
-                'string',
-            ],
-
-            'icon' => [
-                'nullable',
-                'string',
-                'max:100',
-            ],
-
-            'display_order' => [
-                'required',
-                'integer',
-                'min:1',
-                'unique:core_values,display_order',
-            ],
-
-            'status' => [
-                'required',
-                Rule::in([
-                    'active',
-                    'inactive',
-                ]),
-            ],
-        ]);
+        $validated = $request->validated();
 
         DB::transaction(function () use ($validated) {
             $coreValue = CoreValue::create($validated);
@@ -152,45 +122,9 @@ class CoreValueController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, CoreValue $coreValue)
+    public function update(CoreValueRequest $request, CoreValue $coreValue)
     {
-        $validated = $request->validate([
-
-            'title' => [
-                'required',
-                'string',
-                'max:191',
-            ],
-
-            'description' => [
-                'nullable',
-                'string',
-            ],
-
-            'icon' => [
-                'nullable',
-                'string',
-                'max:100',
-            ],
-
-            'display_order' => [
-                'required',
-                'integer',
-                'min:1',
-                Rule::unique(
-                    'core_values',
-                    'display_order'
-                )->ignore($coreValue->id),
-            ],
-
-            'status' => [
-                'required',
-                Rule::in([
-                    'active',
-                    'inactive',
-                ]),
-            ],
-        ]);
+        $validated = $request->validated();
 
         DB::transaction(function () use (
             $validated,

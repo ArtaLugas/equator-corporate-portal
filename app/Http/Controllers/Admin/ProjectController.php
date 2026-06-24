@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Concerns\GeneratesUniqueSlug;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ProjectRequest;
 use App\Models\Project;
 use App\Models\Service;
 use App\Services\ImageService;
@@ -48,8 +49,14 @@ class ProjectController extends Controller
 
             $query->where(function ($q) use ($search) {
 
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%")
+                // Translatable name across every locale column, plus the slug,
+                // status, and the project's own facets (client / location).
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $q->orWhere("name_{$locale}", 'like', "%{$search}%");
+                }
+
+                $q->orWhere('slug', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
                     ->orWhere('client_name', 'like', "%{$search}%")
                     ->orWhere('location', 'like', "%{$search}%");
             });
@@ -127,13 +134,13 @@ class ProjectController extends Controller
 
             case 'name_asc':
 
-                $query->orderBy('name');
+                $query->orderBy('name_'.config('locales.default'));
 
                 break;
 
             case 'name_desc':
 
-                $query->orderByDesc('name');
+                $query->orderByDesc('name_'.config('locales.default'));
 
                 break;
 
@@ -197,9 +204,9 @@ class ProjectController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function store(Request $request)
+    public function store(ProjectRequest $request)
     {
-        $validated = $this->validateData($request);
+        $validated = $request->validated();
 
         /*
         |--------------------------------------------------------------------------
@@ -211,11 +218,13 @@ class ProjectController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Generate Slug
+        | Generate Slug (from the default-locale name)
         |--------------------------------------------------------------------------
         */
 
-        $validated['slug'] = $this->generateUniqueSlug(Project::class, $validated['name']);
+        $defaultName = $validated['name_'.config('locales.default')];
+
+        $validated['slug'] = $this->generateUniqueSlug(Project::class, $defaultName);
 
         $featuredImage = null;
 
@@ -236,7 +245,7 @@ class ProjectController extends Controller
                 $featuredImage = $this->uploadImage(
                     $request->file('featured_image'),
                     'projects',
-                    $validated['name']
+                    $defaultName
                 );
 
                 $validated['featured_image'] = $featuredImage;
@@ -350,9 +359,9 @@ class ProjectController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function update(Request $request, Project $project)
+    public function update(ProjectRequest $request, Project $project)
     {
-        $validated = $this->validateData($request);
+        $validated = $request->validated();
 
         /*
         |--------------------------------------------------------------------------
@@ -364,15 +373,22 @@ class ProjectController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Preserve Slug
+        | Preserve Slug (regenerate only when enabled AND name_en changed)
         |--------------------------------------------------------------------------
         */
 
-        if ($project->name !== $validated['name']) {
+        $defaultLocale = config('locales.default');
+
+        $defaultName = $validated['name_'.$defaultLocale];
+
+        if (
+            config('cms.auto_regenerate_slug', true)
+            && $project->{'name_'.$defaultLocale} !== $defaultName
+        ) {
 
             $validated['slug'] = $this->generateUniqueSlug(
                 Project::class,
-                $validated['name'],
+                $defaultName,
                 $project->id
             );
         }
@@ -398,7 +414,7 @@ class ProjectController extends Controller
                 $newFeatured = $this->uploadImage(
                     $request->file('featured_image'),
                     'projects',
-                    $validated['name']
+                    $defaultName
                 );
 
                 $validated['featured_image'] = $newFeatured;
@@ -731,61 +747,6 @@ class ProjectController extends Controller
         }
 
         return $removedPaths;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Helper: Validate Data
-    |--------------------------------------------------------------------------
-    */
-
-    private function validateData(Request $request): array
-    {
-        return $request->validate([
-
-            'service_ids' => ['required', 'array', 'min:1'],
-            'service_ids.*' => ['integer', 'exists:services,id'],
-
-            'name' => ['required', 'string', 'max:191'],
-
-            'short_description' => ['nullable', 'string', 'max:255'],
-
-            'description' => ['nullable', 'string'],
-
-            'client_name' => ['nullable', 'string', 'max:191'],
-
-            'location' => ['nullable', 'string', 'max:191'],
-
-            'country' => ['nullable', 'string', 'max:100'],
-
-            'start_date' => ['nullable', 'date'],
-
-            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
-
-            'status' => ['required', 'in:planned,ongoing,completed'],
-
-            'featured_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-
-            'meta_title' => ['nullable', 'string', 'max:191'],
-
-            'meta_description' => ['nullable', 'string', 'max:320'],
-
-            'meta_keywords' => ['nullable', 'string', 'max:255'],
-
-            'is_featured' => ['nullable', 'boolean'],
-
-            // Gallery (new uploads)
-            'gallery_images' => ['nullable', 'array'],
-            'gallery_images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-
-            // Gallery (existing rows metadata)
-            'images' => ['nullable', 'array'],
-            'images.*.caption' => ['nullable', 'string', 'max:191'],
-            'images.*.display_order' => ['nullable', 'integer', 'min:0'],
-
-            'delete_images' => ['nullable', 'array'],
-            'delete_images.*' => ['integer'],
-        ]);
     }
 
     /*

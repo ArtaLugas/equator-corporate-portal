@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,10 +10,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AboutSection extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasTranslations, SoftDeletes;
 
+    /**
+     * Only NON-translatable columns. The HasTranslations trait appends the
+     * localized columns (name_en, name_id) from config/translatable.php. The
+     * `slug` is an internal identifier generated from the default-locale name
+     * and is intentionally NOT translated.
+     */
     protected $fillable = [
-        'name',
         'slug',
         'display_order',
         'status',

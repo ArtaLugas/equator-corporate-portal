@@ -2,19 +2,22 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class HeroBanner extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
+    /**
+     * Only NON-translatable columns. The HasTranslations trait appends the
+     * localized columns (title_en/_id, subtitle_en/_id, button_text_en/_id)
+     * from config/translatable.php.
+     */
     protected $fillable = [
-        'title',
-        'subtitle',
         'image',
-        'button_text',
         'button_link',
         'display_order',
         'status',

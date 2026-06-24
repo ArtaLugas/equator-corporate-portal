@@ -35,6 +35,7 @@
             <x-admin.th>Section</x-admin.th>
             <x-admin.th>Title</x-admin.th>
             <x-admin.th>Status</x-admin.th>
+            <x-admin.th>Translation</x-admin.th>
             <x-admin.th>Order</x-admin.th>
             <x-admin.th>Action</x-admin.th>
 
@@ -69,6 +70,12 @@
                     <x-admin.td>
 
                         <x-admin.status-badge :dot="true" :status="$content->status" />
+
+                    </x-admin.td>
+
+                    <x-admin.td>
+
+                        <x-admin.translation-status :model="$content" />
 
                     </x-admin.td>
 
@@ -124,7 +131,7 @@
             @empty
 
                 <tr>
-                    <td colspan="5" class="px-6 py-16">
+                    <td colspan="7" class="px-6 py-16">
                         <div class="mx-auto flex max-w-md flex-col items-center justify-center text-center">
 
                             {{-- Ikon Empty State (Image/Slider Indicator) --}}

@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AboutSectionRequest;
 use App\Models\AboutSection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class AboutSectionController extends Controller
 {
@@ -41,8 +41,12 @@ class AboutSectionController extends Controller
 
             $query->where(function ($q) use ($search) {
 
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%");
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $q->orWhere("name_{$locale}", 'like', "%{$search}%");
+                }
+
+                $q->orWhere('slug', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%");
             });
         }
 
@@ -76,13 +80,13 @@ class AboutSectionController extends Controller
 
             case 'name_asc':
 
-                $query->orderBy('name');
+                $query->orderBy('name_'.config('locales.default'));
 
                 break;
 
             case 'name_desc':
 
-                $query->orderByDesc('name');
+                $query->orderByDesc('name_'.config('locales.default'));
 
                 break;
 
@@ -132,38 +136,17 @@ class AboutSectionController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function store(Request $request)
+    public function store(AboutSectionRequest $request)
     {
-        $validated = $request->validate([
-
-            'name' => [
-                'required',
-                'string',
-                'max:191',
-            ],
-
-            'display_order' => [
-                'nullable',
-                'integer',
-                'min:1',
-                Rule::unique('about_sections', 'display_order'),
-            ],
-
-            'status' => [
-                'required',
-                'in:active,inactive',
-            ],
-        ], [
-            'display_order.unique' => 'This display order is already used by another section.',
-        ]);
+        $validated = $request->validated();
 
         /*
         |--------------------------------------------------------------------------
-        | Auto Slug Generator
+        | Auto Slug Generator (from the default-locale name; internal identifier)
         |--------------------------------------------------------------------------
         */
 
-        $baseSlug = Str::slug($validated['name']);
+        $baseSlug = Str::slug($validated['name_'.config('locales.default')]);
 
         $slug = $baseSlug;
 
@@ -275,57 +258,47 @@ class AboutSectionController extends Controller
     */
 
     public function update(
-        Request $request,
+        AboutSectionRequest $request,
         AboutSection $aboutSection
     ) {
 
-        $validated = $request->validate([
-
-            'name' => [
-                'required',
-                'string',
-                'max:191',
-            ],
-
-            'display_order' => [
-                'nullable',
-                'integer',
-                'min:1',
-                Rule::unique('about_sections', 'display_order')->ignore($aboutSection->id),
-            ],
-
-            'status' => [
-                'required',
-                'in:active,inactive',
-            ],
-        ], [
-            'display_order.unique' => 'This display order is already used by another section.',
-        ]);
+        $validated = $request->validated();
 
         /*
         |--------------------------------------------------------------------------
-        | Auto Slug Generator
+        | Auto Slug Generator — regenerate from the default-locale name only when
+        | enabled (config) AND the name actually changed. Slug is internal.
         |--------------------------------------------------------------------------
         */
 
-        $baseSlug = Str::slug($validated['name']);
+        $defaultLocale = config('locales.default');
 
-        $slug = $baseSlug;
+        $defaultName = $validated['name_'.$defaultLocale];
 
-        $count = 1;
-
-        while (
-
-            AboutSection::where('slug', $slug)
-                ->where('id', '!=', $aboutSection->id)
-                ->exists()
-
+        if (
+            config('cms.auto_regenerate_slug', true)
+            && $aboutSection->{'name_'.$defaultLocale} !== $defaultName
         ) {
 
-            $slug = $baseSlug.'-'.$count++;
-        }
+            $baseSlug = Str::slug($defaultName);
 
-        $validated['slug'] = $slug;
+            $slug = $baseSlug;
+
+            $count = 1;
+
+            while (
+
+                AboutSection::where('slug', $slug)
+                    ->where('id', '!=', $aboutSection->id)
+                    ->exists()
+
+            ) {
+
+                $slug = $baseSlug.'-'.$count++;
+            }
+
+            $validated['slug'] = $slug;
+        }
 
         /*
         |--------------------------------------------------------------------------

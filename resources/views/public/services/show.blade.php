@@ -46,7 +46,7 @@
     {{-- ════════════════════════════════════════════════════════════
          HERO — service identity (single CTA)
     ════════════════════════════════════════════════════════════ --}}
-    <section class="relative overflow-hidden bg-equator-dark text-white" data-service-hero>
+    <section class="relative overflow-hidden bg-equator-dark text-white">
         <div class="pointer-events-none absolute inset-0" aria-hidden="true">
             <div class="absolute inset-0 bg-gradient-to-b from-equator-darker/50 to-equator-dark"></div>
             <div class="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-white/[0.05] blur-[80px]"></div>
@@ -58,9 +58,9 @@
 
                 <div class="{{ $service->image ? 'lg:col-span-7' : 'lg:col-span-9' }}">
                     <nav class="mb-6 flex items-center gap-2 text-xs font-medium text-white/55">
-                        <a href="{{ route('home') }}" class="transition-colors hover:text-white">Home</a>
+                        <a href="{{ route('home') }}" class="transition-colors hover:text-white">{{ __('services.breadcrumb_home') }}</a>
                         <span>/</span>
-                        <a href="{{ route('services.index') }}" class="transition-colors hover:text-white">Services</a>
+                        <a href="{{ route('services.index') }}" class="transition-colors hover:text-white">{{ __('services.breadcrumb_services') }}</a>
                         @if ($service->category)
                             <span>/</span>
                             <span class="text-white/85">{{ $service->category->name }}</span>
@@ -90,7 +90,7 @@
                     <div class="mt-9">
                         <a href="{{ $contactUrl }}"
                             class="group inline-flex items-center justify-center gap-2.5 rounded-xl bg-white px-7 py-3.5 text-sm font-bold text-equator-dark shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)] transition-all duration-300 hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.5)]">
-                            Discuss this service
+                            {{ __('services.discuss_service') }}
                             <i class="bi bi-arrow-right transition-transform duration-300 group-hover:translate-x-1.5"></i>
                         </a>
                     </div>
@@ -118,13 +118,13 @@
         <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             <div class="mb-8 flex items-center gap-3">
                 <span class="h-px w-8 bg-equator-orange"></span>
-                <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">Overview</span>
+                <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">{{ __('services.overview') }}</span>
             </div>
 
             <div
                 class="prose prose-xl max-w-none prose-headings:font-heading prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-equator-dark prose-p:text-[1.2rem] prose-p:leading-[1.85] prose-p:text-slate-600 prose-a:font-medium prose-a:text-equator-bright prose-a:no-underline hover:prose-a:underline prose-strong:text-equator-dark prose-li:text-[1.2rem] prose-li:leading-[1.8] prose-li:text-slate-600">
                 {!! $service->description ?:
-                    '<p class="text-slate-400">A detailed overview for this service is being prepared. Get in touch and our team will walk you through it in detail.</p>' !!}
+                    '<p class="text-slate-400">' . e(__('services.overview_placeholder')) . '</p>' !!}
             </div>
         </div>
     </section>
@@ -139,16 +139,15 @@
                     <div>
                         <div class="mb-4 flex items-center gap-3">
                             <span class="h-px w-8 bg-equator-orange"></span>
-                            <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">Selected
-                                Work</span>
+                            <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">{{ __('services.selected_work') }}</span>
                         </div>
                         <h2 class="font-heading text-2xl font-semibold tracking-tight text-equator-dark sm:text-3xl">
-                            Related projects
+                            {{ __('services.related_projects') }}
                         </h2>
                     </div>
                     <a href="{{ route('projects.index') }}"
                         class="hidden shrink-0 items-center gap-1.5 text-sm font-semibold text-equator-bright transition-colors hover:text-equator-dark sm:inline-flex">
-                        All projects
+                        {{ __('services.all_projects') }}
                         <i class="bi bi-arrow-right text-xs"></i>
                     </a>
                 </div>
@@ -192,55 +191,23 @@
         </section>
     @endif
 
-    {{-- ════════════════════════════════════════════════════════════
-         CTA — single closing call to action
-    ════════════════════════════════════════════════════════════ --}}
-    <section class="relative overflow-hidden bg-equator-dark py-20 text-white sm:py-24">
-        <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div class="absolute -left-20 bottom-0 h-80 w-80 rounded-full bg-equator-bright/[0.14] blur-[90px]"></div>
-        </div>
-        <div class="relative mx-auto max-w-2xl px-4 text-center sm:px-6 lg:px-8">
-            <h2 class="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
-                Have a project in mind?
-            </h2>
-            <p class="mt-4 text-base leading-relaxed text-white/65">
-                Tell us about your objectives and our team will get back to you within one business day.
-            </p>
-            <div class="mt-9">
-                <a href="{{ $contactUrl }}"
-                    class="group inline-flex items-center justify-center gap-2.5 rounded-xl bg-white px-8 py-4 text-sm font-bold text-equator-dark shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)] transition-all duration-300 hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.5)]">
-                    Discuss this service
-                    <i class="bi bi-arrow-right transition-transform duration-300 group-hover:translate-x-1.5"></i>
-                </a>
-            </div>
-            <div class="mt-10">
-                <a href="{{ route('services.index') }}"
-                    class="inline-flex items-center gap-2 text-sm font-semibold text-white/55 transition-colors hover:text-white">
-                    <i class="bi bi-arrow-left"></i>
-                    Back to all services
-                </a>
-            </div>
-        </div>
-    </section>
+    {{-- Closing contextual CTA (shared component). --}}
+    <x-public.lead-cta :heading="__('services.cta_heading')" :body="__('services.cta_body')"
+        :cta-label="__('services.cta_button')" :cta-href="$contactUrl">
+        <x-slot:back>
+            <a href="{{ route('services.index') }}"
+                class="inline-flex items-center gap-2 rounded text-sm font-semibold text-white/55 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                {{ __('services.back_to_all') }}
+            </a>
+        </x-slot:back>
+    </x-public.lead-cta>
 
     {{-- ════════════════════════════════════════════════════════════
-         SCRIPTS — sticky bar visibility + recently-viewed recorder
+         SCRIPTS — recently-viewed recorder
     ════════════════════════════════════════════════════════════ --}}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const hero = document.querySelector('[data-service-hero]');
-            const bar = document.getElementById('service-action-bar');
-            if (hero && bar) {
-                const io = new IntersectionObserver(([entry]) => {
-                    const show = !entry.isIntersecting;
-                    bar.classList.toggle('translate-y-full', !show);
-                    bar.classList.toggle('opacity-0', !show);
-                }, {
-                    rootMargin: '-40% 0px 0px 0px'
-                });
-                io.observe(hero);
-            }
-
             // Record this service for the "recently viewed" rail on the services index.
             const KEY = 'equator_recent_services';
             const entry = {

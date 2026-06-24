@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\TeamRequest;
 use App\Models\Team;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class TeamController extends Controller
 {
@@ -43,9 +43,13 @@ class TeamController extends Controller
 
             $query->where(function ($q) use ($search) {
 
+                // name is single-language; position is translatable across locales.
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('position', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
+
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $q->orWhere("position_{$locale}", 'like', "%{$search}%");
+                }
             });
         }
 
@@ -135,9 +139,9 @@ class TeamController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function store(Request $request)
+    public function store(TeamRequest $request)
     {
-        $validated = $this->validateData($request);
+        $validated = $request->validated();
 
         /*
         |--------------------------------------------------------------------------
@@ -265,11 +269,11 @@ class TeamController extends Controller
     */
 
     public function update(
-        Request $request,
+        TeamRequest $request,
         Team $team
     ) {
 
-        $validated = $this->validateData($request, $team);
+        $validated = $request->validated();
 
         /*
         |--------------------------------------------------------------------------
@@ -596,73 +600,6 @@ class TeamController extends Controller
                 'Failed to permanently delete team member.'
             );
         }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Validate Data
-    |--------------------------------------------------------------------------
-    */
-
-    private function validateData(Request $request, ?Team $team = null): array
-    {
-        return $request->validate([
-
-            'name' => [
-                'required',
-                'string',
-                'max:191',
-            ],
-
-            'position' => [
-                'required',
-                'string',
-                'max:191',
-            ],
-
-            'photo' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048',
-            ],
-
-            'bio' => [
-                'nullable',
-                'string',
-            ],
-
-            'email' => [
-                'nullable',
-                'email',
-                'max:191',
-            ],
-
-            'linkedin_url' => [
-                'nullable',
-                'url',
-                'max:500',
-            ],
-
-            'display_order' => [
-                'nullable',
-                'integer',
-                'min:1',
-
-                // Display order must be unique per table.
-                // Soft-deleted rows are excluded so their order can be reused.
-                Rule::unique('teams', 'display_order')
-                    ->ignore($team?->id)
-                    ->whereNull('deleted_at'),
-            ],
-
-            'status' => [
-                'required',
-                'in:active,inactive',
-            ],
-        ], [
-            'display_order.unique' => 'This display order is already used by another member.',
-        ]);
     }
 
     /*

@@ -142,6 +142,7 @@
             <x-admin.th>Image</x-admin.th>
             <x-admin.th>Name Project</x-admin.th>
             <x-admin.th class="hidden md:table-cell">Status</x-admin.th>
+            <x-admin.th class="hidden md:table-cell">Translation</x-admin.th>
             <x-admin.th class="text-right">Actions</x-admin.th>
         </x-admin.table-head>
 
@@ -218,6 +219,11 @@
                         </div>
                     </x-admin.td>
 
+                    {{-- TRANSLATION STATUS --}}
+                    <x-admin.td class="hidden md:table-cell">
+                        <x-admin.translation-status :model="$project" />
+                    </x-admin.td>
+
                     {{-- ACTIONS --}}
                     <x-admin.td>
                         <div class="flex items-center justify-end gap-1 whitespace-nowrap">
@@ -254,7 +260,7 @@
             @empty
 
                 <tr>
-                    <td colspan="4" class="px-6 py-16">
+                    <td colspan="5" class="px-6 py-16">
                         <div class="mx-auto flex max-w-md flex-col items-center justify-center text-center">
                             <div
                                 class="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50/50">

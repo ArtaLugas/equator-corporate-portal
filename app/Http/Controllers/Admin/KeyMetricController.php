@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\KeyMetricRequest;
 use App\Models\KeyMetric;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class KeyMetricController extends Controller
 {
@@ -42,9 +42,10 @@ class KeyMetricController extends Controller
         return view('admin.key-metrics.create');
     }
 
-    public function store(Request $request)
+    public function store(KeyMetricRequest $request)
     {
-        $validated = $this->validateData($request);
+        $validated = $request->validated();
+        $validated['is_featured'] = $request->boolean('is_featured');
         $validated['display_order'] ??= 0;
 
         try {
@@ -65,9 +66,10 @@ class KeyMetricController extends Controller
         return view('admin.key-metrics.edit', compact('keyMetric'));
     }
 
-    public function update(Request $request, KeyMetric $keyMetric)
+    public function update(KeyMetricRequest $request, KeyMetric $keyMetric)
     {
-        $validated = $this->validateData($request);
+        $validated = $request->validated();
+        $validated['is_featured'] = $request->boolean('is_featured');
         $validated['display_order'] ??= 0;
 
         try {
@@ -96,25 +98,5 @@ class KeyMetricController extends Controller
 
             return back()->with('error', 'Failed to delete metric.');
         }
-    }
-
-    private function validateData(Request $request): array
-    {
-        $validated = $request->validate([
-            'icon' => ['nullable', 'string', 'max:100'],
-            'value' => ['required', 'string', 'max:50'],
-            'label' => ['required', 'string', 'max:191'],
-            'display_order' => [
-                'nullable', 'integer', 'min:0',
-                Rule::unique('key_metrics', 'display_order')->ignore($request->route('key_metric')?->id),
-            ],
-            'status' => ['required', 'in:active,inactive'],
-            'is_featured' => ['nullable', 'boolean'],
-        ]);
-
-        // Toggle mengirim '0'/'1' (hidden input) — normalisasi ke boolean.
-        $validated['is_featured'] = $request->boolean('is_featured');
-
-        return $validated;
     }
 }

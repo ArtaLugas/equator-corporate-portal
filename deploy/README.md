@@ -88,8 +88,12 @@ handled at the application layer rather than by upgrading:
   Admin email fields are trusted input behind auth and are likewise mailer-protected.
 
 `guzzlehttp/*` and `symfony/*` advisories were resolved by updating to patched
-releases within the Laravel 11 constraints. Re-evaluate the Laravel 12 upgrade at
-the next major maintenance window.
+releases within the Laravel 11 constraints.
+
+**Framework policy:** this project stays on **Laravel 11**; a major upgrade to
+Laravel 12 is intentionally **out of scope**. Any future advisory is handled with
+an L11-compatible patch, an application-layer mitigation (as above), or a scoped
+dependency update — never a major framework upgrade.
 
 A baseline **Content-Security-Policy** is emitted by `App\Http\Middleware\SecurityHeaders`
 (allowlists Cloudflare Turnstile + the admin-login Alpine CDN; everything else is
@@ -106,9 +110,10 @@ No paid APM is required for this deployment. Error visibility relies on:
   to Slack. No extra package needed.
 
 If a hosted error tracker (Sentry/Flare) is adopted later, wire it in
-`bootstrap/app.php` `->withExceptions()`. (Adding the package currently requires the
-Laravel 12 upgrade or a temporary advisory-ignore, since Composer blocks installs
-against the open framework advisory.)
+`bootstrap/app.php` `->withExceptions()`. Because the project stays on Laravel 11
+(see framework policy above), prefer an L11-compatible tracker version; if Composer
+blocks an install against the open framework advisory, use a scoped, documented
+advisory-ignore rather than upgrading the framework.
 
 ## 6. Redeploys
 

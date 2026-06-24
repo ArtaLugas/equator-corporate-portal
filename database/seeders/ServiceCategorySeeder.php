@@ -18,8 +18,8 @@ class ServiceCategorySeeder extends Seeder
             ServiceCategory::updateOrCreate(
                 ['slug' => $this->clip($row['slug'])],
                 [
-                    'name' => $this->clip($row['category_name']),
-                    'description' => $this->nullable($row['description'] ?? null),
+                    'name_en' => $this->clip($row['category_name']),
+                    'description_en' => $this->nullable($row['description'] ?? null),
                     'image' => $this->nullable($row['image'] ?? null),
                     'display_order' => $order++,
                     'status' => $row['status'] === 'active' ? 'active' : 'inactive',

@@ -1,8 +1,36 @@
+@php
+    $locales = config('locales.supported', []);
+    $default = config('locales.default');
+
+    // Open the tab of the first locale that has a validation error.
+    $activeTab = $default;
+    foreach (array_keys($locales) as $lc) {
+        foreach (['name', 'short_description', 'description', 'meta_title', 'meta_description', 'meta_keywords'] as $f) {
+            if ($errors->has("{$f}_{$lc}")) {
+                $activeTab = $lc;
+                break 2;
+            }
+        }
+    }
+
+    // Slug auto-regeneration: always on for new records; on edit it follows
+    // config('cms.auto_regenerate_slug') so permalinks can be frozen post go-live.
+    $editing = isset($project) && $project->exists;
+    $autoSlug = ! $editing || config('cms.auto_regenerate_slug', true);
+
+    $translationSummaries = collect(array_keys($locales))
+        ->reject(fn ($l) => $l === $default)
+        ->filter(fn ($l) => $errors->has("translation_{$l}"));
+@endphp
+
 <div x-data="{
-    name: @js(old('name', $project->name ?? '')),
+    locale: @js($activeTab),
+    autoSlug: @js($autoSlug),
+    nameEn: @js(old('name_' . $default, $project->{'name_' . $default} ?? '')),
     slug: @js(old('slug', $project->slug ?? '')),
     generateSlug() {
-        this.slug = this.name
+        if (! this.autoSlug) return; // permalink frozen — keep the existing slug
+        this.slug = this.nameEn
             .toString()
             .toLowerCase()
             .trim()
@@ -162,15 +190,63 @@
                 @enderror
             </div>
 
-            {{-- NAME + SLUG --}}
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <x-admin.form.input name="name" label="Project Name" x-model="name"
-                    placeholder="e.g. Coastal Mapping Survey" required />
-                <x-admin.form.input name="slug" label="URL Slug" x-model="slug"
-                    placeholder="e.g. coastal-mapping-survey" readonly required />
-            </div>
+            {{-- ALL-OR-NOTHING TRANSLATION SUMMARY --}}
+            @if ($translationSummaries->isNotEmpty())
+                <div class="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="mt-0.5 shrink-0 text-amber-500">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                        <line x1="12" x2="12" y1="9" y2="13" />
+                        <line x1="12" x2="12.01" y1="17" y2="17" />
+                    </svg>
+                    <div class="space-y-1">
+                        @foreach ($translationSummaries as $l)
+                            <p class="text-sm font-semibold text-amber-800">{{ $errors->first("translation_{$l}") }}</p>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
-            {{-- CLIENT + LOCATION + COUNTRY --}}
+            {{-- LANGUAGE TABS (control every translatable field) --}}
+            <x-admin.lang-tabs />
+
+            {{-- TRANSLATABLE FIELDS — one panel per locale --}}
+            @foreach ($locales as $code => $meta)
+                <div x-show="locale === '{{ $code }}'" x-cloak class="space-y-6">
+
+                    <x-admin.form.input
+                        name="name_{{ $code }}"
+                        label="Project Name ({{ strtoupper($code) }})"
+                        placeholder="e.g. Coastal Mapping Survey"
+                        :required="$code === $default"
+                        @if ($code === $default)
+                            x-model="nameEn"
+                        @else
+                            value="{{ old('name_' . $code, $project->{'name_' . $code} ?? '') }}"
+                        @endif
+                    />
+
+                    <x-admin.form.textarea
+                        name="short_description_{{ $code }}"
+                        label="Short Description ({{ strtoupper($code) }})"
+                        rows="3"
+                        :value="$project->{'short_description_' . $code} ?? ''"
+                        placeholder="Brief summary (max 255 characters)..." />
+
+                    <x-admin.form.wysiwyg
+                        name="description_{{ $code }}"
+                        label="Project Description ({{ strtoupper($code) }})"
+                        :value="$project->{'description_' . $code} ?? ''" />
+
+                </div>
+            @endforeach
+
+            {{-- SLUG (single, generated from the default-locale name) --}}
+            <x-admin.form.input name="slug" label="URL Slug" x-model="slug"
+                placeholder="e.g. coastal-mapping-survey" readonly required />
+
+            {{-- CLIENT + LOCATION + COUNTRY (not translated) --}}
             <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <x-admin.form.input name="client_name" label="Client Name"
                     :value="old('client_name', $project->client_name ?? '')" placeholder="e.g. PT Maju Jaya" />
@@ -180,7 +256,7 @@
                     :value="old('country', $project->country ?? '')" placeholder="e.g. Indonesia" />
             </div>
 
-            {{-- DATES --}}
+            {{-- DATES (not translated) --}}
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <x-admin.form.input name="start_date" label="Start Date" type="date"
                     :value="old('start_date', isset($project) && $project->start_date ? $project->start_date->format('Y-m-d') : '')" />
@@ -188,16 +264,7 @@
                     :value="old('end_date', isset($project) && $project->end_date ? $project->end_date->format('Y-m-d') : '')" />
             </div>
 
-            {{-- SHORT DESCRIPTION --}}
-            <x-admin.form.textarea name="short_description" label="Short Description" rows="3"
-                :value="old('short_description', $project->short_description ?? '')"
-                placeholder="Brief summary (max 255 characters)..." />
-
-            {{-- DESCRIPTION --}}
-            <x-admin.form.wysiwyg name="description" label="Project Description"
-                :value="old('description', $project->description ?? '')" />
-
-            {{-- FEATURED IMAGE --}}
+            {{-- FEATURED IMAGE (not translated) --}}
             <div class="pt-2">
                 <x-admin.image-preview name="featured_image" label="Featured Image"
                     helpText="16:9 aspect ratio recommended. Max 2MB."
@@ -208,7 +275,7 @@
     </div>
 
     {{-- ===================================================== --}}
-    {{-- CARD 2 : GALLERY --}}
+    {{-- CARD 2 : GALLERY (not translated) --}}
     {{-- ===================================================== --}}
     <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
 
@@ -314,23 +381,39 @@
 
         <div class="mb-6 border-b border-gray-50 pb-4">
             <h2 class="text-lg font-extrabold tracking-tight text-equator-text">Search Engine Optimization (SEO)</h2>
-            <p class="mt-1 text-xs font-medium text-gray-500">Configure metadata for better search visibility.</p>
+            <p class="mt-1 text-xs font-medium text-gray-500">Per-language metadata. Use the language tabs above to switch.</p>
         </div>
 
-        <div class="space-y-6">
-            <x-admin.form.input name="meta_title" label="Meta Title"
-                :value="old('meta_title', $project->meta_title ?? '')" placeholder="Maximum 60 characters" />
-            <x-admin.form.textarea name="meta_description" label="Meta Description" rows="3"
-                :value="old('meta_description', $project->meta_description ?? '')"
-                placeholder="Brief summary for search engines..." />
-            <x-admin.form.input name="meta_keywords" label="Meta Keywords"
-                :value="old('meta_keywords', $project->meta_keywords ?? '')"
-                placeholder="e.g. survey, mapping, lidar" />
-        </div>
+        {{-- TRANSLATABLE SEO FIELDS — share the same locale tab as above --}}
+        @foreach ($locales as $code => $meta)
+            <div x-show="locale === '{{ $code }}'" x-cloak class="space-y-6">
+
+                <x-admin.form.input
+                    name="meta_title_{{ $code }}"
+                    label="Meta Title ({{ strtoupper($code) }})"
+                    placeholder="Maximum 60 characters"
+                    value="{{ old('meta_title_' . $code, $project->{'meta_title_' . $code} ?? '') }}" />
+
+                <x-admin.form.textarea
+                    name="meta_description_{{ $code }}"
+                    label="Meta Description ({{ strtoupper($code) }})"
+                    rows="3"
+                    :value="$project->{'meta_description_' . $code} ?? ''"
+                    placeholder="Brief summary for search engines..." />
+
+                <x-admin.form.input
+                    name="meta_keywords_{{ $code }}"
+                    label="Meta Keywords ({{ strtoupper($code) }})"
+                    placeholder="e.g. survey, mapping, lidar"
+                    value="{{ old('meta_keywords_' . $code, $project->{'meta_keywords_' . $code} ?? '') }}" />
+
+            </div>
+        @endforeach
+
     </div>
 
     {{-- ===================================================== --}}
-    {{-- CARD 4 : VISIBILITY --}}
+    {{-- CARD 4 : VISIBILITY (not translated) --}}
     {{-- ===================================================== --}}
     <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
 

@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             KeyMetricSeeder::class,
             OfficeLocationSeeder::class,
             FaqSeeder::class,
+            CompanyCredentialSeeder::class,
 
             // Inbox
             MessageSeeder::class,

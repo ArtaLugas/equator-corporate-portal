@@ -1,8 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'About Us — ' . app_setting('company_name', 'Equator Group'))
+@section('title', __('about.page_title', ['company' => app_setting('company_name', 'Equator Group')]))
 
-@section('meta_description', 'Learn about ' . app_setting('company_name', 'Equator Group') . ' — ' . app_setting('tagline', 'a social and environmental advisory firm across sustainability, ESG, resilience and development.'))
+@section('meta_description', __('about.page_meta', ['company' => app_setting('company_name', 'Equator Group'), 'tagline' => app_setting('tagline', 'a social and environmental advisory firm across sustainability, ESG, resilience and development.')]))
 
 @push('head')
     @php
@@ -20,7 +20,7 @@
         $aboutJsonLd = [
             '@context' => 'https://schema.org',
             '@graph' => [
-                ['@type' => 'AboutPage', 'url' => url()->current(), 'name' => 'About — ' . app_setting('company_name', 'Equator Group')],
+                ['@type' => 'AboutPage', 'url' => url()->current(), 'name' => __('about.hero_title', ['company' => app_setting('company_name', 'Equator Group')])],
                 $aboutOrg,
                 [
                     '@type' => 'BreadcrumbList',
@@ -39,7 +39,7 @@
 
     {{-- HERO --}}
     @include('public.partials.page-hero', [
-        'title' => 'About ' . app_setting('company_name', 'Equator Group'),
+        'title' => __('about.hero_title', ['company' => app_setting('company_name', 'Equator Group')]),
         'subtitle' => app_setting('tagline', 'Safeguarding people, planet, prosperity, and principles.'),
     ])
 
@@ -79,8 +79,7 @@
                                 <div class="story-content lg:col-span-7">
                                     <div class="story-eyebrow flex items-center gap-3">
                                         <span class="h-px w-8 bg-equator-orange"></span>
-                                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">About
-                                            Us</span>
+                                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{{ __('about.eyebrow_about_us') }}</span>
                                     </div>
                                     <h2
                                         class="story-heading mt-5 font-heading text-3xl font-semibold tracking-tight text-equator-dark sm:text-4xl lg:text-[2.5rem] lg:leading-[1.2]">
@@ -111,8 +110,7 @@
                                 <div class="story-content lg:col-span-5">
                                     <div class="story-eyebrow flex items-center gap-3">
                                         <span class="h-px w-8 bg-equator-orange"></span>
-                                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">About
-                                            Us</span>
+                                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{{ __('about.eyebrow_about_us') }}</span>
                                     </div>
                                     <h2
                                         class="story-heading mt-5 font-heading text-3xl font-semibold tracking-tight text-equator-dark sm:text-4xl lg:text-5xl">
@@ -135,8 +133,7 @@
                             <div class="max-w-3xl">
                                 <div class="story-eyebrow flex items-center gap-3">
                                     <span class="h-px w-8 bg-equator-orange"></span>
-                                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">About
-                                        Us</span>
+                                    <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{{ __('about.eyebrow_about_us') }}</span>
                                 </div>
                                 <h2
                                     class="story-heading mt-5 font-heading text-3xl font-semibold tracking-tight text-equator-dark sm:text-4xl lg:text-5xl">
@@ -170,7 +167,7 @@
 
                                     <h3
                                         class="mt-6 font-heading text-xl font-semibold tracking-tight text-equator-dark sm:text-2xl">
-                                        {{ $vision->title ?? 'Vision' }}
+                                        {{ $vision->title ?? __('about.vision') }}
                                     </h3>
 
                                     <div
@@ -194,7 +191,7 @@
 
                                     <h3
                                         class="mt-6 font-heading text-xl font-semibold tracking-tight text-equator-dark sm:text-2xl">
-                                        {{ $mission->title ?? 'Mission' }}
+                                        {{ $mission->title ?? __('about.mission') }}
                                     </h3>
 
                                     <div
@@ -213,14 +210,13 @@
                 <div class="max-w-3xl">
                     <div class="flex items-center gap-3">
                         <span class="h-px w-8 bg-equator-orange"></span>
-                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">About Us</span>
+                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{{ __('about.eyebrow_about_us') }}</span>
                     </div>
                     <h2 class="mt-6 font-heading text-3xl font-semibold tracking-tight text-equator-dark sm:text-4xl">
                         {{ app_setting('company_name', 'Equator Group') }}
                     </h2>
                     <p class="mt-6 text-base leading-8 text-slate-600 sm:text-[1.0625rem]">
-                        A social and environmental advisory firm helping organizations manage risk and compliance
-                        across multiple industries and regions.
+                        {{ __('about.empty_lead') }}
                     </p>
                 </div>
 
@@ -298,16 +294,16 @@
                     <div class="lg:col-span-7">
                         <div class="flex items-center gap-3">
                             <span class="h-px w-8 bg-equator-orange"></span>
-                            <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Our Values</span>
+                            <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{{ __('about.values_eyebrow') }}</span>
                         </div>
                         <h2
                             class="mt-5 font-heading text-2xl font-semibold tracking-tight text-equator-dark sm:text-3xl lg:text-4xl">
-                            Principles That Shape Every Decision
+                            {{ __('about.values_heading') }}
                         </h2>
                     </div>
                     <div class="lg:col-span-5">
                         <p class="text-[0.9375rem] leading-7 text-slate-600 sm:text-base">
-                            These values define how we work with clients, partners, communities, and one another.
+                            {{ __('about.values_intro') }}
                         </p>
                     </div>
                 </div>
@@ -433,16 +429,16 @@
                     <div class="lg:col-span-7">
                         <div class="flex items-center gap-3">
                             <span class="h-px w-8 bg-equator-orange"></span>
-                            <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Our Journey</span>
+                            <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{{ __('about.journey_eyebrow') }}</span>
                         </div>
                         <h2
                             class="mt-5 font-heading text-2xl font-semibold tracking-tight text-equator-dark sm:text-3xl lg:text-4xl">
-                            Milestones That Define Our Story
+                            {{ __('about.journey_heading') }}
                         </h2>
                     </div>
                     <div class="lg:col-span-5">
                         <p class="text-[0.9375rem] leading-7 text-slate-600 sm:text-base">
-                            A record of growth, commitment, and impact — chapter by chapter.
+                            {{ __('about.journey_intro') }}
                         </p>
                     </div>
                 </div>
@@ -589,16 +585,16 @@
                     <div class="lg:col-span-7">
                         <div class="flex items-center gap-3">
                             <span class="h-px w-8 bg-equator-orange"></span>
-                            <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Our People</span>
+                            <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{{ __('about.team_eyebrow') }}</span>
                         </div>
                         <h2
                             class="mt-5 font-heading text-2xl font-semibold tracking-tight text-equator-dark sm:text-3xl lg:text-4xl">
-                            The People Behind Our Work
+                            {{ __('about.team_heading') }}
                         </h2>
                     </div>
                     <div class="lg:col-span-5">
                         <p class="text-[0.9375rem] leading-7 text-slate-600 sm:text-base">
-                            A team of specialists committed to delivering responsible, high-impact solutions.
+                            {{ __('about.team_intro') }}
                         </p>
                     </div>
                 </div>
@@ -637,14 +633,14 @@
                                     <div class="mt-3 flex items-center gap-1.5 border-t border-slate-100 pt-3">
                                         @if ($member->linkedin_url)
                                             <a href="{{ $member->linkedin_url }}" target="_blank" rel="noopener"
-                                                aria-label="LinkedIn — {{ $member->name }}"
+                                                aria-label="{{ __('about.linkedin_aria', ['name' => $member->name]) }}"
                                                 class="flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-400 transition-colors duration-200 hover:border-equator-dark hover:bg-equator-dark hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-equator-dark/30">
                                                 <i class="bi bi-linkedin text-[0.65rem]"></i>
                                             </a>
                                         @endif
                                         @if ($member->email)
                                             <a href="mailto:{{ $member->email }}"
-                                                aria-label="Email — {{ $member->name }}"
+                                                aria-label="{{ __('about.email_aria', ['name' => $member->name]) }}"
                                                 class="flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-400 transition-colors duration-200 hover:border-equator-dark hover:bg-equator-dark hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-equator-dark/30">
                                                 <i class="bi bi-envelope text-[0.65rem]"></i>
                                             </a>
@@ -695,6 +691,119 @@
         </script>
     @endif
 
+    {{-- ============================ CREDENTIALS & CERTIFICATIONS ============================ --}}
+    @if (($credentials ?? collect())->isNotEmpty())
+        @php
+            $credBadge = [
+                'active' => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+                'expiring_soon' => 'bg-amber-50 text-amber-700 ring-amber-600/20',
+                'expired' => 'bg-red-50 text-red-700 ring-red-600/20',
+            ];
+        @endphp
+        <section id="credentials" class="scroll-mt-24 border-t border-slate-200 bg-slate-50 py-24 sm:py-28">
+            <div class="mx-auto max-w-7xl px-6 lg:px-8">
+
+                <div class="grid gap-x-10 gap-y-5 lg:grid-cols-12 lg:items-end">
+                    <div class="lg:col-span-7">
+                        <div class="flex items-center gap-3">
+                            <span class="h-px w-8 bg-equator-orange"></span>
+                            <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{{ __('credentials.breadcrumb') }}</span>
+                        </div>
+                        <h2
+                            class="mt-5 font-heading text-2xl font-semibold tracking-tight text-equator-dark sm:text-3xl lg:text-4xl">
+                            {{ __('credentials.section_heading') }}
+                        </h2>
+                    </div>
+                    <div class="lg:col-span-5">
+                        <p class="text-[0.9375rem] leading-7 text-slate-600 sm:text-base">
+                            {{ __('credentials.page_subtitle') }}</p>
+                    </div>
+                </div>
+
+                <div class="mt-16 space-y-14">
+                    @foreach ($credentials as $category => $group)
+                        @php $hasItems = $group->contains(fn ($c) => $c->items->isNotEmpty()); @endphp
+                        <div>
+                            <div class="mb-6 flex items-center gap-3">
+                                <span
+                                    class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-equator-dark">
+                                    <x-icon :name="config('credentials.categories.' . $category . '.icon', 'file-badge')" class="h-5 w-5"
+                                        stroke-width="1.5" />
+                                </span>
+                                <h3 class="font-heading text-lg font-semibold tracking-tight text-equator-dark sm:text-xl">
+                                    {{ __('credentials.categories.' . $category) }}
+                                </h3>
+                            </div>
+
+                            <div @class([
+                                'grid gap-6',
+                                'sm:grid-cols-2 lg:grid-cols-3' => ! $hasItems,
+                            ])>
+                                @foreach ($group as $cred)
+                                    @php $ds = $cred->displayStatus(); @endphp
+                                    <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7">
+                                        <div class="flex flex-wrap items-start justify-between gap-4">
+                                            <div class="flex items-start gap-4">
+                                                @if ($cred->image)
+                                                    <img src="{{ asset('storage/' . $cred->image) }}" alt="{{ $cred->title }}"
+                                                        loading="lazy" decoding="async"
+                                                        class="h-16 w-16 shrink-0 rounded-xl border border-slate-100 object-contain p-1">
+                                                @endif
+                                                <div>
+                                                    <h4 class="font-heading text-base font-semibold text-equator-dark sm:text-lg">
+                                                        {{ $cred->title }}</h4>
+                                                    @if ($cred->issuer)
+                                                        <p class="mt-0.5 text-sm text-slate-500">{{ $cred->issuer }}</p>
+                                                    @endif
+                                                    @if (isset($credBadge[$ds]))
+                                                        <span
+                                                            class="mt-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ring-1 {{ $credBadge[$ds] }}">{{ __('credentials.status.' . $ds) }}</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-wrap gap-2">
+                                                @if ($cred->verification_url)
+                                                    <a href="{{ $cred->verification_url }}" target="_blank" rel="noopener"
+                                                        class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-equator-dark transition hover:border-equator-dark">
+                                                        <i class="bi bi-patch-check"></i>{{ __('credentials.verify') }}</a>
+                                                @endif
+                                                @if ($cred->attachment)
+                                                    <a href="{{ asset('storage/' . $cred->attachment) }}" target="_blank"
+                                                        rel="noopener"
+                                                        class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-equator-dark transition hover:border-equator-dark">
+                                                        <i class="bi bi-download"></i>{{ __('credentials.download') }}</a>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        @if (filled(strip_tags((string) $cred->description)))
+                                            <div class="prose prose-sm mt-4 max-w-none text-slate-600">{!! $cred->description !!}</div>
+                                        @endif
+
+                                        @if ($cred->items->isNotEmpty())
+                                            <div class="mt-5 border-t border-slate-100 pt-5">
+                                                <p class="mb-3 text-[0.7rem] font-bold uppercase tracking-[0.18em] text-slate-400">
+                                                    {{ __('credentials.classifications') }}</p>
+                                                <div class="grid gap-2 sm:grid-cols-2">
+                                                    @foreach ($cred->items as $it)
+                                                        <div class="flex items-start gap-2 text-sm text-slate-600">
+                                                            <i class="bi bi-check-circle-fill mt-0.5 shrink-0 text-equator-bright"></i>
+                                                            <span>{{ $it->title }}</span>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
     {{-- ============================ 05 — CLOSING (CONTACT + COMPANY PROFILE) ============================ --}}
     @php $hasProfile = !empty($companyProfile) && $companyProfile->file; @endphp
     <section class="closing-cta-section relative overflow-hidden bg-equator-dark py-28 sm:py-36">
@@ -720,20 +829,18 @@
                     <div class="closing-reveal flex items-center gap-3" data-delay="50"
                         style="transform: translateX(-8px);">
                         <span class="h-px w-8 bg-equator-orange"></span>
-                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">Begin the
-                            conversation</span>
+                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">{{ __('about.closing_eyebrow') }}</span>
                     </div>
 
                     <h2 class="closing-reveal mt-6 font-heading text-4xl font-semibold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-[3.25rem]"
                         data-delay="130" style="transform: translateY(14px);">
-                        Ready to take<br>
-                        <span class="text-white/60">the next step?</span>
+                        {{ __('about.closing_heading_line1') }}<br>
+                        <span class="text-white/60">{{ __('about.closing_heading_line2') }}</span>
                     </h2>
 
                     <p class="closing-reveal mt-8 max-w-lg text-[1.0625rem] leading-8 text-white/[0.68]" data-delay="230"
                         style="transform: translateY(10px);">
-                        Tell us about your goals and we'll connect you with the right specialists — whether it's
-                        environmental compliance, social assessment, or ESG advisory.
+                        {{ __('about.closing_body') }}
                     </p>
 
                     <div class="closing-reveal mt-12" data-delay="330" style="transform: translateY(8px);">
@@ -741,7 +848,7 @@
                             class="group inline-flex items-center gap-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-4 focus-visible:ring-offset-equator-dark">
                             <span
                                 class="inline-flex items-center gap-3 rounded-xl bg-white px-8 py-4 text-base font-semibold text-equator-dark shadow-[0_8px_24px_-8px_rgba(0,0,0,0.3)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:shadow-[0_20px_48px_-12px_rgba(0,0,0,0.45),0_0_0_1px_rgba(255,255,255,0.2)]">
-                                Contact our team
+                                {{ __('common.contact_team') }}
                                 <i class="bi bi-arrow-right transition-transform duration-300 group-hover:translate-x-1.5"
                                     aria-hidden="true"></i>
                             </span>
@@ -780,7 +887,7 @@
                                     class="flex items-center gap-1.5 rounded-full border border-white/[0.18] bg-white/[0.08] px-3 py-1 transition-all duration-300 group-hover:border-equator-orange/40 group-hover:bg-equator-orange/[0.12]">
                                     <span class="h-1 w-1 rounded-full bg-equator-orange" aria-hidden="true"></span>
                                     <span
-                                        class="font-mono text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white/60 transition-colors duration-300 group-hover:text-equator-orange/90">PDF</span>
+                                        class="font-mono text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white/60 transition-colors duration-300 group-hover:text-equator-orange/90">{{ __('about.profile_label_pdf') }}</span>
                                 </div>
                             </div>
 
@@ -791,12 +898,11 @@
                                 </p>
                                 <h3
                                     class="mt-2.5 font-heading text-[1.375rem] font-semibold leading-snug tracking-tight text-white">
-                                    Company Profile
+                                    {{ __('about.profile_title') }}
                                 </h3>
                                 <p
                                     class="mt-3 text-sm leading-6 text-white/[0.58] transition-colors duration-300 group-hover:text-white/[0.75]">
-                                    An overview of our services, expertise, and the impact we've delivered across industries
-                                    and geographies.
+                                    {{ __('about.profile_description') }}
                                 </p>
                             </div>
 
@@ -811,20 +917,20 @@
                                         <span class="text-white/25" aria-hidden="true">·</span>
                                     @endif
                                     <span
-                                        class="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-white/40">Document</span>
+                                        class="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-white/40">{{ __('about.profile_document') }}</span>
                                 </div>
                                 <div
                                     class="flex items-center gap-2 text-[0.8125rem] font-medium text-white/50 transition-all duration-300 group-hover:text-white/90">
                                     <i class="bi bi-download transition-transform duration-300 group-hover:translate-y-0.5"
                                         aria-hidden="true"></i>
-                                    <span>Download</span>
+                                    <span>{{ __('about.profile_download') }}</span>
                                 </div>
                             </div>
 
                         </a>
 
                         <p class="mt-4 text-[0.72rem] leading-5 text-white/30">
-                            Free to download · No registration required
+                            {{ __('about.profile_free_note') }}
                         </p>
 
                     </div>

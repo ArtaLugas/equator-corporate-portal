@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\HeroBannerRequest;
 use App\Models\HeroBanner;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 
 class HeroBannerController extends Controller
 {
@@ -43,9 +43,11 @@ class HeroBannerController extends Controller
 
             $query->where(function ($q) use ($search) {
 
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('subtitle', 'like', "%{$search}%")
-                    ->orWhere('button_text', 'like', "%{$search}%");
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $q->orWhere("title_{$locale}", 'like', "%{$search}%")
+                        ->orWhere("subtitle_{$locale}", 'like', "%{$search}%")
+                        ->orWhere("button_text_{$locale}", 'like', "%{$search}%");
+                }
             });
         }
 
@@ -79,13 +81,13 @@ class HeroBannerController extends Controller
 
             case 'title_asc':
 
-                $query->orderBy('title');
+                $query->orderBy('title_'.config('locales.default'));
 
                 break;
 
             case 'title_desc':
 
-                $query->orderByDesc('title');
+                $query->orderByDesc('title_'.config('locales.default'));
 
                 break;
 
@@ -135,53 +137,9 @@ class HeroBannerController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function store(Request $request)
+    public function store(HeroBannerRequest $request)
     {
-        $validated = $request->validate([
-
-            'title' => [
-                'nullable',
-                'string',
-                'max:191',
-            ],
-
-            'subtitle' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'image' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048',
-            ],
-
-            'button_text' => [
-                'nullable',
-                'string',
-                'max:100',
-            ],
-
-            'button_link' => [
-                'nullable',
-                'url',
-                'max:500',
-            ],
-
-            'display_order' => [
-                'nullable',
-                'integer',
-                'min:1',
-                Rule::unique('hero_banners', 'display_order')->ignore($request->route('hero_banner')?->id),
-            ],
-
-            'status' => [
-                'required',
-                'in:active,inactive',
-            ],
-        ]);
+        $validated = $request->validated();
 
         /*
         |--------------------------------------------------------------------------
@@ -211,7 +169,7 @@ class HeroBannerController extends Controller
 
                     'hero-banners',
 
-                    $validated['title'] ?? 'hero-banner'
+                    $validated['title_en'] ?? 'hero-banner'
                 );
 
                 $validated['image'] = $imagePath;
@@ -314,55 +272,11 @@ class HeroBannerController extends Controller
     */
 
     public function update(
-        Request $request,
+        HeroBannerRequest $request,
         HeroBanner $heroBanner
     ) {
 
-        $validated = $request->validate([
-
-            'title' => [
-                'nullable',
-                'string',
-                'max:191',
-            ],
-
-            'subtitle' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'image' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048',
-            ],
-
-            'button_text' => [
-                'nullable',
-                'string',
-                'max:100',
-            ],
-
-            'button_link' => [
-                'nullable',
-                'url',
-                'max:500',
-            ],
-
-            'display_order' => [
-                'nullable',
-                'integer',
-                'min:1',
-                Rule::unique('hero_banners', 'display_order')->ignore($request->route('hero_banner')?->id),
-            ],
-
-            'status' => [
-                'required',
-                'in:active,inactive',
-            ],
-        ]);
+        $validated = $request->validated();
 
         /*
         |--------------------------------------------------------------------------
@@ -394,7 +308,7 @@ class HeroBannerController extends Controller
 
                     'hero-banners',
 
-                    $validated['title'] ?? 'hero-banner'
+                    $validated['title_en'] ?? 'hero-banner'
                 );
 
                 $validated['image'] = $newImage;

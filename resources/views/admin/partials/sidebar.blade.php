@@ -63,6 +63,19 @@
                     <span class="text-sm">Dashboard</span>
                 </a>
 
+                {{-- Translation Progress --}}
+                <a href="{{ route('admin.translations.index') }}"
+                    class="{{ request()->routeIs('admin.translations.*') ? 'bg-equator-dark/5 text-equator-dark font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="{{ request()->routeIs('admin.translations.*') ? 'text-equator-dark' : 'text-gray-400 group-hover:text-gray-600' }} shrink-0">
+                        <path d="m5 8 6 6" /><path d="m4 14 6-6 2-3" /><path d="M2 5h12" /><path d="M7 2h1" />
+                        <path d="m22 22-5-10-5 10" /><path d="M14 18h6" />
+                    </svg>
+                    <span class="text-sm">Translation Progress</span>
+                </a>
+
                 {{-- SERVICE MENU (Accordion) --}}
                 <div x-data="{ open: {{ request()->routeIs('admin.services.*') || request()->routeIs('admin.service-categories.*') ? 'true' : 'false' }} }" class="space-y-1">
 
@@ -288,6 +301,27 @@
                     <span class="text-sm">
 
                         Company Documents
+
+                    </span>
+
+                </a>
+
+                {{-- COMPANY CREDENTIALS --}}
+                <a href="{{ route('admin.company-credentials.index') }}"
+                    class="{{ request()->routeIs('admin.company-credentials.*') ? 'text-equator-dark font-bold bg-gray-50/50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="{{ request()->routeIs('admin.company-credentials.*') ? 'text-equator-dark' : 'text-gray-400 group-hover:text-gray-600' }} shrink-0">
+                        <path
+                            d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                        <path d="m9 12 2 2 4-4" />
+                    </svg>
+
+                    <span class="text-sm">
+
+                        Company Credentials
 
                     </span>
 

@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AboutHistoryRequest;
 use App\Models\AboutHistory;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class AboutHistoryController extends Controller
 {
@@ -39,8 +38,12 @@ class AboutHistoryController extends Controller
             $search = trim($request->input('search'));
 
             $query->where(function ($q) use ($search) {
-                $q->whereRaw('CAST(year AS CHAR) LIKE ?', ["%{$search}%"])
-                    ->orWhere('title', 'like', "%{$search}%");
+                $q->whereRaw('CAST(year AS CHAR) LIKE ?', ["%{$search}%"]);
+
+                // Title is translatable — search every locale column.
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $q->orWhere("title_{$locale}", 'like', "%{$search}%");
+                }
             });
         }
 
@@ -100,55 +103,9 @@ class AboutHistoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(AboutHistoryRequest $request)
     {
-        $validated = Validator::make(
-
-            $request->all(),
-
-            [
-                'year' => [
-                    'required',
-                    'integer',
-                    'min:1900',
-                    'max:'.(date('Y') + 10),
-                ],
-
-                'title' => [
-                    'required',
-                    'string',
-                    'max:191',
-                ],
-
-                'description' => [
-                    'nullable',
-                    'string',
-                ],
-
-                'image' => [
-                    'nullable',
-                    'image',
-                    'mimes:jpg,jpeg,png,webp',
-                    'max:2048',
-                ],
-
-                'display_order' => [
-                    'required',
-                    'integer',
-                    'min:1',
-                    'unique:about_histories,display_order',
-                ],
-
-                'status' => [
-                    'required',
-                    Rule::in([
-                        'active',
-                        'inactive',
-                    ]),
-                ],
-            ]
-
-        )->validate();
+        $validated = $request->validated();
 
         $imagePath = null;
 
@@ -164,7 +121,7 @@ class AboutHistoryController extends Controller
 
                     'about-histories',
 
-                    $validated['title']
+                    $validated['title_en']
                 );
 
                 $validated['image'] = $imagePath;
@@ -228,58 +185,9 @@ class AboutHistoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, AboutHistory $aboutHistory)
+    public function update(AboutHistoryRequest $request, AboutHistory $aboutHistory)
     {
-        $validated = Validator::make(
-
-            $request->all(),
-
-            [
-                'year' => [
-                    'required',
-                    'integer',
-                    'min:1900',
-                    'max:'.(date('Y') + 10),
-                ],
-
-                'title' => [
-                    'required',
-                    'string',
-                    'max:191',
-                ],
-
-                'description' => [
-                    'nullable',
-                    'string',
-                ],
-
-                'image' => [
-                    'nullable',
-                    'image',
-                    'mimes:jpg,jpeg,png,webp',
-                    'max:2048',
-                ],
-
-                'display_order' => [
-                    'required',
-                    'integer',
-                    'min:1',
-                    Rule::unique(
-                        'about_histories',
-                        'display_order'
-                    )->ignore($aboutHistory->id),
-                ],
-
-                'status' => [
-                    'required',
-                    Rule::in([
-                        'active',
-                        'inactive',
-                    ]),
-                ],
-            ]
-
-        )->validate();
+        $validated = $request->validated();
 
         $oldImage = $aboutHistory->image;
 
@@ -297,7 +205,7 @@ class AboutHistoryController extends Controller
 
                     'about-histories',
 
-                    $validated['title']
+                    $validated['title_en']
                 );
 
                 $validated['image'] = $newImage;

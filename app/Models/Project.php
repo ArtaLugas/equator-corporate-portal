@@ -2,26 +2,28 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Mews\Purifier\Facades\Purifier;
 
 class Project extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasTranslations, SoftDeletes;
 
     /** Statuses that are visible on the public site (a "case study" is delivered work). */
     public const PUBLIC_STATUSES = ['ongoing', 'completed'];
 
+    /**
+     * Only NON-translatable columns. The HasTranslations trait appends the
+     * localized columns (name_en, name_id, …) from config/translatable.php and
+     * centrally Purifier-sanitizes the HTML field (description) for every locale
+     * on write — replacing the old description() mutator.
+     */
     protected $fillable = [
-        'name',
         'slug',
-        'short_description',
-        'description',
         'client_name',
         'location',
         'country',
@@ -29,9 +31,6 @@ class Project extends Model
         'end_date',
         'status',
         'featured_image',
-        'meta_title',
-        'meta_description',
-        'meta_keywords',
         'is_featured',
     ];
 
@@ -67,16 +66,5 @@ class Project extends Model
     public function scopePublic(Builder $query): Builder
     {
         return $query->whereIn('status', self::PUBLIC_STATUSES);
-    }
-
-    /**
-     * Sanitize the rich-text body on write — rendered to the public with
-     * {!! !!} on the project page, so purifying at the source closes stored XSS.
-     */
-    protected function description(): Attribute
-    {
-        return Attribute::set(
-            fn (?string $value) => $value === null ? null : Purifier::clean($value)
-        );
     }
 }

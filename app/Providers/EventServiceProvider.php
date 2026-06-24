@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Models\AboutContent;
 use App\Models\AboutHistory;
 use App\Models\AboutSection;
+use App\Models\CompanyCredential;
+use App\Models\CompanyCredentialItem;
 use App\Models\CompanyDocument;
 use App\Models\CoreValue;
 use App\Models\HeroBanner;
@@ -36,6 +38,8 @@ class EventServiceProvider extends ServiceProvider
         AboutHistory::class,
         Team::class,
         CompanyDocument::class,
+        CompanyCredential::class,
+        CompanyCredentialItem::class,
     ];
 
     /**

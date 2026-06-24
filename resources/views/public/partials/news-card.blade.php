@@ -22,7 +22,7 @@
         <h3
             class="line-clamp-2 text-base font-extrabold leading-snug text-equator-text group-hover:text-equator-bright">
             {{ $article->title }}</h3>
-        <span class="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-equator-bright">Read more
+        <span class="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-equator-bright">{{ __('common.read_more') }}
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
                 class="transition group-hover:translate-x-1">

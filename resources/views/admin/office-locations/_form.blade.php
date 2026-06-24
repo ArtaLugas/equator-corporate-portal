@@ -1,4 +1,23 @@
-<div class="space-y-6">
+@php
+    $locales = config('locales.supported', []);
+    $default = config('locales.default');
+
+    $activeTab = $default;
+    foreach (array_keys($locales) as $lc) {
+        foreach (['name', 'address'] as $f) {
+            if ($errors->has("{$f}_{$lc}")) {
+                $activeTab = $lc;
+                break 2;
+            }
+        }
+    }
+
+    $translationSummaries = collect(array_keys($locales))
+        ->reject(fn ($l) => $l === $default)
+        ->filter(fn ($l) => $errors->has("translation_{$l}"));
+@endphp
+
+<div class="space-y-6" x-data="{ locale: @js($activeTab) }">
     <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
 
         <div class="mb-6 border-b border-gray-50 pb-4">
@@ -9,11 +28,47 @@
 
         <div class="space-y-6">
 
-            <x-admin.form.input name="name" label="Location Name"
-                :value="old('name', $location->name ?? '')" placeholder="e.g. Head Office — Jakarta" required />
+            {{-- ALL-OR-NOTHING TRANSLATION SUMMARY --}}
+            @if ($translationSummaries->isNotEmpty())
+                <div class="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="mt-0.5 shrink-0 text-amber-500">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                        <line x1="12" x2="12" y1="9" y2="13" />
+                        <line x1="12" x2="12.01" y1="17" y2="17" />
+                    </svg>
+                    <div class="space-y-1">
+                        @foreach ($translationSummaries as $l)
+                            <p class="text-sm font-semibold text-amber-800">{{ $errors->first("translation_{$l}") }}</p>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
-            <x-admin.form.textarea name="address" label="Address" rows="3" placeholder="Full street address"
-                :value="$location->address ?? ''" />
+            {{-- LANGUAGE TABS (control name + address) --}}
+            <x-admin.lang-tabs />
+
+            {{-- TRANSLATABLE FIELDS — one panel per locale --}}
+            @foreach ($locales as $code => $meta)
+                <div x-show="locale === '{{ $code }}'" x-cloak class="space-y-6">
+
+                    <x-admin.form.input
+                        name="name_{{ $code }}"
+                        label="Location Name ({{ strtoupper($code) }})"
+                        value="{{ old('name_' . $code, $location->{'name_' . $code} ?? '') }}"
+                        placeholder="e.g. Head Office — Jakarta"
+                        :required="$code === $default" />
+
+                    <x-admin.form.textarea
+                        name="address_{{ $code }}"
+                        label="Address ({{ strtoupper($code) }})"
+                        rows="3"
+                        placeholder="Full street address"
+                        :value="old('address_' . $code, $location->{'address_' . $code} ?? '')" />
+
+                </div>
+            @endforeach
 
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <x-admin.form.input name="phone" label="Phone"

@@ -12,5 +12,5 @@
         @endforeach
     </div>
 @else
-    <p class="text-sm text-slate-400">No topics yet.</p>
+    <p class="text-sm text-slate-400">{{ __('news.no_topics') }}</p>
 @endif

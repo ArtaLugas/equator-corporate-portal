@@ -1,4 +1,23 @@
-<div class="space-y-8">
+@php
+    $locales = config('locales.supported', []);
+    $default = config('locales.default');
+
+    $activeTab = $default;
+    foreach (array_keys($locales) as $lc) {
+        foreach (['title', 'subtitle', 'button_text'] as $f) {
+            if ($errors->has("{$f}_{$lc}")) {
+                $activeTab = $lc;
+                break 2;
+            }
+        }
+    }
+
+    $translationSummaries = collect(array_keys($locales))
+        ->reject(fn ($l) => $l === $default)
+        ->filter(fn ($l) => $errors->has("translation_{$l}"));
+@endphp
+
+<div class="space-y-8" x-data="{ locale: @js($activeTab) }">
 
     {{-- CARD : HERO INFORMATION --}}
     <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
@@ -17,39 +36,71 @@
 
         <div class="space-y-6">
 
-            {{-- TITLE --}}
-            <x-admin.form.input name="title" label="Banner Title" :value="old('title', $banner->title ?? '')"
-                placeholder="Example: Empowering Sustainable Development" />
+            {{-- ALL-OR-NOTHING TRANSLATION SUMMARY --}}
+            @if ($translationSummaries->isNotEmpty())
+                <div class="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="mt-0.5 shrink-0 text-amber-500">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                        <line x1="12" x2="12" y1="9" y2="13" />
+                        <line x1="12" x2="12.01" y1="17" y2="17" />
+                    </svg>
+                    <div class="space-y-1">
+                        @foreach ($translationSummaries as $l)
+                            <p class="text-sm font-semibold text-amber-800">{{ $errors->first("translation_{$l}") }}</p>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
-            {{-- SUBTITLE --}}
-            <div class="space-y-1.5">
+            {{-- LANGUAGE TABS (control title + subtitle + button text) --}}
+            <x-admin.lang-tabs />
 
-                <label for="subtitle" class="block text-xs font-bold tracking-wide text-gray-700">
+            {{-- TRANSLATABLE FIELDS — one panel per locale --}}
+            @foreach ($locales as $code => $meta)
+                <div x-show="locale === '{{ $code }}'" x-cloak class="space-y-6">
 
-                    Subtitle
+                    {{-- TITLE --}}
+                    <x-admin.form.input
+                        name="title_{{ $code }}"
+                        label="Banner Title ({{ strtoupper($code) }})"
+                        value="{{ old('title_' . $code, $banner->{'title_' . $code} ?? '') }}"
+                        placeholder="Example: Empowering Sustainable Development"
+                        :required="$code === $default" />
 
-                </label>
+                    {{-- SUBTITLE --}}
+                    <div class="space-y-1.5">
 
-                <textarea id="subtitle" name="subtitle" rows="4" @class([
-                    'block w-full rounded-xl border px-4 py-3 text-sm text-equator-text shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1',
-                
-                    'border-red-500 focus:border-red-500 focus:ring-red-500/30' => $errors->has(
-                        'subtitle'),
-                
-                    'border-gray-200 focus:border-equator-bright focus:ring-equator-bright/20' => !$errors->has(
-                        'subtitle'),
-                ])
-                    placeholder="Write banner subtitle here...">{{ old('subtitle', $banner->subtitle ?? '') }}</textarea>
+                        <label for="subtitle_{{ $code }}" class="block text-xs font-bold tracking-wide text-gray-700">
 
-                @error('subtitle')
-                    <p class="text-xs font-semibold text-red-600">
+                            Subtitle ({{ strtoupper($code) }})
 
-                        {{ $message }}
+                        </label>
 
-                    </p>
-                @enderror
+                        <textarea id="subtitle_{{ $code }}" name="subtitle_{{ $code }}" rows="4" @class([
+                            'block w-full rounded-xl border px-4 py-3 text-sm text-equator-text shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1',
 
-            </div>
+                            'border-red-500 focus:border-red-500 focus:ring-red-500/30' => $errors->has(
+                                'subtitle_' . $code),
+
+                            'border-gray-200 focus:border-equator-bright focus:ring-equator-bright/20' => !$errors->has(
+                                'subtitle_' . $code),
+                        ])
+                            placeholder="Write banner subtitle here...">{{ old('subtitle_' . $code, $banner->{'subtitle_' . $code} ?? '') }}</textarea>
+
+                        @error('subtitle_' . $code)
+                            <p class="text-xs font-semibold text-red-600">
+
+                                {{ $message }}
+
+                            </p>
+                        @enderror
+
+                    </div>
+
+                </div>
+            @endforeach
 
             {{-- IMAGE --}}
             <div class="pt-2">
@@ -78,13 +129,20 @@
 
         </div>
 
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div class="space-y-6">
 
-            {{-- BUTTON TEXT --}}
-            <x-admin.form.input name="button_text" label="Button Text" :value="old('button_text', $banner->button_text ?? '')"
-                placeholder="Example: Learn More" />
+            {{-- BUTTON TEXT (translatable — one input per locale) --}}
+            @foreach ($locales as $code => $meta)
+                <div x-show="locale === '{{ $code }}'" x-cloak>
+                    <x-admin.form.input
+                        name="button_text_{{ $code }}"
+                        label="Button Text ({{ strtoupper($code) }})"
+                        value="{{ old('button_text_' . $code, $banner->{'button_text_' . $code} ?? '') }}"
+                        placeholder="Example: Learn More" />
+                </div>
+            @endforeach
 
-            {{-- BUTTON LINK --}}
+            {{-- BUTTON LINK (not translated) --}}
             <x-admin.form.input name="button_link" label="Button Link" :value="old('button_link', $banner->button_link ?? '')"
                 placeholder="https://example.com" />
 

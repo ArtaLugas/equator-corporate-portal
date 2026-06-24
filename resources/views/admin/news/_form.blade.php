@@ -1,12 +1,37 @@
 @php
     $currentTags = old('tags', isset($news) ? $news->tags->pluck('name')->all() : []);
+
+    $locales = config('locales.supported', []);
+    $default = config('locales.default');
+
+    // Open the tab of the first locale that has a validation error.
+    $activeTab = $default;
+    foreach (array_keys($locales) as $lc) {
+        foreach (['title', 'content', 'meta_title', 'meta_description', 'meta_keywords'] as $f) {
+            if ($errors->has("{$f}_{$lc}")) {
+                $activeTab = $lc;
+                break 2;
+            }
+        }
+    }
+
+    // Slug auto-regeneration: always on for new records; on edit it follows config.
+    $editing = isset($news) && $news->exists;
+    $autoSlug = ! $editing || config('cms.auto_regenerate_slug', true);
+
+    $translationSummaries = collect(array_keys($locales))
+        ->reject(fn ($l) => $l === $default)
+        ->filter(fn ($l) => $errors->has("translation_{$l}"));
 @endphp
 
 <div x-data="{
-    title: @js(old('title', $news->title ?? '')),
+    locale: @js($activeTab),
+    autoSlug: @js($autoSlug),
+    titleEn: @js(old('title_' . $default, $news->{'title_' . $default} ?? '')),
     slug: @js(old('slug', $news->slug ?? '')),
     generateSlug() {
-        this.slug = this.title.toString().toLowerCase().trim()
+        if (! this.autoSlug) return; // permalink frozen — keep the existing slug
+        this.slug = this.titleEn.toString().toLowerCase().trim()
             .replace(/\s+/g, '-').replace(/[^\w\-]+/g, '')
             .replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
     }
@@ -24,7 +49,7 @@
 
         <div class="space-y-6">
 
-            {{-- CATEGORY --}}
+            {{-- CATEGORY (not translated) --}}
             <x-admin.form.select name="category_id" label="Category" required>
                 <option value="">Select Category</option>
                 @foreach ($categories as $category)
@@ -42,26 +67,63 @@
                 </p>
             @endif
 
-            {{-- TITLE + SLUG --}}
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <x-admin.form.input name="title" label="Title" x-model="title"
-                    placeholder="e.g. Company wins national award" required />
-                <x-admin.form.input name="slug" label="URL Slug" x-model="slug"
-                    placeholder="auto-generated" readonly required />
-            </div>
+            {{-- ALL-OR-NOTHING TRANSLATION SUMMARY --}}
+            @if ($translationSummaries->isNotEmpty())
+                <div class="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="mt-0.5 shrink-0 text-amber-500">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                        <line x1="12" x2="12" y1="9" y2="13" />
+                        <line x1="12" x2="12.01" y1="17" y2="17" />
+                    </svg>
+                    <div class="space-y-1">
+                        @foreach ($translationSummaries as $l)
+                            <p class="text-sm font-semibold text-amber-800">{{ $errors->first("translation_{$l}") }}</p>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
-            {{-- CONTENT --}}
-            <x-admin.form.wysiwyg name="content" label="Content"
-                :value="old('content', $news->content ?? '')" />
+            {{-- LANGUAGE TABS (control every translatable field) --}}
+            <x-admin.lang-tabs />
 
-            {{-- IMAGE --}}
+            {{-- TRANSLATABLE FIELDS — one panel per locale --}}
+            @foreach ($locales as $code => $meta)
+                <div x-show="locale === '{{ $code }}'" x-cloak class="space-y-6">
+
+                    <x-admin.form.input
+                        name="title_{{ $code }}"
+                        label="Title ({{ strtoupper($code) }})"
+                        placeholder="e.g. Company wins national award"
+                        :required="$code === $default"
+                        @if ($code === $default)
+                            x-model="titleEn"
+                        @else
+                            value="{{ old('title_' . $code, $news->{'title_' . $code} ?? '') }}"
+                        @endif
+                    />
+
+                    <x-admin.form.wysiwyg
+                        name="content_{{ $code }}"
+                        label="Content ({{ strtoupper($code) }})"
+                        :value="$news->{'content_' . $code} ?? ''" />
+
+                </div>
+            @endforeach
+
+            {{-- SLUG (single, generated from the default-locale title) --}}
+            <x-admin.form.input name="slug" label="URL Slug" x-model="slug"
+                placeholder="auto-generated" readonly required />
+
+            {{-- IMAGE (not translated) --}}
             <div class="pt-2">
                 <x-admin.image-preview name="image" label="Featured Image"
                     helpText="16:9 aspect ratio recommended. Max 2MB."
                     :preview="isset($news) && $news->image ? asset('storage/' . $news->image) : null" />
             </div>
 
-            {{-- TAGS --}}
+            {{-- TAGS (not translated) --}}
             <div class="space-y-1.5"
                 x-data="{
                     tags: @js($currentTags),
@@ -113,21 +175,39 @@
 
         <div class="mb-6 border-b border-gray-50 pb-4">
             <h2 class="text-lg font-extrabold tracking-tight text-equator-text">Search Engine Optimization (SEO)</h2>
-            <p class="mt-1 text-xs font-medium text-gray-500">Configure metadata for better search visibility.</p>
+            <p class="mt-1 text-xs font-medium text-gray-500">Per-language metadata. Use the language tabs above to switch.</p>
         </div>
 
-        <div class="space-y-6">
-            <x-admin.form.input name="meta_title" label="Meta Title"
-                :value="old('meta_title', $news->meta_title ?? '')" placeholder="Maximum 60 characters" />
-            <x-admin.form.textarea name="meta_description" label="Meta Description" rows="3"
-                :value="old('meta_description', $news->meta_description ?? '')" placeholder="Brief summary for search engines..." />
-            <x-admin.form.input name="meta_keywords" label="Meta Keywords"
-                :value="old('meta_keywords', $news->meta_keywords ?? '')" placeholder="e.g. award, company, milestone" />
-        </div>
+        {{-- TRANSLATABLE SEO FIELDS — share the same locale tab as above --}}
+        @foreach ($locales as $code => $meta)
+            <div x-show="locale === '{{ $code }}'" x-cloak class="space-y-6">
+
+                <x-admin.form.input
+                    name="meta_title_{{ $code }}"
+                    label="Meta Title ({{ strtoupper($code) }})"
+                    placeholder="Maximum 60 characters"
+                    value="{{ old('meta_title_' . $code, $news->{'meta_title_' . $code} ?? '') }}" />
+
+                <x-admin.form.textarea
+                    name="meta_description_{{ $code }}"
+                    label="Meta Description ({{ strtoupper($code) }})"
+                    rows="3"
+                    :value="$news->{'meta_description_' . $code} ?? ''"
+                    placeholder="Brief summary for search engines..." />
+
+                <x-admin.form.input
+                    name="meta_keywords_{{ $code }}"
+                    label="Meta Keywords ({{ strtoupper($code) }})"
+                    placeholder="e.g. award, company, milestone"
+                    value="{{ old('meta_keywords_' . $code, $news->{'meta_keywords_' . $code} ?? '') }}" />
+
+            </div>
+        @endforeach
+
     </div>
 
     {{-- ===================================================== --}}
-    {{-- CARD 3 : PUBLISHING --}}
+    {{-- CARD 3 : PUBLISHING (not translated) --}}
     {{-- ===================================================== --}}
     <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
 

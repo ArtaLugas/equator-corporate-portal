@@ -120,6 +120,7 @@
             <x-admin.th class="whitespace-normal">Title</x-admin.th>
             <x-admin.th class="w-px whitespace-nowrap">Category</x-admin.th>
             <x-admin.th class="w-px whitespace-nowrap">Status</x-admin.th>
+            <x-admin.th class="w-px whitespace-nowrap">Translation</x-admin.th>
             <x-admin.th class="w-px whitespace-nowrap">Views</x-admin.th>
             <x-admin.th class="w-px whitespace-nowrap">Published</x-admin.th>
             <x-admin.th class="w-px whitespace-nowrap">Action</x-admin.th>
@@ -188,6 +189,10 @@
                     </x-admin.td>
 
                     <x-admin.td>
+                        <x-admin.translation-status :model="$item" />
+                    </x-admin.td>
+
+                    <x-admin.td>
                         <span class="text-sm font-bold text-gray-700">{{ number_format($item->views_count) }}</span>
                     </x-admin.td>
 
@@ -227,7 +232,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="px-6 py-16 text-center">
+                    <td colspan="8" class="px-6 py-16 text-center">
                         <h3 class="text-sm font-extrabold text-gray-900">No news found</h3>
                         <p class="mt-1.5 text-sm font-medium text-gray-500">Create your first article, or adjust your
                             filters.</p>

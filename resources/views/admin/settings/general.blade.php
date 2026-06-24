@@ -101,6 +101,23 @@
                 </div>
             </div>
 
+            {{-- SEO & ANALYTICS --}}
+            <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
+                <div class="mb-6 border-b border-gray-50 pb-4">
+                    <h2 class="text-lg font-extrabold tracking-tight text-equator-text">SEO &amp; Analytics</h2>
+                    <p class="mt-1 text-xs font-medium text-gray-500">
+                        Google Analytics 4 loads only after a visitor accepts Analytics cookies. Leave blank to disable.
+                    </p>
+                </div>
+                <div class="space-y-6">
+                    <x-admin.form.input name="ga4_measurement_id" label="GA4 Measurement ID"
+                        :value="old('ga4_measurement_id', $settings->ga4_measurement_id)" placeholder="G-XXXXXXXXXX" />
+                    <x-admin.form.input name="gsc_verification" label="Google Search Console Verification"
+                        :value="old('gsc_verification', $settings->gsc_verification)"
+                        placeholder="Verification token (content value of the google-site-verification meta tag)" />
+                </div>
+            </div>
+
             <div class="flex justify-end">
                 <button type="submit"
                     class="rounded-xl bg-equator-dark px-6 py-3 text-sm font-semibold text-white transition hover:bg-equator-bright">

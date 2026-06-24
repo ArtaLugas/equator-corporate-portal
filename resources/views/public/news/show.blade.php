@@ -39,6 +39,46 @@
     @if ($article->meta_keywords)
         <meta name="keywords" content="{{ $article->meta_keywords }}">
     @endif
+
+    {{-- Structured data — NewsArticle + breadcrumb. --}}
+    @php
+        $publisher = array_filter([
+            '@type' => 'Organization',
+            'name' => app_setting('company_name', 'Equator Group'),
+            'url' => url('/'),
+            'logo' => app_setting('logo')
+                ? ['@type' => 'ImageObject', 'url' => asset('storage/' . app_setting('logo'))]
+                : null,
+        ]);
+
+        $newsLd = [
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                array_filter([
+                    '@type' => 'NewsArticle',
+                    'headline' => Str::limit($article->title, 110),
+                    'description' => $metaDescription,
+                    'image' => $ogImage,
+                    'url' => $canonical,
+                    'datePublished' => $article->published_at?->toIso8601String(),
+                    'dateModified' => $article->updated_at?->toIso8601String(),
+                    'articleSection' => $article->category?->name,
+                    'author' => $publisher,
+                    'publisher' => $publisher,
+                    'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => $canonical],
+                ]),
+                [
+                    '@type' => 'BreadcrumbList',
+                    'itemListElement' => [
+                        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => route('home')],
+                        ['@type' => 'ListItem', 'position' => 2, 'name' => 'News', 'item' => route('news.index')],
+                        ['@type' => 'ListItem', 'position' => 3, 'name' => $article->title, 'item' => $canonical],
+                    ],
+                ],
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($newsLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 @endpush
 
 @section('content')
@@ -54,10 +94,10 @@
         </div>
 
         <div class="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-            <nav class="mb-6 flex items-center gap-2 text-xs font-medium text-white/55" aria-label="Breadcrumb">
-                <a href="{{ route('home') }}" class="transition-colors hover:text-white">Home</a>
+            <nav class="mb-6 flex items-center gap-2 text-xs font-medium text-white/55" aria-label="{{ __('common.breadcrumb') }}">
+                <a href="{{ route('home') }}" class="transition-colors hover:text-white">{{ __('news.breadcrumb_home') }}</a>
                 <span class="text-white/30" aria-hidden="true">/</span>
-                <a href="{{ route('news.index') }}" class="transition-colors hover:text-white">News</a>
+                <a href="{{ route('news.index') }}" class="transition-colors hover:text-white">{{ __('news.breadcrumb_news') }}</a>
             </nav>
 
             <div>
@@ -69,12 +109,12 @@
                             {{ $article->category->name }}
                         </a>
                     @else
-                        <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-white/50">Article</span>
+                        <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-white/50">{{ __('news.article_label') }}</span>
                     @endif
                     @if ($article->is_featured)
                         <span
                             class="inline-flex items-center gap-1.5 rounded-full border border-equator-orange/40 bg-equator-orange/10 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-equator-orange">
-                            <i class="bi bi-star-fill text-[0.55rem]"></i> Featured
+                            <i class="bi bi-star-fill text-[0.55rem]"></i> {{ __('news.featured') }}
                         </span>
                     @endif
                 </div>
@@ -90,9 +130,9 @@
                                 class="bi bi-calendar3 text-white/40"></i>{{ $article->published_at->format('d M Y') }}</span>
                     @endif
                     <span class="inline-flex items-center gap-2"><i
-                            class="bi bi-clock text-white/40"></i>{{ $readMinutes }} min read</span>
+                            class="bi bi-clock text-white/40"></i>{{ __('news.min_read', ['count' => $readMinutes]) }}</span>
                     <span class="inline-flex items-center gap-2"><i
-                            class="bi bi-eye text-white/40"></i>{{ number_format($views) }} views</span>
+                            class="bi bi-eye text-white/40"></i>{{ __('news.views', ['count' => number_format($views)]) }}</span>
                 </div>
             </div>
         </div>
@@ -123,7 +163,7 @@
                     {{-- Tags --}}
                     @if ($article->tags->isNotEmpty())
                         <div class="mt-10 border-t border-slate-100 pt-6">
-                            <p class="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">Tags</p>
+                            <p class="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('news.tags') }}</p>
                             <x-public.tag-cloud :tags="$article->tags" />
                         </div>
                     @endif
@@ -132,7 +172,7 @@
                     <div class="mt-10">
                         <a href="{{ route('news.index') }}"
                             class="inline-flex items-center gap-2 text-sm font-bold text-equator-dark transition-colors hover:text-equator-bright">
-                            <i class="bi bi-arrow-left"></i> Back to all news
+                            <i class="bi bi-arrow-left"></i> {{ __('news.back_to_news') }}
                         </a>
                     </div>
                 </article>
@@ -146,7 +186,7 @@
                             <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                                 <h2
                                     class="mb-5 flex items-center gap-2 text-sm font-extrabold uppercase tracking-wider text-equator-dark">
-                                    <span class="h-4 w-1 rounded-full bg-equator-orange"></span> Latest Articles
+                                    <span class="h-4 w-1 rounded-full bg-equator-orange"></span> {{ __('news.sidebar_latest_articles') }}
                                 </h2>
                                 <ul class="space-y-5">
                                     @foreach ($recent as $r)
@@ -186,7 +226,7 @@
                             <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                                 <h2
                                     class="mb-5 flex items-center gap-2 text-sm font-extrabold uppercase tracking-wider text-equator-dark">
-                                    <span class="h-4 w-1 rounded-full bg-equator-orange"></span> Categories
+                                    <span class="h-4 w-1 rounded-full bg-equator-orange"></span> {{ __('news.sidebar_categories') }}
                                 </h2>
                                 <ul class="space-y-1">
                                     @foreach ($categories as $cat)
@@ -215,7 +255,7 @@
                         <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                             <h2
                                 class="mb-5 flex items-center gap-2 text-sm font-extrabold uppercase tracking-wider text-equator-dark">
-                                <span class="h-4 w-1 rounded-full bg-equator-orange"></span> Topics
+                                <span class="h-4 w-1 rounded-full bg-equator-orange"></span> {{ __('news.sidebar_topics') }}
                             </h2>
                             <x-public.tag-cloud :tags="$article->tags" />
                         </section>

@@ -46,7 +46,7 @@ class ServiceController extends Controller
         $services = Service::where('status', 'published')
             ->with('category')
             ->when($activeCategory, fn ($q) => $q->where('category_id', $activeCategory->id))
-            ->when($hasSearch, fn ($q) => $q->where('name', 'like', '%'.trim($request->search).'%'))
+            ->when($hasSearch, fn ($q) => $q->searchTranslatable(trim($request->search), ['name']))
             ->when($featured->isNotEmpty(), fn ($q) => $q->whereNotIn('id', $featured->pluck('id')))
             ->latest()
             ->paginate(9)

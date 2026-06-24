@@ -2,26 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Mews\Purifier\Facades\Purifier;
 
 class Service extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasTranslations, SoftDeletes;
 
+    /**
+     * Only NON-translatable columns. The HasTranslations trait appends the
+     * localized columns (name_en, name_id, …) from config/translatable.php to
+     * $fillable, and centrally Purifier-sanitizes the HTML field (description)
+     * for every locale on write — replacing the old description() mutator.
+     */
     protected $fillable = [
         'category_id',
-        'name',
         'slug',
-        'short_description',
-        'description',
         'image',
-        'meta_title',
-        'meta_description',
-        'meta_keywords',
         'status',
         'is_featured',
     ];
@@ -29,17 +28,6 @@ class Service extends Model
     protected $casts = [
         'is_featured' => 'boolean',
     ];
-
-    /**
-     * Sanitize the rich-text body on write — rendered to the public with
-     * {!! !!} on the service page, so purifying at the source closes stored XSS.
-     */
-    protected function description(): Attribute
-    {
-        return Attribute::set(
-            fn (?string $value) => $value === null ? null : Purifier::clean($value)
-        );
-    }
 
     /*
     |-----------------------------------------------------------

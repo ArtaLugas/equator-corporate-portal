@@ -37,6 +37,7 @@ class Message extends Model
     ];
 
     protected $fillable = [
+        'reference',
         'name',
         'email',
         'phone',
@@ -45,10 +46,41 @@ class Message extends Model
         'message',
         'ip_address',
         'user_agent',
+        // Lead-source attribution (auto-captured).
+        'landing_page',
+        'referrer',
+        'locale',
+        'utm_source',
+        'utm_medium',
+        'utm_campaign',
+        'utm_content',
+        'utm_term',
+        'gclid',
+        'fbclid',
         'status',
         'replied_at',
         'archived_at',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reference Number (e.g. EQ-20260715-000034) — unique, derived from the id.
+    |--------------------------------------------------------------------------
+    */
+
+    protected static function booted(): void
+    {
+        static::created(function (Message $message) {
+            if (blank($message->reference)) {
+                $message->reference = sprintf(
+                    'EQ-%s-%06d',
+                    ($message->created_at ?? now())->format('Ymd'),
+                    $message->id
+                );
+                $message->saveQuietly();
+            }
+        });
+    }
 
     protected $casts = [
         'replied_at' => 'datetime',

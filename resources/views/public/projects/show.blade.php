@@ -48,14 +48,14 @@
         $period = null;
         if ($project->start_date) {
             $start = $project->start_date->format('Y');
-            $end = $project->end_date ? $project->end_date->format('Y') : 'Present';
+            $end = $project->end_date ? $project->end_date->format('Y') : __('projects.period_present');
             $period = $start === $end ? $start : "{$start} — {$end}";
         }
 
         $statusMeta = [
-            'completed' => ['label' => 'Completed', 'dot' => 'bg-emerald-400'],
-            'ongoing' => ['label' => 'Ongoing', 'dot' => 'bg-blue-400'],
-            'planned' => ['label' => 'Planned', 'dot' => 'bg-amber-400'],
+            'completed' => ['label' => __('projects.status_completed'), 'dot' => 'bg-emerald-400'],
+            'ongoing' => ['label' => __('projects.status_ongoing'), 'dot' => 'bg-blue-400'],
+            'planned' => ['label' => __('projects.status_planned'), 'dot' => 'bg-amber-400'],
         ][$project->status] ?? ['label' => ucfirst((string) $project->status), 'dot' => 'bg-slate-400'];
 
         $locationLine = collect([$project->location, $project->country])
@@ -64,10 +64,10 @@
 
         // Snapshot facts — project facts only (no services; those live in Scope of Work).
         $facts = collect([
-            ['label' => 'Client', 'value' => $project->client_name],
-            ['label' => 'Location', 'value' => $locationLine ?: null],
-            ['label' => 'Status', 'value' => $statusMeta['label'], 'dot' => $statusMeta['dot']],
-            ['label' => 'Period', 'value' => $period],
+            ['label' => __('projects.fact_client'), 'value' => $project->client_name],
+            ['label' => __('projects.fact_location'), 'value' => $locationLine ?: null],
+            ['label' => __('projects.fact_status'), 'value' => $statusMeta['label'], 'dot' => $statusMeta['dot']],
+            ['label' => __('projects.fact_period'), 'value' => $period],
         ])
             ->filter(fn($f) => filled($f['value']))
             ->values();
@@ -108,16 +108,15 @@ $contactUrl = route('contact', ['service' => $ctaService]);
 
         <div class="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
             <nav class="mb-6 flex items-center gap-2 text-xs font-medium text-white/55">
-                <a href="{{ route('home') }}" class="transition-colors hover:text-white">Home</a>
+                <a href="{{ route('home') }}" class="transition-colors hover:text-white">{{ __('projects.breadcrumb_home') }}</a>
                 <span>/</span>
-                <a href="{{ route('projects.index') }}" class="transition-colors hover:text-white">Projects</a>
+                <a href="{{ route('projects.index') }}" class="transition-colors hover:text-white">{{ __('projects.breadcrumb_projects') }}</a>
             </nav>
 
             <div class="max-w-3xl">
                 <div class="mb-5 flex items-center gap-3">
                     <span class="h-px w-8 bg-equator-orange"></span>
-                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-equator-orange">Project Case
-                        Study</span>
+                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-equator-orange">{{ __('projects.case_study_eyebrow') }}</span>
                 </div>
 
                 <h1 class="font-heading text-3xl font-semibold leading-[1.1] tracking-tight sm:text-4xl lg:text-5xl">
@@ -146,7 +145,7 @@ $contactUrl = route('contact', ['service' => $ctaService]);
                 <div class="mt-9">
                     <a href="{{ $contactUrl }}"
                         class="group inline-flex items-center gap-2.5 rounded-xl bg-white px-7 py-3.5 text-sm font-bold text-equator-dark shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)] transition-all duration-300 hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.5)]">
-                        Discuss a similar engagement
+                        {{ __('projects.discuss_engagement') }}
                         <i class="bi bi-arrow-right transition-transform duration-300 group-hover:translate-x-1.5"></i>
                     </a>
                 </div>
@@ -187,10 +186,10 @@ $contactUrl = route('contact', ['service' => $ctaService]);
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="mb-6 flex items-center gap-3">
                     <span class="h-px w-8 bg-equator-orange"></span>
-                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">Scope of Work</span>
+                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">{{ __('projects.scope_eyebrow') }}</span>
                 </div>
                 <p class="mb-6 max-w-2xl font-heading text-xl font-semibold tracking-tight text-equator-dark">
-                    Services proven by this engagement
+                    {{ __('projects.scope_title') }}
                 </p>
                 <div class="flex flex-wrap gap-2.5">
                     @foreach ($services as $svc)
@@ -214,7 +213,7 @@ $contactUrl = route('contact', ['service' => $ctaService]);
             <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
                 <div class="mb-8 flex items-center gap-3">
                     <span class="h-px w-8 bg-equator-orange"></span>
-                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">Overview</span>
+                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">{{ __('projects.overview_eyebrow') }}</span>
                 </div>
                 <div
                     class="prose prose-xl max-w-none prose-headings:font-heading prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-equator-dark prose-p:text-[1.2rem] prose-p:leading-[1.85] prose-p:text-slate-600 prose-a:font-medium prose-a:text-equator-bright prose-a:no-underline hover:prose-a:underline prose-strong:text-equator-dark prose-li:text-[1.2rem] prose-li:leading-[1.8] prose-li:text-slate-600">
@@ -228,18 +227,23 @@ $contactUrl = route('contact', ['service' => $ctaService]);
          6 — GALLERY (immersive; only when images exist)
     ════════════════════════════════════════════════════════════ --}}
     @if ($images->isNotEmpty())
-        <section class="border-t border-slate-200 bg-slate-50 py-16 sm:py-20" x-data="{ lightbox: null }">
+        <section class="border-t border-slate-200 bg-slate-50 py-16 sm:py-20" x-data="{
+            lightbox: null,
+            trigger: null,
+            open(src, el) { this.trigger = el; this.lightbox = src; this.$nextTick(() => this.$refs.closeBtn && this.$refs.closeBtn.focus()); },
+            close() { const t = this.trigger; this.lightbox = null; this.trigger = null; this.$nextTick(() => t && t.focus()); },
+        }">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="mb-8 flex items-center gap-3">
                     <span class="h-px w-8 bg-equator-orange"></span>
-                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">From the Field</span>
+                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">{{ __('projects.gallery_eyebrow') }}</span>
                 </div>
 
                 @if ($images->count() === 1)
                     {{-- Single image → one large immersive visual (no awkward 1-item grid) --}}
                     @php $img = $images->first(); @endphp
                     <figure>
-                        <button type="button" @click="lightbox = '{{ asset('storage/' . $img->image) }}'"
+                        <button type="button" @click="open('{{ asset('storage/' . $img->image) }}', $event.currentTarget)"
                             class="group block w-full overflow-hidden rounded-2xl bg-slate-100">
                             <img src="{{ asset('storage/' . $img->image) }}" alt="{{ $img->caption ?: $project->name }}"
                                 loading="lazy"
@@ -256,7 +260,7 @@ $contactUrl = route('contact', ['service' => $ctaService]);
                         $rest = $images->slice(1);
                     @endphp
                     <figure class="mb-4">
-                        <button type="button" @click="lightbox = '{{ asset('storage/' . $lead->image) }}'"
+                        <button type="button" @click="open('{{ asset('storage/' . $lead->image) }}', $event.currentTarget)"
                             class="group block w-full overflow-hidden rounded-2xl bg-slate-100">
                             <img src="{{ asset('storage/' . $lead->image) }}" alt="{{ $lead->caption ?: $project->name }}"
                                 loading="lazy"
@@ -270,7 +274,7 @@ $contactUrl = route('contact', ['service' => $ctaService]);
                         class="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible sm:px-0 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden">
                         @foreach ($rest as $img)
                             <figure class="w-64 shrink-0 sm:w-auto">
-                                <button type="button" @click="lightbox = '{{ asset('storage/' . $img->image) }}'"
+                                <button type="button" @click="open('{{ asset('storage/' . $img->image) }}', $event.currentTarget)"
                                     class="group block aspect-[4/3] w-full overflow-hidden rounded-xl bg-slate-100">
                                     <img src="{{ asset('storage/' . $img->image) }}"
                                         alt="{{ $img->caption ?: $project->name }}" loading="lazy"
@@ -286,14 +290,15 @@ $contactUrl = route('contact', ['service' => $ctaService]);
             </div>
 
             {{-- Lightbox --}}
-            <div x-show="lightbox" x-cloak @click="lightbox = null" @keydown.escape.window="lightbox = null"
-                role="dialog" aria-modal="true" aria-label="Project image viewer (press Escape to close)"
+            <div x-show="lightbox" x-cloak @click="close()" @keydown.escape.window="close()"
+                @keydown.tab.prevent="$refs.closeBtn.focus()"
+                role="dialog" aria-modal="true" aria-label="{{ __('projects.lightbox_label') }}"
                 class="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 p-4">
-                <button type="button" @click="lightbox = null" aria-label="Close image viewer"
+                <button type="button" x-ref="closeBtn" @click="close()" aria-label="{{ __('projects.lightbox_close') }}"
                     class="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20">
                     <i class="bi bi-x-lg" aria-hidden="true"></i>
                 </button>
-                <img :src="lightbox" alt="Enlarged project image" class="max-h-[90vh] max-w-full rounded-xl object-contain">
+                <img :src="lightbox" alt="{{ __('projects.lightbox_alt') }}" class="max-h-[90vh] max-w-full rounded-xl object-contain">
             </div>
         </section>
     @endif
@@ -307,11 +312,10 @@ $contactUrl = route('contact', ['service' => $ctaService]);
                 <div class="mb-8">
                     <div class="mb-4 flex items-center gap-3">
                         <span class="h-px w-8 bg-equator-orange"></span>
-                        <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">Capability
-                            Proof</span>
+                        <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">{{ __('projects.capability_eyebrow') }}</span>
                     </div>
                     <h2 class="font-heading text-2xl font-semibold tracking-tight text-equator-dark sm:text-3xl">
-                        Capabilities this work demonstrates
+                        {{ __('projects.capability_title') }}
                     </h2>
                 </div>
                 <div class="grid gap-6 md:grid-cols-3">
@@ -330,7 +334,7 @@ $contactUrl = route('contact', ['service' => $ctaService]);
                             </div>
                             <span
                                 class="mt-6 inline-flex items-center gap-2 text-xs font-semibold text-slate-400 transition-colors group-hover:text-equator-dark">
-                                Explore capability
+                                {{ __('projects.explore_capability') }}
                                 <i
                                     class="bi bi-arrow-right transition-transform duration-300 group-hover:translate-x-1.5"></i>
                             </span>
@@ -351,16 +355,15 @@ $contactUrl = route('contact', ['service' => $ctaService]);
                     <div>
                         <div class="mb-4 flex items-center gap-3">
                             <span class="h-px w-8 bg-equator-orange"></span>
-                            <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">More
-                                Evidence</span>
+                            <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">{{ __('projects.related_eyebrow') }}</span>
                         </div>
                         <h2 class="font-heading text-2xl font-semibold tracking-tight text-equator-dark sm:text-3xl">
-                            {{ $relatedByService ? 'Related projects' : 'More from our portfolio' }}
+                            {{ $relatedByService ? __('projects.related_projects') : __('projects.more_from_portfolio') }}
                         </h2>
                     </div>
                     <a href="{{ route('projects.index') }}"
                         class="hidden shrink-0 items-center gap-1.5 text-sm font-semibold text-equator-bright transition-colors hover:text-equator-dark sm:inline-flex">
-                        All projects
+                        {{ __('projects.all_projects') }}
                         <i class="bi bi-arrow-right text-xs"></i>
                     </a>
                 </div>
@@ -396,7 +399,7 @@ $contactUrl = route('contact', ['service' => $ctaService]);
                                 <div class="mb-2 flex items-center gap-2">
                                     <span class="{{ $rStatus }} h-1.5 w-1.5 rounded-full"></span>
                                     <span
-                                        class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-slate-400">{{ ucfirst($r->status) }}</span>
+                                        class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-slate-400">{{ __('projects.status_' . $r->status) !== 'projects.status_' . $r->status ? __('projects.status_' . $r->status) : ucfirst($r->status) }}</span>
                                 </div>
                                 <h3
                                     class="line-clamp-2 font-heading text-base font-semibold leading-snug text-equator-dark transition-colors group-hover:text-equator-bright">
@@ -416,38 +419,22 @@ $contactUrl = route('contact', ['service' => $ctaService]);
     {{-- ════════════════════════════════════════════════════════════
          9 — CONVERSION CTA
     ════════════════════════════════════════════════════════════ --}}
-    <section class="relative overflow-hidden bg-equator-darker py-20 text-white sm:py-24">
-        <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div class="absolute -left-20 bottom-0 h-80 w-80 rounded-full bg-equator-bright/[0.14] blur-[90px]"></div>
-        </div>
-        <div class="relative mx-auto max-w-2xl px-4 text-center sm:px-6 lg:px-8">
-            <h2 class="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
-                Looking for similar expertise?
-            </h2>
-            <p class="mt-4 text-base leading-relaxed text-white/65">
-                Tell us about your project and our specialists will show you how we can deliver.
-            </p>
-            <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-                <a href="{{ $contactUrl }}"
-                    class="group inline-flex items-center justify-center gap-2.5 rounded-xl bg-white px-7 py-3.5 text-sm font-bold text-equator-dark shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)] transition-all duration-300 hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.5)]">
-                    Discuss a similar engagement
-                    <i class="bi bi-arrow-right transition-transform duration-300 group-hover:translate-x-1.5"></i>
-                </a>
-                @if ($services->isNotEmpty())
-                    <a href="{{ route('services.show', $services->first()->slug) }}"
-                        class="inline-flex items-center justify-center gap-2.5 rounded-xl border border-white/25 px-7 py-3.5 text-sm font-bold text-white transition-colors duration-300 hover:bg-white/10">
-                        Explore this capability
-                    </a>
-                @endif
-            </div>
-            <div class="mt-10">
-                <a href="{{ route('projects.index') }}"
-                    class="inline-flex items-center gap-2 text-sm font-semibold text-white/55 transition-colors hover:text-white">
-                    <i class="bi bi-arrow-left"></i>
-                    Back to all projects
-                </a>
-            </div>
-        </div>
-    </section>
+    {{-- Closing contextual CTA (shared component). --}}
+    <x-public.lead-cta :heading="__('projects.show_cta_title')" :body="__('projects.show_cta_subtitle')"
+        :cta-label="__('projects.show_cta_discuss')" :cta-href="$contactUrl">
+        @if ($services->isNotEmpty())
+            <a href="{{ route('services.show', $services->first()->slug) }}"
+                class="inline-flex items-center justify-center gap-2.5 rounded-xl border border-white/25 px-7 py-3.5 text-sm font-bold text-white transition-colors duration-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+                {{ __('projects.show_cta_explore_capability') }}
+            </a>
+        @endif
+        <x-slot:back>
+            <a href="{{ route('projects.index') }}"
+                class="inline-flex items-center gap-2 rounded text-sm font-semibold text-white/55 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                {{ __('projects.back_to_all_projects') }}
+            </a>
+        </x-slot:back>
+    </x-public.lead-cta>
 
 @endsection

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\CompanyCredentialController;
 use App\Http\Controllers\Admin\CompanyDocumentController;
 use App\Http\Controllers\Admin\CoreValueController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -25,8 +26,10 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SocialLinkController;
 use App\Http\Controllers\Admin\TeamController;
+use App\Http\Controllers\Admin\TranslationProgressController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\LegalController;
 use App\Http\Controllers\Public\NewsController as PublicNewsController;
 use App\Http\Controllers\Public\PageController;
 use App\Http\Controllers\Public\ProjectController as PublicProjectController;
@@ -36,53 +39,76 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Public
+| Public (localized)
 |--------------------------------------------------------------------------
+|
+| URL strategy: the default locale (en) is served unprefixed (/services) and
+| is the SEO canonical; other locales are URL-prefixed (/id/services).
+|
+| Symfony drops the optionality of a leading {locale?} when a static segment
+| follows it (so "{locale?}/about" compiles as required), which means a single
+| optional-prefix group cannot match BOTH /about and /id/about. We therefore
+| register the same routes twice from one closure:
+|
+|   (1) PLAIN, unprefixed, UNNAMED → matches default-locale URLs (/about) only.
+|   (2) LOCALIZED, {locale?}, NAMED → matches prefixed URLs (/id/about) AND owns
+|       the route names, so route() stays locale-aware via URL::defaults (set
+|       per-request in SetLocale). An explicit default prefix (/en/...) is 301'd
+|       to the canonical URL by SetLocale.
+|
+| Only the localized group is named — registering both with the same names would
+| break `route:cache` (Symfony requires unique route names). Matching is by URI,
+| so the unnamed plain group still resolves /about, /services, etc.
+| No existing route() call needs to change.
+|
 */
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+$publicRoutes = function (bool $named) {
+    $name = fn ($route, $routeName) => $named ? $route->name($routeName) : $route;
 
-Route::get('about', [PageController::class, 'about'])->name('about');
-Route::get('faq', [PageController::class, 'faq'])->name('faq');
+    $name(Route::get('/', [HomeController::class, 'index']), 'home');
 
-Route::get('services', [PublicServiceController::class, 'index'])->name('services.index');
-Route::get('services/{slug}', [PublicServiceController::class, 'show'])->name('services.show');
+    $name(Route::get('about', [PageController::class, 'about']), 'about');
+    $name(Route::get('faq', [PageController::class, 'faq']), 'faq');
 
-Route::get('projects', [PublicProjectController::class, 'index'])->name('projects.index');
-Route::get('projects/{slug}', [PublicProjectController::class, 'show'])->name('projects.show');
+    $name(Route::get('privacy', [LegalController::class, 'privacy']), 'privacy');
+    $name(Route::get('cookies', [LegalController::class, 'cookies']), 'cookies');
 
-Route::get('news', [PublicNewsController::class, 'index'])->name('news.index');
-Route::get('news/{slug}', [PublicNewsController::class, 'show'])->name('news.show');
+    $name(Route::get('services', [PublicServiceController::class, 'index']), 'services.index');
+    $name(Route::get('services/{slug}', [PublicServiceController::class, 'show']), 'services.show');
+
+    $name(Route::get('projects', [PublicProjectController::class, 'index']), 'projects.index');
+    $name(Route::get('projects/{slug}', [PublicProjectController::class, 'show']), 'projects.show');
+
+    $name(Route::get('news', [PublicNewsController::class, 'index']), 'news.index');
+    $name(Route::get('news/{slug}', [PublicNewsController::class, 'show']), 'news.show');
+
+    $name(Route::get('contact', [ContactController::class, 'create']), 'contact');
+    $name(
+        Route::post('contact', [ContactController::class, 'store'])->middleware('throttle:5,1'),
+        'contact.store'
+    );
+};
+
+// (1) Default locale — unprefixed, canonical. UNNAMED (matching only).
+Route::middleware('setlocale')->group(fn () => $publicRoutes(false));
+
+// (2) Localized — prefixed for non-default locales. NAMED (owns route names).
+Route::prefix('{locale?}')
+    ->where(['locale' => implode('|', array_keys(config('locales.supported', [])))])
+    ->middleware('setlocale')
+    ->group(fn () => $publicRoutes(true));
 
 /*
 |--------------------------------------------------------------------------
-| SEO — sitemap & robots (dynamic so URLs are domain-aware)
+| SEO — sitemap & robots (dynamic so URLs are domain-aware; not localized)
 |--------------------------------------------------------------------------
 */
 
 Route::get('sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
-Route::get('robots.txt', function () {
-    $body = implode("\n", [
-        'User-agent: *',
-        'Disallow: /admin',
-        '',
-        'Sitemap: '.route('sitemap'),
-    ])."\n";
-
-    return response($body, 200)->header('Content-Type', 'text/plain');
-})->name('robots');
-
-/*
-|--------------------------------------------------------------------------
-| Public Contact Form
-|--------------------------------------------------------------------------
-*/
-
-Route::get('contact', [ContactController::class, 'create'])->name('contact');
-Route::post('contact', [ContactController::class, 'store'])
-    ->middleware('throttle:5,1')
-    ->name('contact.store');
+// Controller (not a closure) so the route set stays cacheable via route:cache.
+Route::get('robots.txt', [SitemapController::class, 'robots'])->name('robots');
 
 /*
 |--------------------------------------------------------------------------
@@ -131,6 +157,15 @@ Route::prefix('admin')
 
             Route::get('dashboard/export', [DashboardController::class, 'export'])
                 ->name('dashboard.export');
+
+            /*
+            |--------------------------------------------------------------------------
+            | Translation Progress (i18n monitoring)
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get('translations', [TranslationProgressController::class, 'index'])
+                ->name('translations.index');
 
             /*
             |--------------------------------------------------------------------------
@@ -258,6 +293,19 @@ Route::prefix('admin')
 
             /*
             |--------------------------------------------------------------------------
+            | Company Credentials
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get('company-credentials/trash', [CompanyCredentialController::class, 'trash'])->name('company-credentials.trash');
+            Route::patch('company-credentials/{id}/restore', [CompanyCredentialController::class, 'restore'])->name('company-credentials.restore');
+            Route::delete('company-credentials/{id}/force-delete', [CompanyCredentialController::class, 'forceDelete'])->name('company-credentials.force-delete');
+            Route::post('company-credentials/bulk-destroy', [CompanyCredentialController::class, 'bulkDestroy'])->name('company-credentials.bulk-destroy');
+
+            Route::resource('company-credentials', CompanyCredentialController::class);
+
+            /*
+            |--------------------------------------------------------------------------
             | Teams
             |--------------------------------------------------------------------------
             */
@@ -378,6 +426,9 @@ Route::prefix('admin')
             Route::get('messages/trash', [MessageController::class, 'trash'])->name('messages.trash');
             Route::patch('messages/{id}/restore', [MessageController::class, 'restore'])->name('messages.restore');
             Route::delete('messages/{id}/force-delete', [MessageController::class, 'forceDelete'])->name('messages.force-delete');
+
+            // Lead analytics (mini-CRM) — before the {message} wildcard.
+            Route::get('messages/analytics', [MessageController::class, 'analytics'])->name('messages.analytics');
 
             Route::get('messages', [MessageController::class, 'index'])->name('messages.index');
             Route::get('messages/{message}', [MessageController::class, 'show'])->name('messages.show');

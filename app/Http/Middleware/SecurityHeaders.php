@@ -20,17 +20,19 @@ class SecurityHeaders
      * Allowlisted third parties:
      * - challenges.cloudflare.com  → Turnstile CAPTCHA (script + iframe) on contact/login
      * - cdn.jsdelivr.net           → Alpine.js on the admin login screen
+     * - googletagmanager.com       → Google Analytics 4 (gtag.js) — consent-gated
+     * - *.google-analytics.com     → GA4 measurement / collect — consent-gated
      * - data:/blob:                → inline icons + CKEditor image preview/workers
      *
      * If a future integration needs another origin, extend this constant (kept here,
      * not in env(), so it stays correct under `config:cache`).
      */
     private const POLICY = "default-src 'self'; "
-        ."script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://cdn.jsdelivr.net; "
+        ."script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://www.googletagmanager.com; "
         ."style-src 'self' 'unsafe-inline'; "
-        ."img-src 'self' data: blob:; "
+        ."img-src 'self' data: blob: https://www.google-analytics.com https://*.google-analytics.com; "
         ."font-src 'self' data:; "
-        ."connect-src 'self' https://challenges.cloudflare.com; "
+        ."connect-src 'self' https://challenges.cloudflare.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com; "
         .'frame-src https://challenges.cloudflare.com; '
         ."worker-src 'self' blob:; "
         ."object-src 'none'; "

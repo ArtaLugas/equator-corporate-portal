@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SendMessageReplyRequest;
 use App\Jobs\SendContactReply;
 use App\Models\Message;
+use App\Services\LeadAnalytics;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -39,6 +40,21 @@ class MessageController extends Controller
         $counts['all'] = (int) $counts->sum();
 
         return view('admin.messages.index', compact('messages', 'counts'));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | LEAD ANALYTICS (mini-CRM dashboard)
+    |--------------------------------------------------------------------------
+    */
+
+    public function analytics(LeadAnalytics $analytics)
+    {
+        $this->authorize('viewAny', Message::class);
+
+        $data = $analytics->summary();
+
+        return view('admin.messages.analytics', compact('data'));
     }
 
     /*

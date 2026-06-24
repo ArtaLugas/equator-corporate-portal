@@ -3,7 +3,7 @@
     <div class="absolute inset-0 bg-gradient-to-b from-equator-darker/40 to-equator-dark"></div>
     <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <nav class="mb-3 flex items-center gap-2 text-xs font-medium text-white/60">
-            <a href="{{ route('home') }}" class="hover:text-white">Home</a>
+            <a href="{{ route('home') }}" class="hover:text-white">{{ __('nav.home') }}</a>
             <span>/</span>
             <span class="text-white/90">{{ $title }}</span>
         </nav>

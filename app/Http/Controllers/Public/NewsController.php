@@ -29,7 +29,11 @@ class NewsController extends Controller
         $news = News::where('status', 'published')
             ->with('category')
             ->when($activeCategory, fn ($q) => $q->where('category_id', $activeCategory->id))
-            ->when($search !== '', fn ($q) => $q->where('title', 'like', "%{$search}%"))
+            ->when($search !== '', fn ($q) => $q->where(function ($w) use ($search) {
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $w->orWhere("title_{$locale}", 'like', "%{$search}%");
+                }
+            }))
             ->when($lead, fn ($q) => $q->where('id', '!=', $lead->id))
             ->latest('published_at')
             ->paginate(9)
@@ -42,15 +46,16 @@ class NewsController extends Controller
         return view('public.news.index', compact('news', 'categories', 'activeCategory', 'lead', 'mostRead', 'search'));
     }
 
-    public function show(string $slug)
+    public function show(Request $request, string $slug)
     {
         $article = News::where('status', 'published')
             ->where('slug', $slug)
             ->with(['category', 'tags'])
             ->firstOrFail();
 
-        // Increment view counter (without touching updated_at).
-        News::where('id', $article->id)->increment('views_count');
+        // Count one view per session per article, skipping obvious bots — keeps
+        // the "Most Read" ranking representative of real readers (see recordView).
+        $this->recordView($request, $article);
 
         // Sidebar — latest articles (excluding current).
         $recent = News::where('status', 'published')
@@ -63,5 +68,47 @@ class NewsController extends Controller
             ->orderBy('name')->get();
 
         return view('public.news.show', compact('article', 'recent', 'categories'));
+    }
+
+    /**
+     * Increment views_count at most once per session per article, and never for
+     * obvious bots/crawlers. Uses the session that already exists for CSRF — no
+     * new tracking cookie (keeps the consent surface unchanged). The increment
+     * still avoids touching updated_at.
+     */
+    private function recordView(Request $request, News $article): void
+    {
+        if ($this->isLikelyBot($request)) {
+            return;
+        }
+
+        $seen = (array) $request->session()->get('news_viewed', []);
+
+        if (in_array($article->id, $seen, true)) {
+            return;
+        }
+
+        $seen[] = $article->id;
+        $request->session()->put('news_viewed', $seen);
+
+        News::where('id', $article->id)->increment('views_count');
+    }
+
+    /**
+     * Heuristic bot filter for view counting only (NOT a security control).
+     * An empty User-Agent is treated as a bot, since real browsers always send one.
+     */
+    private function isLikelyBot(Request $request): bool
+    {
+        $ua = (string) $request->userAgent();
+
+        if ($ua === '') {
+            return true;
+        }
+
+        return (bool) preg_match(
+            '/bot|crawl|spider|slurp|mediapartners|facebookexternalhit|embedly|quora|pinterest|slackbot|telegrambot|bitlybot|monitor|uptime|curl|wget|python-requests|headless|phantomjs/i',
+            $ua
+        );
     }
 }

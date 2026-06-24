@@ -1,8 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'Projects — ' . app_setting('company_name', 'Equator Group'))
+@section('title', __('projects.meta_title') . ' — ' . app_setting('company_name', 'Equator Group'))
 
-@section('meta_description', 'Explore selected projects and case studies delivered by ' . app_setting('company_name', 'Equator Group') . ' across environmental, social and ESG engagements worldwide.')
+@section('meta_description', __('projects.meta_description', ['company' => app_setting('company_name', 'Equator Group')]))
 
 @section('content')
 
@@ -18,11 +18,11 @@
 
         $statusMeta = [
             'completed' => [
-                'label' => 'Completed',
+                'label' => __('projects.status_completed'),
                 'dot' => 'bg-emerald-500',
                 'pill' => 'bg-emerald-50 text-emerald-700',
             ],
-            'ongoing' => ['label' => 'Ongoing', 'dot' => 'bg-blue-500', 'pill' => 'bg-blue-50 text-blue-700'],
+            'ongoing' => ['label' => __('projects.status_ongoing'), 'dot' => 'bg-blue-500', 'pill' => 'bg-blue-50 text-blue-700'],
         ];
 
         // Card meta-line builder (year · client · location) — all real, all populated.
@@ -46,39 +46,37 @@
 
         <div class="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
             <nav class="mb-6 flex items-center gap-2 text-xs font-medium text-white/55">
-                <a href="{{ route('home') }}" class="transition-colors hover:text-white">Home</a>
+                <a href="{{ route('home') }}" class="transition-colors hover:text-white">{{ __('projects.breadcrumb_home') }}</a>
                 <span>/</span>
-                <span class="text-white/85">Projects</span>
+                <span class="text-white/85">{{ __('projects.breadcrumb_projects') }}</span>
             </nav>
 
             <div class="max-w-3xl">
                 <div class="mb-5 flex items-center gap-3">
                     <span class="h-px w-8 bg-equator-orange"></span>
-                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-equator-orange">Proven
-                        Delivery</span>
+                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-equator-orange">{{ __('projects.hero_eyebrow') }}</span>
                 </div>
                 <h1 class="font-heading text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.5rem]">
-                    A track record that speaks for itself
+                    {{ __('projects.hero_title') }}
                 </h1>
                 <p class="mt-6 text-lg leading-relaxed text-white/70">
-                    Social and environmental work delivered for clients across industries — evidence of capability, not just
-                    a catalogue.
+                    {{ __('projects.hero_subtitle') }}
                 </p>
             </div>
 
             {{-- Proof stats — integrated into the hero, not a generic stat block --}}
             <dl class="mt-12 grid max-w-3xl grid-cols-2 gap-x-8 gap-y-8 border-t border-white/10 pt-10 sm:grid-cols-4">
                 <div>
-                    <dt class="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-white/45">Projects delivered</dt>
+                    <dt class="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-white/45">{{ __('projects.stat_projects_delivered') }}</dt>
                     <dd class="mt-2 font-heading text-3xl font-bold tracking-tight sm:text-4xl">{{ $stats['total'] }}</dd>
                 </div>
                 <div>
-                    <dt class="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-white/45">Completed</dt>
+                    <dt class="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-white/45">{{ __('projects.stat_completed') }}</dt>
                     <dd class="mt-2 font-heading text-3xl font-bold tracking-tight sm:text-4xl">{{ $stats['completed'] }}
                     </dd>
                 </div>
                 <div>
-                    <dt class="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-white/45">Clients served</dt>
+                    <dt class="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-white/45">{{ __('projects.stat_clients_served') }}</dt>
                     <dd class="mt-2 font-heading text-3xl font-bold tracking-tight sm:text-4xl">{{ $stats['clients'] }}</dd>
                 </div>
             </dl>
@@ -95,13 +93,13 @@
             <div class="mb-8">
                 <div class="mb-4 flex items-center gap-3">
                     <span class="h-px w-8 bg-equator-orange"></span>
-                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">The Portfolio</span>
+                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">{{ __('projects.portfolio_eyebrow') }}</span>
                 </div>
                 <h2 class="font-heading text-2xl font-semibold tracking-tight text-equator-dark sm:text-3xl">
                     @if ($hasFilter)
-                        {{ $projects->total() }} {{ Str::plural('project', $projects->total()) }} found
+                        {{ __('projects.results_found', ['count' => $projects->total(), 'label' => $projects->total() === 1 ? __('projects.project_singular') : __('projects.project_plural')]) }}
                     @else
-                        Explore our work
+                        {{ __('projects.explore_our_work') }}
                     @endif
                 </h2>
             </div>
@@ -117,7 +115,7 @@
                             'rounded-lg px-4 py-2 text-sm font-semibold transition-colors',
                             'bg-equator-dark text-white' => !$activeStatus,
                             'bg-slate-100 text-slate-600 hover:bg-slate-200' => $activeStatus,
-                        ])>All</a>
+                        ])>{{ __('common.all') }}</a>
                     @foreach ($statusMeta as $key => $meta)
                         <a href="{{ route('projects.index', array_filter(['status' => $key, 'search' => $searchTerm ?: null, 'year' => $activeYear, 'country' => $activeCountry, 'service' => $activeServiceSlug])) }}"
                             @class([
@@ -140,7 +138,8 @@
                         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
                             <i class="bi bi-search text-xs"></i>
                         </div>
-                        <input type="search" name="search" value="{{ $searchTerm }}" placeholder="Search projects…"
+                        <input type="search" name="search" value="{{ $searchTerm }}" placeholder="{{ __('projects.search_placeholder') }}"
+                            aria-label="{{ __('projects.search_placeholder') }}"
                             class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm text-equator-text placeholder-slate-400 transition-colors hover:bg-slate-100 focus:border-equator-dark focus:bg-white focus:outline-none focus:ring-2 focus:ring-equator-dark/15 sm:w-52 [&::-webkit-search-cancel-button]:appearance-none">
                     </div>
 
@@ -148,7 +147,7 @@
                     @if ($years->isNotEmpty())
                         <select name="year" onchange="this.form.submit()"
                             class="cursor-pointer rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-equator-text transition-colors hover:bg-slate-100 focus:border-equator-dark focus:outline-none">
-                            <option value="">All years</option>
+                            <option value="">{{ __('projects.all_years') }}</option>
                             @foreach ($years as $y)
                                 <option value="{{ $y }}"
                                     {{ (string) $activeYear === (string) $y ? 'selected' : '' }}>{{ $y }}
@@ -161,7 +160,7 @@
                     @if ($countries->count() > 1)
                         <select name="country" onchange="this.form.submit()"
                             class="cursor-pointer rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-equator-text transition-colors hover:bg-slate-100 focus:border-equator-dark focus:outline-none">
-                            <option value="">All regions</option>
+                            <option value="">{{ __('projects.all_regions') }}</option>
                             @foreach ($countries as $c)
                                 <option value="{{ $c }}" {{ $activeCountry === $c ? 'selected' : '' }}>
                                     {{ $c }}</option>
@@ -178,13 +177,13 @@
 
                     <button type="submit"
                         class="rounded-lg bg-equator-dark px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-equator-bright">
-                        Search
+                        {{ __('common.search') }}
                     </button>
 
                     @if ($hasFilter)
                         <a href="{{ route('projects.index') }}"
                             class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-700">
-                            <i class="bi bi-x-lg text-xs"></i> Clear
+                            <i class="bi bi-x-lg text-xs"></i> {{ __('common.clear') }}
                         </a>
                     @endif
                 </div>
@@ -198,12 +197,12 @@
                         class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-300">
                         <i class="bi bi-folder2-open text-xl"></i>
                     </div>
-                    <h3 class="font-heading text-lg font-semibold text-equator-dark">No projects found</h3>
-                    <p class="mt-1.5 max-w-sm text-sm text-slate-500">Try a different year, status, or clear your search.
+                    <h3 class="font-heading text-lg font-semibold text-equator-dark">{{ __('projects.empty_title') }}</h3>
+                    <p class="mt-1.5 max-w-sm text-sm text-slate-500">{{ __('projects.empty_subtitle') }}
                     </p>
                     <a href="{{ route('projects.index') }}"
                         class="mt-6 inline-flex items-center gap-2 rounded-xl bg-equator-dark px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-equator-bright">
-                        Reset filters
+                        {{ __('projects.empty_reset') }}
                     </a>
                 </div>
             @else
@@ -264,20 +263,20 @@
         </div>
         <div class="relative mx-auto max-w-2xl px-4 text-center sm:px-6 lg:px-8">
             <h2 class="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
-                See the capability behind the work
+                {{ __('projects.index_cta_title') }}
             </h2>
             <p class="mt-4 text-base leading-relaxed text-white/65">
-                Every project draws on a defined set of services. Explore what we do — or start a conversation about yours.
+                {{ __('projects.index_cta_subtitle') }}
             </p>
             <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
                 <a href="{{ route('services.index') }}"
                     class="group inline-flex items-center justify-center gap-2.5 rounded-xl bg-white px-7 py-3.5 text-sm font-bold text-equator-dark shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)] transition-all duration-300 hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.5)]">
-                    Explore our services
+                    {{ __('projects.index_cta_services') }}
                     <i class="bi bi-arrow-right transition-transform duration-300 group-hover:translate-x-1.5"></i>
                 </a>
                 <a href="{{ route('contact') }}"
                     class="inline-flex items-center justify-center gap-2.5 rounded-xl border border-white/25 px-7 py-3.5 text-sm font-bold text-white transition-colors duration-300 hover:bg-white/10">
-                    Start a conversation
+                    {{ __('projects.index_cta_conversation') }}
                 </a>
             </div>
         </div>

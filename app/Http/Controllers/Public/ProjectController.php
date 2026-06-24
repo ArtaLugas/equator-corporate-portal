@@ -59,9 +59,13 @@ class ProjectController extends Controller
             ))
             ->when($request->filled('search'), function ($q) use ($request) {
                 $term = trim($request->search);
-                $q->where(fn ($w) => $w->where('name', 'like', "%{$term}%")
-                    ->orWhere('client_name', 'like', "%{$term}%")
-                    ->orWhere('location', 'like', "%{$term}%"));
+                $q->where(function ($w) use ($term) {
+                    foreach (array_keys(config('locales.supported', [])) as $locale) {
+                        $w->orWhere("name_{$locale}", 'like', "%{$term}%");
+                    }
+                    $w->orWhere('client_name', 'like', "%{$term}%")
+                        ->orWhere('location', 'like', "%{$term}%");
+                });
             })
             ->latest('start_date')->latest()
             ->paginate(9)

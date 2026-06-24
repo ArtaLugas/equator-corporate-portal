@@ -11,9 +11,9 @@
     $catMeta = function ($name) {
         $n = Str::lower($name);
         return match (true) {
-            str_contains($n, 'assessment') || str_contains($n, 'planning')   => ['Assessment', 'Studies, impact assessments & planning'],
-            str_contains($n, 'implementation') || str_contains($n, 'assistance') => ['Implementation', 'Delivery, assistance & capacity building'],
-            str_contains($n, 'monitoring') || str_contains($n, 'evaluation')  => ['Monitoring', 'Auditing, compliance & evaluation'],
+            str_contains($n, 'assessment') || str_contains($n, 'planning')   => [__('projects.capability_assessment_label'), __('projects.capability_assessment_desc')],
+            str_contains($n, 'implementation') || str_contains($n, 'assistance') => [__('projects.capability_implementation_label'), __('projects.capability_implementation_desc')],
+            str_contains($n, 'monitoring') || str_contains($n, 'evaluation')  => [__('projects.capability_monitoring_label'), __('projects.capability_monitoring_desc')],
             default => [$name, ''],
         };
     };
@@ -58,11 +58,11 @@
                     'border-slate-200 bg-slate-50 text-equator-text hover:bg-slate-100' => ! $active,
                 ])>
                 <i class="bi bi-grid-1x2 text-xs {{ $active ? 'text-equator-orange' : 'text-slate-400' }}"></i>
-                <span class="max-w-[11rem] truncate">{{ $active?->name ?? 'Expertise' }}</span>
+                <span class="max-w-[11rem] truncate">{{ $active?->name ?? __('projects.capability_trigger') }}</span>
                 <i class="bi bi-chevron-down text-[0.6rem] transition-transform" :class="open && 'rotate-180'"></i>
             </button>
             @if ($active)
-                <a href="{{ $clearHref }}" aria-label="Clear expertise filter"
+                <a href="{{ $clearHref }}" aria-label="{{ __('projects.capability_clear_aria') }}"
                     class="inline-flex items-center rounded-r-lg border border-l-0 border-equator-dark bg-equator-dark px-2.5 text-white/70 transition-colors hover:text-white">
                     <i class="bi bi-x-lg text-xs"></i>
                 </a>
@@ -87,8 +87,8 @@
             {{-- header --}}
             <div class="mb-4 flex items-start justify-between gap-4">
                 <div>
-                    <p class="text-[0.62rem] font-bold uppercase tracking-[0.2em] text-equator-orange">Explore our expertise</p>
-                    <p class="mt-1 text-sm text-slate-500">See the projects behind each capability.</p>
+                    <p class="text-[0.62rem] font-bold uppercase tracking-[0.2em] text-equator-orange">{{ __('projects.capability_panel_eyebrow') }}</p>
+                    <p class="mt-1 text-sm text-slate-500">{{ __('projects.capability_panel_subtitle') }}</p>
                 </div>
                 <button type="button" @click="close()" class="-mr-1 -mt-1 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 sm:hidden">
                     <i class="bi bi-x-lg text-sm"></i>
@@ -98,7 +98,7 @@
             {{-- search --}}
             <div class="relative mb-4 shrink-0">
                 <i class="bi bi-search pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
-                <input x-ref="search" x-model="q" type="text" placeholder="Find an expertise…"
+                <input x-ref="search" x-model="q" type="text" placeholder="{{ __('projects.capability_search_placeholder') }}"
                     @keydown.enter.prevent
                     class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-3 text-sm text-equator-text placeholder-slate-400 focus:border-equator-dark focus:bg-white focus:outline-none focus:ring-2 focus:ring-equator-dark/15">
             </div>
@@ -145,7 +145,7 @@
                                 </a>
                             </template>
                             <p x-show="results.length === 0" class="px-3 py-10 text-center text-sm text-slate-400">
-                                No expertise matches “<span x-text="q"></span>”.
+                                {{ __('projects.no_expertise_match') }} “<span x-text="q"></span>”.
                             </p>
                         </div>
                     </template>
@@ -163,7 +163,7 @@
                         </a>
                     </template>
                     <p x-show="results.length === 0" class="px-3 py-10 text-center text-sm text-slate-400">
-                        No expertise matches “<span x-text="q"></span>”.
+                        {{ __('projects.no_expertise_match') }} “<span x-text="q"></span>”.
                     </p>
                 </div>
 
@@ -205,7 +205,7 @@
             @if ($active)
                 <div class="mt-3 shrink-0 border-t border-slate-100 pt-3">
                     <a href="{{ $clearHref }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-equator-dark">
-                        <i class="bi bi-x-lg text-xs"></i> Clear expertise
+                        <i class="bi bi-x-lg text-xs"></i> {{ __('projects.capability_clear') }}
                     </a>
                 </div>
             @endif

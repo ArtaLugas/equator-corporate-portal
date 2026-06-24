@@ -41,7 +41,7 @@
                     <a href="{{ route('contact') }}"
                         class="group inline-flex items-center gap-3 text-sm font-medium text-white/70 transition-all duration-300 hover:text-white">
                         <span class="h-px w-8 bg-equator-orange transition-all duration-300 group-hover:w-14"></span>
-                        <span>Start a conversation</span>
+                        <span>{{ __('footer.start_conversation') }}</span>
                         <i class="bi bi-arrow-right text-xs transition-transform duration-300 group-hover:translate-x-1"
                             aria-hidden="true"></i>
                     </a>
@@ -62,8 +62,7 @@
                 @endif
 
                 <p class="mt-5 max-w-xs text-sm leading-7 text-white/90">
-                    A social and environmental advisory firm dedicated to managing risk and delivering sustainable
-                    impact across industries and geographies.
+                    {{ __('footer.company_blurb') }}
                 </p>
 
                 {{-- Social icons — brand color on hover via data attribute (bypasses Tailwind purging) --}}
@@ -101,36 +100,34 @@
 
                 {{-- Explore --}}
                 <div class="footer-reveal" data-footer-delay="60">
-                    <p class="mb-5 text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-white">Explore</p>
+                    <p class="mb-5 text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-white">{{ __('footer.explore') }}</p>
                     <ul class="space-y-3">
                         <li>
                             <a href="{{ route('about') }}"
-                                class="text-sm text-white/90 transition-colors duration-200 hover:text-white">About
-                                Us</a>
+                                class="text-sm text-white/90 transition-colors duration-200 hover:text-white">{{ __('footer.about_us') }}</a>
                         </li>
                         <li>
                             <a href="{{ route('services.index') }}"
-                                class="text-sm text-white/90 transition-colors duration-200 hover:text-white">Services</a>
+                                class="text-sm text-white/90 transition-colors duration-200 hover:text-white">{{ __('nav.services') }}</a>
                         </li>
                         <li>
                             <a href="{{ route('projects.index') }}"
-                                class="text-sm text-white/90 transition-colors duration-200 hover:text-white">Projects</a>
+                                class="text-sm text-white/90 transition-colors duration-200 hover:text-white">{{ __('nav.projects') }}</a>
                         </li>
                         <li>
                             <a href="{{ route('news.index') }}"
-                                class="text-sm text-white/90 transition-colors duration-200 hover:text-white">News</a>
+                                class="text-sm text-white/90 transition-colors duration-200 hover:text-white">{{ __('nav.news') }}</a>
                         </li>
                         <li>
                             <a href="{{ route('faq') }}"
-                                class="text-sm text-white/90 transition-colors duration-200 hover:text-white">FAQ</a>
+                                class="text-sm text-white/90 transition-colors duration-200 hover:text-white">{{ __('nav.faq') }}</a>
                         </li>
                     </ul>
                 </div>
 
                 {{-- Practice Areas --}}
                 <div class="footer-reveal" data-footer-delay="110">
-                    <p class="mb-5 text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-white">Practice
-                        Areas</p>
+                    <p class="mb-5 text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-white">{{ __('footer.practice_areas') }}</p>
                     <ul class="space-y-3">
                         @foreach (\App\Models\ServiceCategory::where('status', 'active')->orderBy('display_order')->take(5)->get() as $cat)
                             <li>
@@ -147,7 +144,7 @@
 
             {{-- Contact: featured email + label-value rows --}}
             <div class="footer-reveal lg:col-span-5" data-footer-delay="70">
-                <p class="mb-5 text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-white">Contact</p>
+                <p class="mb-5 text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-white">{{ __('footer.contact') }}</p>
 
                 @if ($footerEmail)
                     <a href="mailto:{{ $footerEmail }}" class="group block">
@@ -164,7 +161,7 @@
                     @if ($footerPhone)
                         <div class="flex items-center gap-3">
                             <span
-                                class="w-16 shrink-0 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white/90">Phone</span>
+                                class="w-16 shrink-0 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white/90">{{ __('footer.phone') }}</span>
                             <span class="h-px w-3 shrink-0 bg-white/90" aria-hidden="true"></span>
                             <a href="tel:{{ $footerPhone }}"
                                 class="text-sm text-white/90 transition-colors duration-200 hover:text-white">
@@ -176,7 +173,7 @@
                     @if ($footerAddress)
                         <div class="flex items-start gap-3">
                             <span
-                                class="mt-0.5 w-16 shrink-0 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white/90">Location</span>
+                                class="mt-0.5 w-16 shrink-0 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white/90">{{ __('footer.location') }}</span>
                             <span class="mt-2 h-px w-3 shrink-0 bg-white/90" aria-hidden="true"></span>
                             <span
                                 class="whitespace-pre-line text-sm leading-6 text-white/90">{{ $footerAddress }}</span>
@@ -186,7 +183,7 @@
                     @if ($offices->count() > 1)
                         <a href="{{ route('contact') }}"
                             class="inline-flex items-center gap-1.5 text-[0.72rem] font-semibold text-equator-orange/80 transition-colors duration-200 hover:text-equator-orange">
-                            All {{ $offices->count() }} offices
+                            {{ __('footer.all_offices', ['count' => $offices->count()]) }}
                             <i class="bi bi-arrow-right text-[0.6rem]" aria-hidden="true"></i>
                         </a>
                     @endif
@@ -198,14 +195,28 @@
 
     {{-- Copyright bar --}}
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
-        <div
-            class="flex flex-col items-start justify-between gap-2 border-t border-white/[0.08] py-6 sm:flex-row sm:items-center">
-            <p class="text-[0.7rem] text-white/70">
-                &copy; {{ date('Y') }} {{ app_setting('company_name', 'Equator Group') }}. All rights reserved.
-            </p>
-            <p class="text-[0.7rem] text-white/70">
-                Empowering sustainable &amp; resilient development.
-            </p>
+        <div class="border-t border-white/[0.08] py-6">
+            <div class="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
+                <p class="text-[0.7rem] text-white/70">
+                    &copy; {{ date('Y') }} {{ app_setting('company_name', 'Equator Group') }}. {{ __('footer.rights_reserved') }}
+                </p>
+                <p class="text-[0.7rem] text-white/70">
+                    {{ __('footer.motto') }}
+                </p>
+            </div>
+
+            {{-- Legal --}}
+            <nav class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.7rem]"
+                aria-label="{{ __('footer.legal') }}">
+                <a href="{{ route('privacy') }}"
+                    class="text-white/70 transition-colors duration-200 hover:text-white">{{ __('footer.privacy') }}</a>
+                <span class="text-white/20" aria-hidden="true">&middot;</span>
+                <a href="{{ route('cookies') }}"
+                    class="text-white/70 transition-colors duration-200 hover:text-white">{{ __('footer.cookies') }}</a>
+                <span class="text-white/20" aria-hidden="true">&middot;</span>
+                <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-cookie-preferences'))"
+                    class="text-white/70 transition-colors duration-200 hover:text-white">{{ __('cookie_consent.preferences') }}</button>
+            </nav>
         </div>
     </div>
 

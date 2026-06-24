@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Concerns\GeneratesUniqueSlug;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ServiceCategoryRequest;
 use App\Models\ServiceCategory;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
@@ -46,8 +47,12 @@ class ServiceCategoryController extends Controller
 
             $query->where(function ($q) use ($search) {
 
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%");
+                // Name is translatable — search every locale column, plus slug.
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $q->orWhere("name_{$locale}", 'like', "%{$search}%");
+                }
+
+                $q->orWhere('slug', 'like', "%{$search}%");
             });
         }
 
@@ -81,13 +86,13 @@ class ServiceCategoryController extends Controller
 
             case 'name_asc':
 
-                $query->orderBy('name');
+                $query->orderBy('name_'.config('locales.default'));
 
                 break;
 
             case 'name_desc':
 
-                $query->orderByDesc('name');
+                $query->orderByDesc('name_'.config('locales.default'));
 
                 break;
 
@@ -137,58 +142,9 @@ class ServiceCategoryController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function store(Request $request)
+    public function store(ServiceCategoryRequest $request)
     {
-        $validated = $request->validate([
-
-            'name' => [
-                'required',
-                'string',
-                'max:191',
-            ],
-
-            'description' => [
-                'nullable',
-                'string',
-            ],
-
-            'image' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048',
-            ],
-
-            'meta_title' => [
-                'nullable',
-                'string',
-                'max:191',
-            ],
-
-            'meta_description' => [
-                'nullable',
-                'string',
-                'max:320',
-            ],
-
-            'meta_keywords' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'display_order' => [
-                'nullable',
-                'integer',
-                'min:1',
-                'unique:service_categories,display_order',
-            ],
-
-            'status' => [
-                'required',
-                'in:active,inactive',
-            ],
-        ]);
+        $validated = $request->validated();
 
         /*
         |--------------------------------------------------------------------------
@@ -200,13 +156,15 @@ class ServiceCategoryController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Generate Slug
+        | Generate Slug (from the default-locale name)
         |--------------------------------------------------------------------------
         */
 
+        $defaultName = $validated['name_'.config('locales.default')];
+
         $validated['slug'] = $this->generateUniqueSlug(
             ServiceCategory::class,
-            $validated['name']
+            $defaultName
         );
 
         $imagePath = null;
@@ -229,7 +187,7 @@ class ServiceCategoryController extends Controller
 
                     'service-categories',
 
-                    $validated['name']
+                    $defaultName
                 );
 
                 $validated['image'] = $imagePath;
@@ -333,60 +291,11 @@ class ServiceCategoryController extends Controller
     */
 
     public function update(
-        Request $request,
+        ServiceCategoryRequest $request,
         ServiceCategory $serviceCategory
     ) {
 
-        $validated = $request->validate([
-
-            'name' => [
-                'required',
-                'string',
-                'max:191',
-            ],
-
-            'description' => [
-                'nullable',
-                'string',
-            ],
-
-            'image' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048',
-            ],
-
-            'meta_title' => [
-                'nullable',
-                'string',
-                'max:191',
-            ],
-
-            'meta_description' => [
-                'nullable',
-                'string',
-                'max:320',
-            ],
-
-            'meta_keywords' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'display_order' => [
-                'nullable',
-                'integer',
-                'min:1',
-                'unique:service_categories,display_order,'.$serviceCategory->id,
-            ],
-
-            'status' => [
-                'required',
-                'in:active,inactive',
-            ],
-        ]);
+        $validated = $request->validated();
 
         /*
         |--------------------------------------------------------------------------
@@ -398,17 +307,27 @@ class ServiceCategoryController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Preserve Slug
+        | Preserve Slug (regenerate only when the default-locale name changes)
         |--------------------------------------------------------------------------
         */
 
-        if ($serviceCategory->name !== $validated['name']) {
+        $defaultLocale = config('locales.default');
+
+        $defaultName = $validated['name_'.$defaultLocale];
+
+        // Regenerate the slug only when enabled (config) AND the default-locale
+        // name actually changed — keeps it efficient and lets permalinks be
+        // frozen after go-live by flipping cms.auto_regenerate_slug to false.
+        if (
+            config('cms.auto_regenerate_slug', true)
+            && $serviceCategory->{'name_'.$defaultLocale} !== $defaultName
+        ) {
 
             $validated['slug'] = $this->generateUniqueSlug(
 
                 ServiceCategory::class,
 
-                $validated['name'],
+                $defaultName,
 
                 $serviceCategory->id
             );
@@ -436,7 +355,7 @@ class ServiceCategoryController extends Controller
 
                     'service-categories',
 
-                    $validated['name']
+                    $defaultName
                 );
 
                 $validated['image'] = $newImage;

@@ -211,7 +211,7 @@
             @touchend="onTouchEnd($event.changedTouches[0].clientX)"
             :class="paused && 'hero-paused'"
             role="region" aria-roledescription="carousel"
-            aria-label="{{ app_setting('company_name', 'Equator Group') }} highlights"
+            aria-label="{{ __('home.hero_aria_label', ['company' => app_setting('company_name', 'Equator Group')]) }}"
             class="relative flex h-[95vh] min-h-[700px] w-full items-center overflow-hidden bg-equator-dark">
 
             @foreach ($heroBanners as $i => $banner)
@@ -267,7 +267,7 @@
                                 </p>
                             @endif
                             @php
-                                $heroCtaText = $banner->button_text ?: 'Contact Our Team';
+                                $heroCtaText = $banner->button_text ?: __('common.contact_team');
                                 $heroCtaUrl = $banner->button_text ? ($banner->button_link ?: '#') : route('contact');
                             @endphp
                             <div class="ml-1 mt-12">
@@ -294,7 +294,7 @@
                             <div class="flex items-center gap-2">
                                 @foreach ($heroBanners as $i => $b)
                                     <button @click="select({{ $i }})"
-                                        aria-label="Go to slide {{ $i + 1 }}"
+                                        aria-label="{{ __('home.slide_go_to', ['number' => $i + 1]) }}"
                                         class="group flex items-center justify-center py-4 focus:outline-none">
                                         <span
                                             class="block h-[2px] transition-[width,background-color] duration-700 ease-in-out"
@@ -306,7 +306,7 @@
                             <div class="text-xs font-medium tracking-widest text-white/40">
                                 <span x-text="String(total).padStart(2, '0')"></span>
                             </div>
-                            <button @click="toggle()" :aria-label="paused ? 'Play slideshow' : 'Pause slideshow'"
+                            <button @click="toggle()" :aria-label="paused ? '{{ __('home.slideshow_play') }}' : '{{ __('home.slideshow_pause') }}'"
                                 class="flex h-7 w-7 items-center justify-center rounded-full border border-white/20 text-white/60 transition-colors hover:border-equator-orange hover:text-equator-orange">
                                 <i class="bi text-[10px]" :class="paused ? 'bi-play-fill' : 'bi-pause-fill'"
                                     aria-hidden="true"></i>
@@ -314,7 +314,7 @@
                         </div>
                         <div
                             class="hidden items-center gap-4 text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 md:flex">
-                            <span>Scroll</span>
+                            <span>{{ __('home.scroll') }}</span>
                             <div class="relative h-8 w-px overflow-hidden bg-white/20">
                                 <div class="absolute left-0 top-0 h-1/2 w-full hero-scroll-drift bg-equator-orange"></div>
                             </div>
@@ -409,17 +409,16 @@
                     <div class="max-w-2xl">
                         <div class="flex items-center gap-4">
                             <span class="h-px w-10 bg-equator-orange"></span>
-                            <span class="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500">Selected
-                                Work</span>
+                            <span class="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500">{{ __('home.projects_eyebrow') }}</span>
                         </div>
                         <h2
                             class="mt-5 font-heading text-3xl font-light leading-[1.15] tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-                            Impact in practice
+                            {{ __('home.projects_heading') }}
                         </h2>
                     </div>
                     <a href="{{ route('projects.index') }}"
                         class="group inline-flex shrink-0 items-center gap-3 border-b border-slate-300 pb-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-900 transition-colors duration-300 hover:border-equator-orange hover:text-equator-bright">
-                        <span>All Engagements</span>
+                        <span>{{ __('home.projects_view_all') }}</span>
                         <span aria-hidden="true"
                             class="transition-transform duration-300 group-hover:translate-x-1.5">&rarr;</span>
                     </a>
@@ -429,7 +428,7 @@
                     class="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($featuredProjects->take(6) as $i => $p)
                         @php
-                            $sector = $p->services->first()?->name ?? ($p->country ?: 'Environmental Advisory');
+                            $sector = $p->services->first()?->name ?? ($p->country ?: __('home.projects_sector_fallback'));
                             $place = $p->location ?: $p->country;
                         @endphp
                         <div :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
@@ -475,7 +474,7 @@
                                         {{ $p->name }}</h3>
                                     <div class="mt-5 flex items-center justify-between border-t border-white/15 pt-4">
                                         <span
-                                            class="truncate text-[12px] font-medium text-white/70">{{ $place ?: ($p->client_name ?: 'Confidential') }}</span>
+                                            class="truncate text-[12px] font-medium text-white/70">{{ $place ?: ($p->client_name ?: __('home.projects_client_fallback')) }}</span>
                                         <span aria-hidden="true"
                                             class="shrink-0 text-white/60 transition-transform duration-300 group-hover:translate-x-1.5">&rarr;</span>
                                     </div>
@@ -499,21 +498,19 @@
                     <div class="max-w-2xl">
                         <div class="flex items-center gap-4">
                             <span class="h-px w-10 bg-equator-orange"></span>
-                            <span class="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500">Practice
-                                Areas</span>
+                            <span class="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500">{{ __('home.services_eyebrow') }}</span>
                         </div>
                         <h2
                             class="mt-5 font-heading text-3xl font-light leading-[1.15] tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-                            Our Expertise
+                            {{ __('home.services_heading') }}
                         </h2>
                         <p class="mt-5 max-w-xl text-base font-normal leading-relaxed text-slate-600 lg:text-lg">
-                            Multidisciplinary advisory across environmental, social, and governance domains — engineered to
-                            move complex projects from compliance to lasting impact.
+                            {{ __('home.services_intro') }}
                         </p>
                     </div>
                     <a href="{{ route('services.index') }}"
                         class="group inline-flex shrink-0 items-center gap-3 border-b border-slate-300 pb-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-900 transition-colors duration-300 hover:border-equator-orange hover:text-equator-bright">
-                        <span>All Services</span>
+                        <span>{{ __('home.services_view_all') }}</span>
                         <span aria-hidden="true"
                             class="transition-transform duration-300 group-hover:translate-x-1.5">&rarr;</span>
                     </a>
@@ -537,7 +534,7 @@
 
                                 <div class="absolute inset-x-0 top-0 flex items-center justify-between p-6 sm:p-7">
                                     <span
-                                        class="text-[10px] font-bold uppercase tracking-[0.2em] text-white">{{ $s->category?->name ?? 'Core Advisory' }}</span>
+                                        class="text-[10px] font-bold uppercase tracking-[0.2em] text-white">{{ $s->category?->name ?? __('home.services_category_fallback') }}</span>
                                     <span
                                         class="font-heading text-sm font-semibold tracking-[0.15em] text-white">{{ sprintf('%02d', $i + 1) }}</span>
                                 </div>
@@ -553,7 +550,7 @@
                                     @endif
                                     <div
                                         class="mt-6 inline-flex items-center gap-3 border-t border-white/15 pt-5 text-[11px] font-bold uppercase tracking-[0.18em] text-equator-orange">
-                                        <span>Learn more</span>
+                                        <span>{{ __('common.learn_more') }}</span>
                                         <span aria-hidden="true"
                                             class="transition-transform duration-300 group-hover:translate-x-1.5">&rarr;</span>
                                     </div>
@@ -602,7 +599,7 @@
 
                     <div class="flex items-center gap-4">
                         <span class="h-px w-10 bg-equator-orange"></span>
-                        <span class="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500">About Us</span>
+                        <span class="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500">{{ __('home.about_eyebrow') }}</span>
                     </div>
 
                     <h2
@@ -626,7 +623,7 @@
                                         </span>
 
                                         <h3 class="font-heading text-lg font-medium text-slate-900">
-                                            Vision
+                                            {{ __('home.about_vision') }}
                                         </h3>
                                     </div>
 
@@ -645,7 +642,7 @@
                                         </span>
 
                                         <h3 class="font-heading text-lg font-medium text-slate-900">
-                                            Mission
+                                            {{ __('home.about_mission') }}
                                         </h3>
                                     </div>
 
@@ -661,7 +658,7 @@
                     <div class="mt-12 flex flex-col gap-6 sm:flex-row sm:items-center">
                         <a href="{{ route('about') }}"
                             class="group inline-flex items-center gap-3 bg-equator-dark px-8 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white transition-colors duration-300 hover:bg-equator-orange">
-                            About the firm
+                            {{ __('home.about_cta') }}
                             <span aria-hidden="true"
                                 class="transition-transform duration-300 group-hover:translate-x-1.5">&rarr;</span>
                         </a>
@@ -671,7 +668,7 @@
 
                                 <x-icon :name="'file-text'" class="h-4 w-4 text-slate-700" />
 
-                                <span>Company Profile</span>
+                                <span>{{ __('home.company_profile') }}</span>
 
                                 <x-icon name="arrow-up-right"
                                     class="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1" />
@@ -693,12 +690,11 @@
                     :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'">
                     <div class="flex items-center gap-3">
                         <span class="h-px w-8 bg-equator-orange"></span>
-                        <span class="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500">Client
-                            Network</span>
+                        <span class="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500">{{ __('home.partners_eyebrow') }}</span>
                         <span class="h-px w-8 bg-equator-orange"></span>
                     </div>
                     <h2 class="mt-5 font-heading text-2xl font-light tracking-tight text-slate-900 lg:text-3xl">
-                        Organizations We Advise</h2>
+                        {{ __('home.partners_heading') }}</h2>
                 </div>
 
                 <div x-data="{ shown: false }" x-intersect.margin.-60px.once="shown = true"
@@ -728,6 +724,55 @@
         </section>
     @endif
 
+    {{-- ============================ TRUSTED CREDENTIALS ============================ --}}
+    @if (($featuredCredentials ?? collect())->isNotEmpty())
+        <section class="border-t border-slate-100 bg-white py-20 lg:py-28">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div x-data="{ shown: false }" x-intersect.margin.-80px.once="shown = true"
+                    class="mx-auto flex max-w-xl flex-col items-center text-center transition duration-700 ease-out motion-reduce:transition-none"
+                    :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'">
+                    <div class="flex items-center gap-3">
+                        <span class="h-px w-8 bg-equator-orange"></span>
+                        <span class="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500">{{ __('credentials.home_title') }}</span>
+                        <span class="h-px w-8 bg-equator-orange"></span>
+                    </div>
+                    <h2 class="mt-5 font-heading text-2xl font-light tracking-tight text-slate-900 lg:text-3xl">
+                        {{ __('credentials.home_subtitle') }}
+                    </h2>
+                </div>
+
+                <div x-data="{ shown: false }" x-intersect.margin.-60px.once="shown = true"
+                    class="mt-14 grid grid-cols-2 gap-4 transition duration-700 ease-out motion-reduce:transition-none sm:grid-cols-3 lg:grid-cols-6"
+                    :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'">
+                    @foreach ($featuredCredentials as $cred)
+                        <a href="{{ route('about') }}#credentials" title="{{ $cred->title }}"
+                            class="group flex aspect-square flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_18px_40px_-22px_rgba(38,53,146,0.3)]">
+                            @if ($cred->image)
+                                <img src="{{ asset('storage/' . $cred->image) }}" alt="{{ $cred->title }}"
+                                    loading="lazy" decoding="async"
+                                    class="h-14 w-auto max-w-[80%] object-contain opacity-80 grayscale transition duration-300 group-hover:opacity-100 group-hover:grayscale-0">
+                            @else
+                                <x-icon :name="config('credentials.categories.' . $cred->category . '.icon', 'file-badge')"
+                                    class="h-10 w-10 text-equator-dark/70" stroke-width="1.25" />
+                            @endif
+                            <span class="line-clamp-2 text-[11px] font-semibold leading-tight text-slate-500 group-hover:text-equator-dark">
+                                {{ $cred->title }}
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
+
+                <div class="mt-12 text-center">
+                    <a href="{{ route('about') }}#credentials"
+                        class="group inline-flex items-center gap-3 border-b border-slate-300 pb-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-900 transition-colors duration-300 hover:border-equator-orange hover:text-equator-bright">
+                        <span>{{ __('credentials.view_all') }}</span>
+                        <span aria-hidden="true" class="transition-transform duration-300 group-hover:translate-x-1.5">&rarr;</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    @endif
+
     {{-- ============================ FINAL CTA (cinematic full-bleed close) ============================ --}}
     @php
         $ctaImg = optional($featuredProjects->first())->featured_image ?? optional($heroBanners->first())->image;
@@ -748,28 +793,27 @@
             :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'">
             <div class="flex items-center justify-center gap-4">
                 <span class="h-px w-8 bg-equator-orange"></span>
-                <span class="text-xs font-bold uppercase tracking-[0.3em] text-equator-light">Let’s Collaborate</span>
+                <span class="text-xs font-bold uppercase tracking-[0.3em] text-equator-light">{{ __('home.cta_eyebrow') }}</span>
                 <span class="h-px w-8 bg-equator-orange"></span>
             </div>
             <h2
                 class="mt-8 font-heading text-4xl font-light leading-[1.1] tracking-tight text-white md:text-5xl lg:text-6xl">
-                Initiate a Conversation
+                {{ __('home.cta_heading') }}
             </h2>
             <p class="mx-auto mt-8 max-w-2xl text-lg font-light leading-relaxed text-slate-300">
-                Engage with our multidisciplinary experts to discuss how we can drive sustainable impact and compliance
-                for your upcoming projects.
+                {{ __('home.cta_body') }}
             </p>
             <div class="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <a href="{{ route('contact') }}"
                     class="group inline-flex w-full items-center justify-center gap-3 bg-equator-orange px-9 py-5 text-xs font-bold uppercase tracking-[0.2em] text-white transition duration-300 ease-out hover:bg-white hover:text-equator-dark sm:w-auto">
-                    Contact Our Team
+                    {{ __('common.contact_team') }}
                     <span aria-hidden="true"
                         class="transition-transform duration-300 group-hover:translate-x-1.5">&rarr;</span>
                 </a>
                 @if (!empty($companyProfilePath))
                     <a href="{{ asset('storage/' . $companyProfilePath) }}" target="_blank" rel="noopener"
                         class="group inline-flex w-full items-center justify-center gap-3 border border-white/25 px-9 py-5 text-xs font-bold uppercase tracking-[0.2em] text-white transition duration-300 ease-out hover:border-white hover:bg-white/5 sm:w-auto">
-                        Company Profile
+                        {{ __('home.company_profile') }}
                     </a>
                 @endif
             </div>

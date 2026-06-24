@@ -28,3 +28,23 @@ Schedule::command('model:prune', ['--model' => [Visitor::class]])
 Schedule::command('queue:work --stop-when-empty --tries=3 --max-time=50')
     ->everyMinute()
     ->withoutOverlapping();
+
+/*
+|--------------------------------------------------------------------------
+| Backups (database daily; uploaded files weekly + monthly) — off-peak.
+| Same single cron entry drives these. Retention + integrity run after.
+|--------------------------------------------------------------------------
+*/
+Schedule::command('backup:run --type=daily')
+    ->dailyAt('02:00')->withoutOverlapping()->runInBackground();
+
+Schedule::command('backup:run --type=weekly')
+    ->weeklyOn(0, '03:00')->withoutOverlapping()->runInBackground(); // Sunday
+
+Schedule::command('backup:run --type=monthly')
+    ->monthlyOn(1, '04:00')->withoutOverlapping()->runInBackground();
+
+Schedule::command('backup:clean')->dailyAt('05:00');
+
+// Surfaces a stale/corrupt backup via a non-zero exit (cron emails the failure).
+Schedule::command('backup:verify')->dailyAt('05:30');

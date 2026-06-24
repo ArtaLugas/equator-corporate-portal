@@ -2,17 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Faq extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
+    /**
+     * Only NON-translatable columns. The HasTranslations trait appends the
+     * localized columns (question_en/_id, answer_en/_id) from
+     * config/translatable.php. `answer` is plain text (not an HTML field).
+     */
     protected $fillable = [
-        'question',
-        'answer',
         'display_order',
     ];
 
@@ -31,8 +35,10 @@ class Faq extends Model
         return $query->when($term, function ($q) use ($term) {
             $term = trim($term);
             $q->where(function ($inner) use ($term) {
-                $inner->where('question', 'like', "%{$term}%")
-                    ->orWhere('answer', 'like', "%{$term}%");
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $inner->orWhere("question_{$locale}", 'like', "%{$term}%")
+                        ->orWhere("answer_{$locale}", 'like', "%{$term}%");
+                }
             });
         });
     }

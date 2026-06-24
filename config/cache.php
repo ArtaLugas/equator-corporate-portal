@@ -15,7 +15,11 @@ return [
     |
     */
 
-    'default' => env('CACHE_STORE', 'database'),
+    // Default to the `file` store. This app ships NO `cache` table migration and
+    // targets shared hosting (no Redis), so `file` is the safe fallback when
+    // CACHE_STORE is absent from .env — avoids a fatal fallback to the `database`
+    // store whose table does not exist (see Audit #01 / R5).
+    'default' => env('CACHE_STORE', 'file'),
 
     /*
     |--------------------------------------------------------------------------

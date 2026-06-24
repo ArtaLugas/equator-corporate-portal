@@ -20,7 +20,7 @@ class ImageUpdateTest extends TestCase
 
         return Service::create([
             'category_id' => $cat->id,
-            'name' => 'Svc',
+            'name_en' => 'Svc',
             'slug' => 'svc',
             'image' => 'services/old.jpg',
             'status' => 'published',
@@ -32,7 +32,7 @@ class ImageUpdateTest extends TestCase
     {
         return array_merge([
             'category_id' => $service->category_id,
-            'name' => 'Svc',
+            'name_en' => 'Svc',
             'status' => 'published',
         ], $overrides);
     }

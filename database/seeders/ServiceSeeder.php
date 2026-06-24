@@ -31,9 +31,9 @@ class ServiceSeeder extends Seeder
                 ['slug' => $this->clip($row['slug'])],
                 [
                     'category_id' => $categoryId,
-                    'name' => $this->clip($row['service_name']),
-                    'short_description' => null,
-                    'description' => $this->nullable($row['description'] ?? null),
+                    'name_en' => $this->clip($row['service_name']),
+                    'short_description_en' => null,
+                    'description_en' => $this->nullable($row['description'] ?? null),
                     'image' => $this->nullable($row['image'] ?? null),
                     'status' => ($row['status'] ?? '') === 'active' ? 'published' : 'draft',
                     'is_featured' => false,

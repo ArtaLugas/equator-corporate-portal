@@ -2,39 +2,31 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Mews\Purifier\Facades\Purifier;
 
 class AboutContent extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasTranslations, SoftDeletes;
 
+    /**
+     * Only NON-translatable columns. The HasTranslations trait appends the
+     * localized columns (title_en, content_en, …) and Purifier-sanitizes the
+     * HTML field (content) for every locale on write — replacing the old
+     * content() mutator. `key` is a stable machine identifier (derived from the
+     * default-locale title) and is intentionally NOT translated.
+     */
     protected $fillable = [
         'section_id',
         'key',
-        'title',
-        'content',
         'image',
         'display_order',
         'status',
     ];
-
-    /**
-     * Sanitize the rich-text body on write. Content is admin-authored via
-     * CKEditor and rendered to the public with {!! !!}, so purifying at the
-     * source keeps stored HTML trustworthy and closes the stored-XSS vector.
-     */
-    protected function content(): Attribute
-    {
-        return Attribute::set(
-            fn (?string $value) => $value === null ? null : Purifier::clean($value)
-        );
-    }
 
     /*
     |--------------------------------------------------------------------------

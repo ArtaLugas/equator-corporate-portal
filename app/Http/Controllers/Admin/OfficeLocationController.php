@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\OfficeLocationRequest;
 use App\Models\OfficeLocation;
 use Illuminate\Http\Request;
 
@@ -21,7 +22,7 @@ class OfficeLocationController extends Controller
                 $query->latest();
                 break;
             case 'name':
-                $query->orderBy('name');
+                $query->orderBy('name_'.config('locales.default'));
                 break;
             default:
                 $query->ordered();
@@ -38,9 +39,9 @@ class OfficeLocationController extends Controller
         return view('admin.office-locations.create');
     }
 
-    public function store(Request $request)
+    public function store(OfficeLocationRequest $request)
     {
-        $validated = $this->validateData($request);
+        $validated = $request->validated();
         $validated['display_order'] ??= 0;
         $validated['is_primary'] = $request->boolean('is_primary');
 
@@ -64,9 +65,9 @@ class OfficeLocationController extends Controller
         return view('admin.office-locations.edit', ['location' => $officeLocation]);
     }
 
-    public function update(Request $request, OfficeLocation $officeLocation)
+    public function update(OfficeLocationRequest $request, OfficeLocation $officeLocation)
     {
-        $validated = $this->validateData($request);
+        $validated = $request->validated();
         $validated['display_order'] ??= 0;
         $validated['is_primary'] = $request->boolean('is_primary');
 
@@ -111,19 +112,5 @@ class OfficeLocationController extends Controller
                 ->where('is_primary', true)
                 ->update(['is_primary' => false]);
         }
-    }
-
-    private function validateData(Request $request): array
-    {
-        return $request->validate([
-            'name' => ['required', 'string', 'max:191'],
-            'address' => ['nullable', 'string', 'max:2000'],
-            'phone' => ['nullable', 'string', 'max:191'],
-            'email' => ['nullable', 'email', 'max:191'],
-            'map_embed' => ['nullable', 'string', 'max:5000'],
-            'is_primary' => ['nullable', 'boolean'],
-            'display_order' => ['nullable', 'integer', 'min:0'],
-            'status' => ['required', 'in:active,inactive'],
-        ]);
     }
 }

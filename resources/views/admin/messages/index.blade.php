@@ -31,17 +31,29 @@
             <p class="mt-1.5 text-sm font-medium text-gray-500">Inbox for contact form submissions.</p>
         </div>
 
-        @can('viewTrash', App\Models\Message::class)
-            <a href="{{ route('admin.messages.trash') }}"
-                class="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-500 px-5 py-3 text-sm font-bold text-white hover:bg-amber-600">
+        <div class="flex flex-col gap-3 sm:flex-row">
+            <a href="{{ route('admin.messages.analytics') }}"
+                class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 6h18" />
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    <path d="M3 3v18h18" />
+                    <path d="m19 9-5 5-4-4-3 3" />
                 </svg>
-                Trash
+                Lead Analytics
             </a>
-        @endcan
+
+            @can('viewTrash', App\Models\Message::class)
+                <a href="{{ route('admin.messages.trash') }}"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-500 px-5 py-3 text-sm font-bold text-white hover:bg-amber-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 6h18" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                    Trash
+                </a>
+            @endcan
+        </div>
     </div>
 
     {{-- FILTER TABS --}}

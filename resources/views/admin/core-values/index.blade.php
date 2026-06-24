@@ -164,6 +164,10 @@
             </x-admin.th>
 
             <x-admin.th>
+                Translation
+            </x-admin.th>
+
+            <x-admin.th>
                 Display Order
             </x-admin.th>
 
@@ -234,6 +238,12 @@
 
                     <x-admin.td>
 
+                        <x-admin.translation-status :model="$coreValue" />
+
+                    </x-admin.td>
+
+                    <x-admin.td>
+
                         {{ $coreValue->display_order }}
 
                     </x-admin.td>
@@ -271,7 +281,7 @@
             @empty
 
                 <tr>
-                    <td colspan="5" class="px-6 py-16">
+                    <td colspan="6" class="px-6 py-16">
                         <div class="mx-auto flex max-w-md flex-col items-center justify-center text-center">
 
                             {{-- Ikon Empty State (Gaya Flat Premium dengan Border Halus) --}}

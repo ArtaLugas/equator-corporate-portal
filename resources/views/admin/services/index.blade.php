@@ -126,6 +126,7 @@
             <x-admin.th>Image</x-admin.th>
             <x-admin.th>Service Name</x-admin.th>
             <x-admin.th>Category</x-admin.th>
+            <x-admin.th>Translation</x-admin.th>
             <x-admin.th>Status</x-admin.th>
             <x-admin.th>Featured</x-admin.th>
             <x-admin.th class="text-right">Action</x-admin.th>
@@ -177,6 +178,11 @@
                         @else
                             <span class="text-xs font-medium italic text-gray-400">Uncategorized</span>
                         @endif
+                    </x-admin.td>
+
+                    {{-- TRANSLATION STATUS --}}
+                    <x-admin.td>
+                        <x-admin.translation-status :model="$service" />
                     </x-admin.td>
 
                     {{-- STATUS --}}
@@ -257,7 +263,7 @@
             @empty
 
                 <tr>
-                    <td colspan="5" class="px-6 py-16">
+                    <td colspan="7" class="px-6 py-16">
                         <div class="mx-auto flex max-w-md flex-col items-center justify-center text-center">
 
                             {{-- Ikon Empty State (Gaya Flat Premium dengan Border Halus) --}}

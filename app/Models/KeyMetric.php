@@ -2,18 +2,22 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class KeyMetric extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
+    /**
+     * Only NON-translatable columns. The HasTranslations trait appends the
+     * localized columns (label_en, label_id) from config/translatable.php.
+     */
     protected $fillable = [
         'icon',
         'value',
-        'label',
         'display_order',
         'status',
         'is_featured',
@@ -36,9 +40,12 @@ class KeyMetric extends Model
 
     public function scopeSearch(Builder $query, ?string $term): Builder
     {
-        return $query->when($term, function ($q) use ($term) {
+        return $query->when(filled($term), function ($q) use ($term) {
             $term = trim($term);
-            $q->where('label', 'like', "%{$term}%")->orWhere('value', 'like', "%{$term}%");
+            $q->where(function ($inner) use ($term) {
+                $inner->searchTranslatable($term, ['label'])
+                    ->orWhere('value', 'like', "%{$term}%");
+            });
         });
     }
 }

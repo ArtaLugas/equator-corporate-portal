@@ -61,6 +61,7 @@
             <x-admin.th>Order</x-admin.th>
             <x-admin.th>Question</x-admin.th>
             <x-admin.th>Answer</x-admin.th>
+            <x-admin.th>Translation</x-admin.th>
             <x-admin.th class="text-right">Action</x-admin.th>
         </x-admin.table-head>
 
@@ -76,6 +77,9 @@
                     <x-admin.td>
                         <p class="text-sm text-gray-500">{{ \Illuminate\Support\Str::limit(strip_tags($faq->answer), 80) }}</p>
                     </x-admin.td>
+                    <x-admin.td>
+                        <x-admin.translation-status :model="$faq" />
+                    </x-admin.td>
                     <x-admin.td class="text-right">
                         <div class="flex items-center justify-end gap-1 whitespace-nowrap">
                             <a href="{{ route('admin.faqs.edit', $faq) }}"
@@ -89,7 +93,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="px-6 py-16">
+                    <td colspan="5" class="px-6 py-16">
                         <div class="mx-auto flex max-w-md flex-col items-center justify-center text-center">
                             <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50/50">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">

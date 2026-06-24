@@ -1,6 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'News & Insights — ' . app_setting('company_name', 'Equator Group'))
+@section('title', __('news.page_title', ['company' => app_setting('company_name', 'Equator Group')]))
+
+@section('meta_description', __('news.meta_description', ['company' => app_setting('company_name', 'Equator Group')]))
 
 @section('content')
 
@@ -31,9 +33,9 @@
 
         <div class="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
             <nav class="mb-8 flex items-center gap-2 text-xs font-medium text-white/55">
-                <a href="{{ route('home') }}" class="transition-colors hover:text-white">Home</a>
+                <a href="{{ route('home') }}" class="transition-colors hover:text-white">{{ __('news.breadcrumb_home') }}</a>
                 <span>/</span>
-                <span class="text-white/85">Insights</span>
+                <span class="text-white/85">{{ __('news.breadcrumb_insights') }}</span>
             </nav>
 
             @if ($lead)
@@ -42,7 +44,7 @@
                     <div class="lg:col-span-7">
                         <div class="mb-5 flex items-center gap-3">
                             <span class="h-px w-8 bg-equator-orange"></span>
-                            <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-equator-orange">Latest Insight</span>
+                            <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-equator-orange">{{ __('news.latest_insight_eyebrow') }}</span>
                         </div>
 
                         <div class="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-medium text-white/55">
@@ -54,7 +56,7 @@
                                 <span>{{ $lead->published_at->format('d M Y') }}</span>
                                 <span class="text-white/25" aria-hidden="true">·</span>
                             @endif
-                            <span>{{ $readTime($lead) }} min read</span>
+                            <span>{{ __('news.min_read', ['count' => $readTime($lead)]) }}</span>
                         </div>
 
                         <a href="{{ route('news.show', $lead->slug) }}" class="group block">
@@ -62,7 +64,7 @@
                                 {{ $lead->title }}
                             </h1>
                             <span class="mt-7 inline-flex items-center gap-2.5 text-sm font-semibold text-white">
-                                Read insight
+                                {{ __('news.read_insight') }}
                                 <i class="bi bi-arrow-right transition-transform duration-300 group-hover:translate-x-1.5"></i>
                             </span>
                         </a>
@@ -87,13 +89,13 @@
                 <div class="max-w-3xl">
                     <div class="mb-5 flex items-center gap-3">
                         <span class="h-px w-8 bg-equator-orange"></span>
-                        <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-equator-orange">News &amp; Insights</span>
+                        <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-equator-orange">{{ __('news.hero_eyebrow') }}</span>
                     </div>
                     <h1 class="font-heading text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
-                        Insights &amp; Perspectives
+                        {{ __('news.hero_heading') }}
                     </h1>
                     <p class="mt-5 text-lg leading-relaxed text-white/70">
-                        Perspectives, research, and stories from our work in social and environmental sustainability.
+                        {{ __('news.hero_subtitle') }}
                     </p>
                 </div>
             @endif
@@ -116,7 +118,7 @@
                                    'rounded-lg px-4 py-2 text-sm font-semibold transition-colors',
                                    'bg-equator-dark text-white' => ! $activeCategory,
                                    'bg-slate-100 text-slate-600 hover:bg-slate-200' => $activeCategory,
-                               ])>All Insights</a>
+                               ])>{{ __('news.all_insights') }}</a>
                             @foreach ($categories as $cat)
                                 @php $isActive = $activeSlug === $cat->slug; @endphp
                                 <a href="{{ $categoryHref($cat->slug) }}"
@@ -146,15 +148,16 @@
                         <i class="bi bi-search text-xs"></i>
                     </div>
                     <input type="search" name="search" value="{{ $search }}" id="news-search-input"
-                           placeholder="Search insights…" autocomplete="off"
+                           placeholder="{{ __('news.search_placeholder') }}"
+                           aria-label="{{ __('news.search_placeholder') }}" autocomplete="off"
                            class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-20 text-sm text-equator-text placeholder-slate-400 transition-colors hover:bg-slate-100 focus:border-equator-dark focus:bg-white focus:outline-none focus:ring-2 focus:ring-equator-dark/15 lg:w-64 [&::-webkit-search-cancel-button]:appearance-none">
                     <div class="absolute inset-y-0 right-1.5 flex items-center gap-1">
                         @if ($search !== '')
                             <a href="{{ $categoryHref($activeSlug) }}"
                                class="flex h-6 w-6 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
-                               aria-label="Clear search"><i class="bi bi-x-lg text-[0.65rem]"></i></a>
+                               aria-label="{{ __('news.search_clear_aria') }}"><i class="bi bi-x-lg text-[0.65rem]"></i></a>
                         @endif
-                        <button type="submit" class="rounded-md bg-equator-dark px-2.5 py-1 text-xs font-bold text-white transition-colors hover:bg-equator-bright">Go</button>
+                        <button type="submit" class="rounded-md bg-equator-dark px-2.5 py-1 text-xs font-bold text-white transition-colors hover:bg-equator-bright">{{ __('news.search_submit') }}</button>
                     </div>
                 </form>
             </div>
@@ -171,22 +174,22 @@
                 <div class="mb-4 flex items-center gap-3">
                     <span class="h-px w-8 bg-equator-orange"></span>
                     <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">
-                        {{ $hasFilter ? 'Results' : 'The Insights' }}
+                        {{ $hasFilter ? __('news.section_results') : __('news.section_insights') }}
                     </span>
                 </div>
                 <h2 class="font-heading text-2xl font-semibold tracking-tight text-equator-dark sm:text-3xl">
                     @if ($search !== '')
-                        Results for “{{ $search }}”
+                        {{ __('news.results_for', ['query' => $search]) }}
                     @elseif ($activeCategory)
                         {{ $activeCategory->name }}
                     @else
-                        Latest perspectives
+                        {{ __('news.latest_perspectives') }}
                     @endif
                 </h2>
                 @if ($hasFilter)
                     <p class="mt-1.5 text-sm text-slate-500">
-                        {{ $news->total() }} {{ Str::plural('insight', $news->total()) }} found ·
-                        <a href="{{ route('news.index') }}" class="font-semibold text-equator-bright hover:text-equator-dark">Clear</a>
+                        {{ __('news.count_found', ['count' => $news->total(), 'label' => $news->total() === 1 ? __('news.insight_singular') : __('news.insight_plural')]) }} ·
+                        <a href="{{ route('news.index') }}" class="font-semibold text-equator-bright hover:text-equator-dark">{{ __('common.clear') }}</a>
                     </p>
                 @endif
             </div>
@@ -196,11 +199,11 @@
                     <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-300">
                         <i class="bi bi-search text-xl"></i>
                     </div>
-                    <h3 class="font-heading text-lg font-semibold text-equator-dark">No insights found</h3>
-                    <p class="mt-1.5 max-w-sm text-sm text-slate-500">Try a different category or clear your search.</p>
+                    <h3 class="font-heading text-lg font-semibold text-equator-dark">{{ __('news.empty_heading') }}</h3>
+                    <p class="mt-1.5 max-w-sm text-sm text-slate-500">{{ __('news.empty_body') }}</p>
                     <a href="{{ route('news.index') }}"
                        class="mt-6 inline-flex items-center gap-2 rounded-xl bg-equator-dark px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-equator-bright">
-                        Back to all insights
+                        {{ __('news.empty_action') }}
                     </a>
                 </div>
             @else
@@ -230,7 +233,7 @@
                                     {{ $article->title }}
                                 </h3>
                                 <div class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4 text-xs font-semibold text-slate-400">
-                                    <span>{{ $readTime($article) }} min read</span>
+                                    <span>{{ __('news.min_read', ['count' => $readTime($article)]) }}</span>
                                     <span class="h-px flex-1 bg-slate-100"></span>
                                     <i class="bi bi-arrow-right transition-all duration-300 group-hover:translate-x-1 group-hover:text-equator-bright"></i>
                                 </div>
@@ -254,7 +257,7 @@
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="mb-8 flex items-center gap-3">
                     <span class="h-px w-8 bg-equator-orange"></span>
-                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">Most Read</span>
+                    <span class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-slate-400">{{ __('news.most_read') }}</span>
                 </div>
                 <div class="grid gap-x-10 gap-y-2 sm:grid-cols-2 lg:gap-x-16">
                     @foreach ($mostRead as $i => $article)
@@ -287,26 +290,26 @@
         </div>
         <div class="relative mx-auto max-w-2xl px-4 text-center sm:px-6 lg:px-8">
             <h2 class="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
-                Turn insight into action
+                {{ __('news.cta_heading') }}
             </h2>
             <p class="mt-4 text-base leading-relaxed text-white/65">
-                See the expertise and the work behind our perspectives — or start a conversation with our team.
+                {{ __('news.cta_body') }}
             </p>
             <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
                 <a href="{{ route('services.index') }}"
                    class="group inline-flex items-center justify-center gap-2.5 rounded-xl bg-white px-7 py-3.5 text-sm font-bold text-equator-dark shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)] transition-all duration-300 hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.5)]">
-                    Explore our services
+                    {{ __('news.cta_services') }}
                     <i class="bi bi-arrow-right transition-transform duration-300 group-hover:translate-x-1.5"></i>
                 </a>
                 <a href="{{ route('contact') }}"
                    class="inline-flex items-center justify-center gap-2.5 rounded-xl border border-white/25 px-7 py-3.5 text-sm font-bold text-white transition-colors duration-300 hover:bg-white/10">
-                    Talk to our team
+                    {{ __('news.cta_contact') }}
                 </a>
             </div>
             <div class="mt-8">
                 <a href="{{ route('projects.index') }}"
                    class="inline-flex items-center gap-2 text-sm font-semibold text-white/55 transition-colors hover:text-white">
-                    See our work
+                    {{ __('news.cta_work') }}
                     <i class="bi bi-arrow-right text-xs"></i>
                 </a>
             </div>

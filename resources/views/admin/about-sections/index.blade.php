@@ -167,6 +167,10 @@
             </x-admin.th>
 
             <x-admin.th>
+                Translation
+            </x-admin.th>
+
+            <x-admin.th>
                 Order
             </x-admin.th>
 
@@ -215,6 +219,13 @@
                     <x-admin.td>
 
                         <x-admin.status-badge :status="$section->status" :dot="true" />
+
+                    </x-admin.td>
+
+                    {{-- TRANSLATION STATUS --}}
+                    <x-admin.td>
+
+                        <x-admin.translation-status :model="$section" />
 
                     </x-admin.td>
 
@@ -276,7 +287,7 @@
             @empty
 
                 <tr>
-                    <td colspan="5" class="px-6 py-16">
+                    <td colspan="7" class="px-6 py-16">
                         <div class="mx-auto flex max-w-md flex-col items-center justify-center text-center">
 
                             {{-- Ikon Empty State (Gaya Flat Premium dengan Border Halus) --}}

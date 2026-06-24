@@ -58,9 +58,9 @@ class FaqSeeder extends Seeder
 
         foreach ($faqs as $index => $faq) {
             Faq::updateOrCreate(
-                ['question' => $faq['question']],
+                ['question_en' => $faq['question']],
                 [
-                    'answer' => $faq['answer'],
+                    'answer_en' => $faq['answer'],
                     'display_order' => $index + 1,
                 ]
             );

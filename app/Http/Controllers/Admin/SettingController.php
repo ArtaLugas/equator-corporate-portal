@@ -43,6 +43,9 @@ class SettingController extends Controller
             'meta_title' => ['nullable', 'string', 'max:191'],
             'meta_description' => ['nullable', 'string', 'max:320'],
             'meta_keywords' => ['nullable', 'string', 'max:255'],
+            // SEO & Analytics (IDs come from here — never hardcoded).
+            'ga4_measurement_id' => ['nullable', 'string', 'max:32', 'regex:/^G-[A-Z0-9]+$/i'],
+            'gsc_verification' => ['nullable', 'string', 'max:191'],
         ]);
 
         $settings = Setting::current();

@@ -1,6 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'Frequently Asked Questions — ' . app_setting('company_name', 'Equator Group'))
+@section('title', __('faq.hero_title') . ' — ' . app_setting('company_name', 'Equator Group'))
+
+@section('meta_description', __('faq.meta_description', ['company' => app_setting('company_name', 'Equator Group')]))
 
 @section('content')
 
@@ -50,9 +52,8 @@
 
     {{-- HERO BLOCK INTEGRATION --}}
     @include('public.partials.page-hero', [
-        'title' => 'Frequently Asked Questions',
-        'subtitle' =>
-            'Answers to common questions about our services, expertise, and approach to client engagements.',
+        'title' => __('faq.hero_title'),
+        'subtitle' => __('faq.hero_subtitle'),
     ])
 
     <section class="relative bg-white py-24 sm:py-32">
@@ -66,15 +67,13 @@
                     <div class="lg:max-w-xs">
                         <div class="flex items-center gap-4">
                             <span class="h-px w-8 bg-equator-orange"></span>
-                            <span class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Common
-                                Questions</span>
+                            <span class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">{{ __('faq.rail_eyebrow') }}</span>
                         </div>
                         <h2 class="mt-6 font-heading text-2xl font-light tracking-tight text-slate-900 sm:text-3xl">
-                            What clients ask us most
+                            {{ __('faq.rail_heading') }}
                         </h2>
                         <p class="mt-4 text-sm leading-relaxed text-slate-600 sm:text-base">
-                            Clear answers about our services, expertise, and how we work. Can't find what you're
-                            looking for? Our team is one message away.
+                            {{ __('faq.rail_description') }}
                         </p>
                     </div>
                 </div>
@@ -86,7 +85,7 @@
                             <div class="mb-4 flex justify-center">
                                 <x-icon name="folder-open" class="h-8 w-8 text-slate-300" stroke-width="1.5" />
                             </div>
-                            <p class="text-base font-light text-slate-400">No questions have been published yet.</p>
+                            <p class="text-base font-light text-slate-400">{{ __('faq.empty_state') }}</p>
                         </div>
                     @else
                         {{-- Minimalist architectural border stack --}}
@@ -135,14 +134,13 @@
 
                         {{-- Closing rail — editorial, tenang (bukan card/banner) --}}
                         <div class="mt-12 border-t border-slate-200 pt-8">
-                            <p class="font-heading text-base font-medium text-slate-900">Still have questions?</p>
+                            <p class="font-heading text-base font-medium text-slate-900">{{ __('faq.still_have_questions') }}</p>
                             <p class="mt-2 max-w-xl text-sm leading-relaxed text-slate-600">
-                                For questions tied to your specific scope, timeline, or requirements, speak directly
-                                with one of our consultants.
+                                {{ __('faq.still_have_questions_body') }}
                             </p>
                             <a href="{{ route('contact') }}"
                                 class="group mt-4 inline-flex items-center gap-2 text-sm font-semibold text-equator-dark transition-colors duration-300 hover:text-equator-orange">
-                                Contact us
+                                {{ __('faq.contact_us') }}
                                 <x-icon name="arrow-right"
                                     class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                             </a>

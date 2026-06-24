@@ -23,9 +23,9 @@ class ProjectSeeder extends Seeder
                 ['slug' => $this->clip($row['slug'])],
                 [
                     // Service scope kini many-to-many (pivot project_service) — tidak di-set di sini.
-                    'name' => $this->clip($row['project_name']),
-                    'short_description' => null,
-                    'description' => $this->nullable($row['description'] ?? null),
+                    'name_en' => $this->clip($row['project_name']),
+                    'short_description_en' => null,
+                    'description_en' => $this->nullable($row['description'] ?? null),
                     'featured_image' => $this->nullable($row['image'] ?? null),
                     'client_name' => $this->nullable($row['client_name'] ?? null),
                     'location' => $this->nullable($row['location'] ?? null),

@@ -14,7 +14,7 @@ class TeamSeeder extends Seeder
     {
         foreach ($this->loadData('teams') as $row) {
             Team::updateOrCreate(
-                ['name' => $this->clip($row['name']), 'position' => $this->clip($row['position'])],
+                ['name' => $this->clip($row['name']), 'position_en' => $this->clip($row['position'])],
                 [
                     'photo' => $this->nullable($row['photo'] ?? null),
                     'email' => $this->nullable($row['email'] ?? null),

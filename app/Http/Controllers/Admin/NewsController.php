@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\NewsRequest;
 use App\Models\News;
 use App\Models\NewsCategory;
 use App\Models\Tag;
@@ -44,8 +45,16 @@ class NewsController extends Controller
             $search = trim($request->search);
 
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%");
+
+                // Translatable title across every locale column, plus slug,
+                // status, and the category name.
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $q->orWhere("title_{$locale}", 'like', "%{$search}%");
+                }
+
+                $q->orWhere('slug', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
+                    ->orWhereHas('category', fn ($c) => $c->where('name', 'like', "%{$search}%"));
             });
         }
 
@@ -82,10 +91,10 @@ class NewsController extends Controller
                 $query->oldest();
                 break;
             case 'title_asc':
-                $query->orderBy('title');
+                $query->orderBy('title_'.config('locales.default'));
                 break;
             case 'title_desc':
-                $query->orderByDesc('title');
+                $query->orderByDesc('title_'.config('locales.default'));
                 break;
             case 'most_viewed':
                 $query->orderByDesc('views_count');
@@ -131,13 +140,15 @@ class NewsController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function store(Request $request)
+    public function store(NewsRequest $request)
     {
-        $validated = $this->validateData($request);
+        $validated = $request->validated();
 
         $validated['is_featured'] = $request->boolean('is_featured');
 
-        $validated['slug'] = $this->generateUniqueSlug($validated['title']);
+        $defaultTitle = $validated['title_'.config('locales.default')];
+
+        $validated['slug'] = $this->generateUniqueSlug($defaultTitle);
 
         $validated['published_at'] = $this->resolvePublishedAt($validated);
 
@@ -152,7 +163,7 @@ class NewsController extends Controller
                 $imagePath = $this->uploadImage(
                     $request->file('image'),
                     'news',
-                    $validated['title']
+                    $defaultTitle
                 );
 
                 $validated['image'] = $imagePath;
@@ -220,14 +231,23 @@ class NewsController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function update(Request $request, News $news)
+    public function update(NewsRequest $request, News $news)
     {
-        $validated = $this->validateData($request);
+        $validated = $request->validated();
 
         $validated['is_featured'] = $request->boolean('is_featured');
 
-        if ($news->title !== $validated['title']) {
-            $validated['slug'] = $this->generateUniqueSlug($validated['title'], $news->id);
+        $defaultLocale = config('locales.default');
+
+        $defaultTitle = $validated['title_'.$defaultLocale];
+
+        // Regenerate the slug only when enabled (config) AND the default-locale
+        // title actually changed.
+        if (
+            config('cms.auto_regenerate_slug', true)
+            && $news->{'title_'.$defaultLocale} !== $defaultTitle
+        ) {
+            $validated['slug'] = $this->generateUniqueSlug($defaultTitle, $news->id);
         }
 
         $validated['published_at'] = $this->resolvePublishedAt($validated, $news);
@@ -245,7 +265,7 @@ class NewsController extends Controller
                 $newImage = $this->uploadImage(
                     $request->file('image'),
                     'news',
-                    $validated['title']
+                    $defaultTitle
                 );
 
                 $validated['image'] = $newImage;
@@ -452,30 +472,6 @@ class NewsController extends Controller
         }
 
         return null;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Helper: Validate
-    |--------------------------------------------------------------------------
-    */
-
-    private function validateData(Request $request): array
-    {
-        return $request->validate([
-            'category_id' => ['required', 'exists:news_categories,id'],
-            'title' => ['required', 'string', 'max:191'],
-            'content' => ['nullable', 'string'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'meta_title' => ['nullable', 'string', 'max:191'],
-            'meta_description' => ['nullable', 'string', 'max:320'],
-            'meta_keywords' => ['nullable', 'string', 'max:255'],
-            'status' => ['required', 'in:draft,published'],
-            'published_at' => ['nullable', 'date'],
-            'is_featured' => ['nullable', 'boolean'],
-            'tags' => ['nullable', 'array'],
-            'tags.*' => ['string', 'max:100'],
-        ]);
     }
 
     /*

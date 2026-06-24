@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AboutContentRequest;
 use App\Models\AboutContent;
 use App\Models\AboutSection;
 use App\Services\ImageService;
@@ -10,8 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class AboutContentController extends Controller
 {
@@ -46,8 +45,13 @@ class AboutContentController extends Controller
 
             $query->where(function ($q) use ($search) {
 
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('content', 'like', "%{$search}%");
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $q->orWhere("title_{$locale}", 'like', "%{$search}%")
+                        ->orWhere("content_{$locale}", 'like', "%{$search}%");
+                }
+
+                $q->orWhere('status', 'like', "%{$search}%")
+                    ->orWhereHas('section', fn ($s) => $s->where('name_'.config('locales.default'), 'like', "%{$search}%"));
             });
         }
 
@@ -95,13 +99,13 @@ class AboutContentController extends Controller
 
             case 'title_asc':
 
-                $query->orderBy('title');
+                $query->orderBy('title_'.config('locales.default'));
 
                 break;
 
             case 'title_desc':
 
-                $query->orderByDesc('title');
+                $query->orderByDesc('title_'.config('locales.default'));
 
                 break;
 
@@ -161,70 +165,11 @@ class AboutContentController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function store(Request $request)
+    public function store(AboutContentRequest $request)
     {
-        // Key selalu diturunkan dari Title (field read-only di form).
-        $request->merge([
-            'key' => $this->generateKey($request->input('title')),
-        ]);
+        $validated = $request->validated();
 
-        $validated = $request->validate([
-
-            'section_id' => [
-                'required',
-                'exists:about_sections,id',
-            ],
-
-            'key' => [
-                'nullable',
-                'string',
-                'max:100',
-                'regex:/^[a-z0-9_]+$/',
-                Rule::unique('about_contents')
-                    ->where(fn ($query) => $query->where('section_id', $request->section_id)),
-            ],
-
-            'title' => [
-                'nullable',
-                'string',
-                'max:191',
-            ],
-
-            'content' => [
-                'nullable',
-                'string',
-            ],
-
-            'image' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048',
-            ],
-
-            'display_order' => [
-
-                'required',
-
-                'integer',
-
-                'min:1',
-
-                Rule::unique('about_contents')
-                    ->where(function ($query) use ($request) {
-
-                        return $query->where(
-                            'section_id',
-                            $request->section_id
-                        );
-                    }),
-            ],
-
-            'status' => [
-                'required',
-                'in:active,inactive',
-            ],
-        ]);
+        $defaultTitle = $validated['title_'.config('locales.default')] ?? 'about-content';
 
         $imagePath = null;
 
@@ -246,7 +191,7 @@ class AboutContentController extends Controller
 
                     'about-contents',
 
-                    $validated['title'] ?? 'about-content'
+                    $defaultTitle
                 );
 
                 $validated['image'] = $imagePath;
@@ -351,71 +296,13 @@ class AboutContentController extends Controller
     */
 
     public function update(
-        Request $request,
+        AboutContentRequest $request,
         AboutContent $aboutContent
     ) {
 
-        // Key diturunkan dari Title; bila Title dikosongkan, pertahankan key lama.
-        $request->merge([
-            'key' => $this->generateKey($request->input('title'), $aboutContent->key),
-        ]);
+        $validated = $request->validated();
 
-        $validated = $request->validate([
-
-            'section_id' => [
-                'required',
-                'exists:about_sections,id',
-            ],
-
-            'key' => [
-                'nullable',
-                'string',
-                'max:100',
-                'regex:/^[a-z0-9_]+$/',
-                Rule::unique('about_contents')
-                    ->where(fn ($query) => $query->where('section_id', $request->section_id))
-                    ->ignore($aboutContent->id),
-            ],
-
-            'title' => [
-                'nullable',
-                'string',
-                'max:191',
-            ],
-
-            'content' => [
-                'nullable',
-                'string',
-            ],
-
-            'image' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048',
-            ],
-
-            'display_order' => [
-                'required',
-                'integer',
-                'min:1',
-
-                Rule::unique('about_contents')
-                    ->where(function ($query) use ($request) {
-
-                        return $query->where(
-                            'section_id',
-                            $request->section_id
-                        );
-                    })
-                    ->ignore($aboutContent->id),
-            ],
-
-            'status' => [
-                'required',
-                'in:active,inactive',
-            ],
-        ]);
+        $defaultTitle = $validated['title_'.config('locales.default')] ?? 'about-content';
 
         $oldImage = $aboutContent->image;
 
@@ -439,7 +326,7 @@ class AboutContentController extends Controller
 
                     'about-contents',
 
-                    $validated['title'] ?? 'about-content'
+                    $defaultTitle
                 );
 
                 $validated['image'] = $newImage;
@@ -576,30 +463,6 @@ class AboutContentController extends Controller
                 'Failed to delete about content.'
             );
         }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Generate Key
-    |--------------------------------------------------------------------------
-    */
-
-    /**
-     * Bentuk identifier `key` dari Title (field read-only di form):
-     * - utamakan title; bila kosong gunakan $fallback (mis. key lama saat edit);
-     * - selalu di-slug (lowercase, underscore) agar konsisten dengan regex ^[a-z0-9_]+$;
-     * - kembalikan null bila tidak ada sumber sama sekali.
-     */
-    private function generateKey(?string $title, ?string $fallback = null): ?string
-    {
-        $source = filled($title) ? $title : $fallback;
-
-        if (blank($source)) {
-            return null;
-        }
-
-        // Str::slug menghapus karakter spesial (mis. "Vision & Mission" -> "vision_mission").
-        return Str::slug(trim($source), '_');
     }
 
     /*

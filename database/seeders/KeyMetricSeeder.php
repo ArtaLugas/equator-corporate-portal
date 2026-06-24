@@ -18,7 +18,7 @@ class KeyMetricSeeder extends Seeder
 
         foreach ($metrics as $i => $metric) {
             KeyMetric::updateOrCreate(
-                ['label' => $metric['label']],
+                ['label_en' => $metric['label']],
                 [
                     'value' => $metric['value'],
                     'icon' => $metric['icon'],

@@ -2,17 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class OfficeLocation extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
+    /**
+     * Only NON-translatable columns. The HasTranslations trait appends the
+     * localized columns (name_en, name_id, address_en, address_id) from
+     * config/translatable.php.
+     */
     protected $fillable = [
-        'name',
-        'address',
         'phone',
         'email',
         'map_embed',
@@ -47,9 +51,12 @@ class OfficeLocation extends Model
         return $query->when($term, function ($q) use ($term) {
             $term = trim($term);
             $q->where(function ($inner) use ($term) {
-                $inner->where('name', 'like', "%{$term}%")
-                    ->orWhere('address', 'like', "%{$term}%")
-                    ->orWhere('email', 'like', "%{$term}%");
+                // name & address are translatable — search every locale column.
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $inner->orWhere("name_{$locale}", 'like', "%{$term}%")
+                        ->orWhere("address_{$locale}", 'like', "%{$term}%");
+                }
+                $inner->orWhere('email', 'like', "%{$term}%");
             });
         });
     }

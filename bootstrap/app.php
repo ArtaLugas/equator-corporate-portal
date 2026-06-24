@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Middleware\AdminAuthenticate;
+use App\Http\Middleware\CaptureLeadSource;
 use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TrackVisitor;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -22,6 +24,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'admin.auth' => AdminAuthenticate::class,
+            'setlocale' => SetLocale::class,
+        ]);
+
+        // The cookie-consent banner sets this cookie client-side (plain JSON), so
+        // it must be excluded from Laravel's cookie encryption to stay readable
+        // by both JS and the cookie_consent() helper.
+        $middleware->encryptCookies(except: [
+            'equator_cookie_consent',
         ]);
 
         // Baseline security headers on every web response, plus visitor
@@ -29,6 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             SecurityHeaders::class,
             TrackVisitor::class,
+            CaptureLeadSource::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

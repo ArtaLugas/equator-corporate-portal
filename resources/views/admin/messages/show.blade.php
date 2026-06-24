@@ -80,6 +80,41 @@
                     </div>
                 </div>
 
+                {{-- LEAD INFORMATION (mini-CRM, auto-captured) --}}
+                <div class="rounded-2xl border border-gray-200 bg-white p-6 md:p-8">
+                    <div class="mb-6 border-b border-gray-100 pb-4">
+                        <h2 class="text-base font-extrabold tracking-tight text-gray-900">Lead Information</h2>
+                        <p class="mt-1 text-xs font-medium text-gray-400">Automatically captured — the visitor did not enter this.</p>
+                    </div>
+
+                    @php
+                        $leadFields = [
+                            'Landing Page' => $message->landing_page,
+                            'Referrer' => $message->referrer,
+                            'Locale' => $message->locale ? strtoupper($message->locale) : null,
+                            'UTM Source' => $message->utm_source,
+                            'UTM Medium' => $message->utm_medium,
+                            'UTM Campaign' => $message->utm_campaign,
+                            'UTM Content' => $message->utm_content,
+                            'UTM Term' => $message->utm_term,
+                            'Google Click ID' => $message->gclid,
+                            'Facebook Click ID' => $message->fbclid,
+                            'IP Address' => $message->ip_address,
+                            'User Agent' => $message->user_agent,
+                        ];
+                        $wide = ['Landing Page', 'Referrer', 'User Agent'];
+                    @endphp
+
+                    <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+                        @foreach ($leadFields as $label => $value)
+                            <div @class(['sm:col-span-2' => in_array($label, $wide, true)])>
+                                <p class="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">{{ $label }}</p>
+                                <p class="mt-1.5 break-all text-sm font-medium {{ $value ? 'text-gray-900' : 'text-gray-300' }}">{{ $value ?: '—' }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
                 {{-- REPLIES HISTORY --}}
                 @if ($message->replies->isNotEmpty())
                     <div class="rounded-2xl border border-gray-200 bg-white p-6 md:p-8">

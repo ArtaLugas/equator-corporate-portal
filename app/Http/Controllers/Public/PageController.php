@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\AboutHistory;
 use App\Models\AboutSection;
+use App\Models\CompanyCredential;
 use App\Models\CompanyDocument;
 use App\Models\CoreValue;
 use App\Models\Faq;
@@ -43,7 +44,13 @@ class PageController extends Controller
             ->where('document_type', 'company_profile')
             ->orderBy('display_order')->first();
 
-        return compact('sections', 'coreValues', 'histories', 'teams', 'companyProfile');
+        // Credentials live within About (grouped by category, ordered per config).
+        $catOrder = collect(config('credentials.categories', []))->map(fn ($c) => $c['order'] ?? 999);
+        $credentials = CompanyCredential::active()->ordered()->with('items')->get()
+            ->groupBy('category')
+            ->sortBy(fn ($items, $category) => $catOrder[$category] ?? 999);
+
+        return compact('sections', 'coreValues', 'histories', 'teams', 'companyProfile', 'credentials');
     }
 
     public function faq()

@@ -144,6 +144,7 @@
             <x-admin.th>Position</x-admin.th>
             <x-admin.th>Order</x-admin.th>
             <x-admin.th>Status</x-admin.th>
+            <x-admin.th>Translation</x-admin.th>
             <x-admin.th>Action</x-admin.th>
         </x-admin.table-head>
 
@@ -204,6 +205,11 @@
                         <x-admin.status-badge :dot="true" :status="$team->status" />
                     </x-admin.td>
 
+                    {{-- TRANSLATION STATUS --}}
+                    <x-admin.td>
+                        <x-admin.translation-status :model="$team" />
+                    </x-admin.td>
+
                     {{-- ACTIONS --}}
                     <x-admin.td>
                         <div class="flex items-center justify-end gap-1 whitespace-nowrap">
@@ -245,7 +251,7 @@
             @empty
 
                 <tr>
-                    <td colspan="6" class="px-6 py-16">
+                    <td colspan="7" class="px-6 py-16">
                         <div class="mx-auto flex max-w-md flex-col items-center justify-center text-center">
 
                             <div

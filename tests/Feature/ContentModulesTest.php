@@ -20,25 +20,25 @@ class ContentModulesTest extends TestCase
     {
         $this->actingAs($this->admin(), 'admin')
             ->post(route('admin.faqs.store'), [
-                'question' => 'What is X?',
-                'answer' => 'X is Y.',
+                'question_en' => 'What is X?',
+                'answer_en' => 'X is Y.',
                 'display_order' => 1,
             ])
             ->assertRedirect(route('admin.faqs.index'));
 
-        $this->assertDatabaseHas('faqs', ['question' => 'What is X?']);
+        $this->assertDatabaseHas('faqs', ['question_en' => 'What is X?']);
     }
 
     public function test_faq_requires_question_and_answer(): void
     {
         $this->actingAs($this->admin(), 'admin')
             ->post(route('admin.faqs.store'), [])
-            ->assertSessionHasErrors(['question', 'answer']);
+            ->assertSessionHasErrors(['question_en', 'answer_en']);
     }
 
     public function test_admin_can_delete_faq(): void
     {
-        $faq = Faq::create(['question' => 'Q', 'answer' => 'A', 'display_order' => 0]);
+        $faq = Faq::create(['question_en' => 'Q', 'answer_en' => 'A', 'display_order' => 0]);
 
         $this->actingAs($this->admin(), 'admin')
             ->delete(route('admin.faqs.destroy', $faq))

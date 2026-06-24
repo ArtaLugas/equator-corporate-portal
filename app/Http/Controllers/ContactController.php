@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreContactMessageRequest;
+use App\Jobs\SendContactAutoReply;
 use App\Jobs\SendNewMessageNotification;
 use App\Models\Admin;
 use App\Models\Message;
 use App\Models\OfficeLocation;
 use App\Models\SocialLink;
 use App\Notifications\NewContactMessage;
+use App\Services\LeadSource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
@@ -51,9 +53,10 @@ class ContactController extends Controller
             ...$request->safe()->only([
                 'name', 'email', 'phone', 'company', 'subject', 'message',
             ]),
+            // Auto-captured lead-source attribution (landing page, referrer,
+            // locale, UTM, gclid/fbclid, ip, user-agent) — see LeadSource.
+            ...app(LeadSource::class)->metadata($request),
             'status' => Message::STATUS_UNREAD,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
         ]);
 
         activity_log(
@@ -69,6 +72,9 @@ class ContactController extends Controller
             Admin::where('status', 'active')->get(),
             new NewContactMessage($message)
         );
+
+        // Auto-reply confirmation to the visitor, in the website's active locale.
+        SendContactAutoReply::dispatch($message, app()->getLocale());
 
         return back()->with(
             'success',
