@@ -78,6 +78,22 @@
     margin-top: 0.3rem;
 }
 
+/* Embedded media (YouTube/Vimeo) — responsive 16:9. CKEditor saves the embed as
+   <figure class="media"><div><iframe…></iframe></figure>; the raw iframe would
+   otherwise render at its tiny 300×150 default. */
+.prose figure.media {
+    margin: 2rem 0;
+}
+
+.prose figure.media iframe {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    border: 0;
+    border-radius: 0.75rem;
+}
+
 .ck-editor__editable_inline {
     min-height: 350px;
     max-height: 700px;

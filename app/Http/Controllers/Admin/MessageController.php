@@ -202,7 +202,12 @@ class MessageController extends Controller
 
         activity_log('Messages', 'Message Deleted (trashed): #'.$message->id);
 
-        return back()->with('success', 'Message moved to trash.');
+        // Redirect to the inbox, NOT back(): this action is triggered from the
+        // message detail page, and back() would return to that same detail URL —
+        // which now 404s because the message is soft-deleted and the show route's
+        // implicit binding excludes trashed records.
+        return redirect()->route('admin.messages.index')
+            ->with('success', 'Message moved to trash.');
     }
 
     /*

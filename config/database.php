@@ -49,7 +49,10 @@ return [
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
-            'collation' => env('DB_COLLATION', 'utf8mb4_0900_ai_ci'),
+            // utf8mb4_unicode_ci works on BOTH MySQL 8 and MariaDB / MySQL 5.7.
+            // (utf8mb4_0900_ai_ci is MySQL-8-only and breaks on shared-hosting
+            // MariaDB with "Unknown collation" — see deploy runbook.)
+            'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,

@@ -13,6 +13,10 @@
 
     <meta name="description" content="@yield('meta_description', app_setting('meta_description', app_setting('tagline', '')))">
 
+    @if (app_setting('meta_keywords'))
+        <meta name="keywords" content="{{ app_setting('meta_keywords') }}">
+    @endif
+
     {{-- Canonical: the current localized URL (query string excluded). --}}
     <link rel="canonical" href="{{ url()->current() }}">
 
@@ -60,6 +64,28 @@
     @endif
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- Responsive 16:9 frame for CKEditor media embeds (YouTube/Vimeo). HTML
+         Purifier strips the `position` the inline 16:9 hack needs, collapsing the
+         box to 0px height — so we re-impose a clean responsive frame here. Inline
+         (not app.css) so it works on shared hosting without a Vite rebuild. --}}
+    <style>
+        figure.media { margin: 1.75rem 0; }
+        figure.media > div,
+        figure.media > div > div {
+            position: static !important;
+            height: auto !important;
+            padding: 0 !important;
+        }
+        figure.media iframe {
+            display: block;
+            width: 100% !important;
+            height: auto !important;
+            aspect-ratio: 16 / 9;
+            border: 0;
+            border-radius: 0.5rem;
+        }
+    </style>
 
     @stack('head')
 

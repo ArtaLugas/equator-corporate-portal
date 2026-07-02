@@ -64,17 +64,26 @@ class ContactController extends Controller
             'Message Received from '.$message->email.' — '.$message->subject
         );
 
-        // Notify the office inbox (queued, via Brevo SMTP from settings).
-        SendNewMessageNotification::dispatch($message);
-
         // In-app notification for all active admins (bell in the CMS topbar).
-        Notification::send(
-            Admin::where('status', 'active')->get(),
-            new NewContactMessage($message)
-        );
+        // Best-effort: a DB/notify hiccup must not fail the visitor's request.
+        try {
+            Notification::send(
+                Admin::where('status', 'active')->get(),
+                new NewContactMessage($message)
+            );
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
-        // Auto-reply confirmation to the visitor, in the website's active locale.
-        SendContactAutoReply::dispatch($message, app()->getLocale());
+        // Outbound emails via Brevo SMTP. On restrictive shared hosting the SMTP
+        // relay can be blocked/redirected — that must NOT 500 the visitor, since
+        // the message is already saved above. Log the failure and move on.
+        try {
+            SendNewMessageNotification::dispatch($message);
+            SendContactAutoReply::dispatch($message, app()->getLocale());
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return back()->with(
             'success',

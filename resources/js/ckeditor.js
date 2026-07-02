@@ -158,6 +158,13 @@ window.initCkEditor = async (element) => {
                 ],
             },
 
+            // Store the rendered <iframe> in the saved data (not a bare <oembed>),
+            // so embeds survive HTML Purifier (safe-iframe whitelist) and render
+            // on the public site without any client-side oembed resolver.
+            mediaEmbed: {
+                previewsInData: true,
+            },
+
             table: {
                 contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'],
             },

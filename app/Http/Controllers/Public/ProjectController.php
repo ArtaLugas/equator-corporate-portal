@@ -48,7 +48,7 @@ class ProjectController extends Controller
             ? Service::where('status', 'published')->where('slug', $request->service)->first()
             : null;
 
-        // All public projects treated equally — most recent first.
+        // Featured projects are pinned to the top; the rest fall back to most recent first.
         $projects = Project::query()->public()
             ->with('services')
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
@@ -67,6 +67,7 @@ class ProjectController extends Controller
                         ->orWhere('location', 'like', "%{$term}%");
                 });
             })
+            ->orderByDesc('is_featured')
             ->latest('start_date')->latest()
             ->paginate(9)
             ->withQueryString();

@@ -64,6 +64,16 @@ return [
             'local_domain' => env('MAIL_EHLO_DOMAIN'),
         ],
 
+        /*
+        | Brevo transactional HTTP API (port 443). Preferred over the SMTP relay
+        | on shared hosting that blocks/redirects outbound SMTP. Registered as a
+        | custom transport in AppServiceProvider; set BREVO_API_KEY to enable.
+        */
+        'brevo-api' => [
+            'transport' => 'brevo-api',
+            'key' => env('BREVO_API_KEY'),
+        ],
+
         'ses' => [
             'transport' => 'ses',
         ],

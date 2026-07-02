@@ -36,6 +36,15 @@ class SettingSeeder extends Seeder
             'google_maps_embed' => $maps[0]['iframe_map'] ?? null,
         ]);
 
+        // SEO/branding defaults — seed only when empty so we never clobber the
+        // copy an admin has curated in the CMS (these fields are CMS-editable).
+        $settings->update([
+            'tagline' => $settings->tagline ?: ($web['tagline'] ?? null),
+            'meta_title' => $settings->meta_title ?: ($web['meta_title'] ?? null),
+            'meta_description' => $settings->meta_description ?: ($web['meta_description'] ?? null),
+            'meta_keywords' => $settings->meta_keywords ?: ($web['meta_keywords'] ?? null),
+        ]);
+
         // Social links from the legacy web_settings row.
         $social = [
             ['platform' => 'Instagram', 'url' => $web['instagram'] ?? null, 'icon_class' => 'bi bi-instagram'],

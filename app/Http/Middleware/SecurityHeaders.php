@@ -33,7 +33,7 @@ class SecurityHeaders
         ."img-src 'self' data: blob: https://www.google-analytics.com https://*.google-analytics.com; "
         ."font-src 'self' data:; "
         ."connect-src 'self' https://challenges.cloudflare.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com; "
-        .'frame-src https://challenges.cloudflare.com; '
+        .'frame-src https://challenges.cloudflare.com https://www.google.com https://maps.google.com https://www.youtube.com https://www.youtube-nocookie.com https://www.instagram.com; '
         ."worker-src 'self' blob:; "
         ."object-src 'none'; "
         ."base-uri 'self'; "

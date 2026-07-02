@@ -22,3 +22,7 @@ yarn-error.log
 
 # Registry ikon Lucide hasil generate (sumber: resources/icons/icons.json)
 /resources/js/lucide-icons.generated.js
+
+# Dump database & file scratch — jangan pernah masuk repo
+*.sql
+/test.txt

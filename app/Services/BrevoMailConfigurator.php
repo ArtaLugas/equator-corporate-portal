@@ -20,7 +20,14 @@ class BrevoMailConfigurator
     {
         $settings = Setting::current();
 
-        // Without host + username we cannot use Brevo; fall back to default.
+        // Prefer Brevo's HTTP API when a key is configured: it sends over HTTPS
+        // (port 443) and bypasses shared-hosting blocks on outbound SMTP. The
+        // From address still comes from settings via fromAddress() below.
+        if (filled(config('mail.mailers.brevo-api.key'))) {
+            return 'brevo-api';
+        }
+
+        // Without host + username we cannot use Brevo SMTP; fall back to default.
         if (blank($settings->mail_host) || blank($settings->mail_username)) {
             return config('mail.default');
         }

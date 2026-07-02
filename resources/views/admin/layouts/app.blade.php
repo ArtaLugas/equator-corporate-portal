@@ -14,6 +14,28 @@
 
     @vite(['resources/css/app.css', 'resources/js/admin.js'])
 
+    {{-- Responsive 16:9 frame for CKEditor media embeds (YouTube/Vimeo) shown on
+         admin detail pages. Mirrors the rule in the public layout; inline so it
+         works without a Vite rebuild. HTML Purifier strips the `position` the
+         inline 16:9 hack needs, which would otherwise collapse the box to 0px. --}}
+    <style>
+        figure.media { margin: 1.75rem 0; }
+        figure.media > div,
+        figure.media > div > div {
+            position: static !important;
+            height: auto !important;
+            padding: 0 !important;
+        }
+        figure.media iframe {
+            display: block;
+            width: 100% !important;
+            height: auto !important;
+            aspect-ratio: 16 / 9;
+            border: 0;
+            border-radius: 0.5rem;
+        }
+    </style>
+
 </head>
 
 <body x-data="{ sidebarOpen: false }" class="flex h-full bg-gray-100 text-gray-800 antialiased">
