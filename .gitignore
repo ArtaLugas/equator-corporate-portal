@@ -26,3 +26,15 @@ yarn-error.log
 # Dump database & file scratch — jangan pernah masuk repo
 *.sql
 /test.txt
+
+# Editor / IDE / tooling (root & subfolder)
+.vscode/
+.claude/
+.idea/
+.fleet/
+*.code-workspace
+
+# Junk OS
+.DS_Store
+Thumbs.db
+desktop.ini
