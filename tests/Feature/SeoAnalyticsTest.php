@@ -105,7 +105,7 @@ class SeoAnalyticsTest extends TestCase
 
     public function test_news_article_has_structured_data(): void
     {
-        $cat = NewsCategory::create(['name' => 'Updates', 'slug' => 'updates']);
+        $cat = NewsCategory::create(['name_en' => 'Updates', 'slug' => 'updates']);
         News::create([
             'category_id' => $cat->id,
             'title_en' => 'Equator Wins Award',

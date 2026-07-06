@@ -54,7 +54,14 @@ class NewsController extends Controller
 
                 $q->orWhere('slug', 'like', "%{$search}%")
                     ->orWhere('status', 'like', "%{$search}%")
-                    ->orWhereHas('category', fn ($c) => $c->where('name', 'like', "%{$search}%"));
+                    ->orWhereHas('category', function ($c) use ($search) {
+                        // Category name is translatable — match every locale column.
+                        $c->where(function ($cc) use ($search) {
+                            foreach (array_keys(config('locales.supported', [])) as $locale) {
+                                $cc->orWhere("name_{$locale}", 'like', "%{$search}%");
+                            }
+                        });
+                    });
             });
         }
 
@@ -111,7 +118,7 @@ class NewsController extends Controller
             ->paginate(self::PAGINATION)
             ->withQueryString();
 
-        $categories = NewsCategory::orderBy('name')->get();
+        $categories = NewsCategory::orderBy('name_'.config('locales.default'))->get();
 
         $tags = Tag::orderBy('name')->get();
 
@@ -129,7 +136,7 @@ class NewsController extends Controller
 
     public function create()
     {
-        $categories = NewsCategory::orderBy('name')->get();
+        $categories = NewsCategory::orderBy('name_'.config('locales.default'))->get();
 
         return view('admin.news.create', compact('categories'));
     }
@@ -220,7 +227,7 @@ class NewsController extends Controller
     {
         $news->load('tags');
 
-        $categories = NewsCategory::orderBy('name')->get();
+        $categories = NewsCategory::orderBy('name_'.config('locales.default'))->get();
 
         return view('admin.news.edit', compact('news', 'categories'));
     }

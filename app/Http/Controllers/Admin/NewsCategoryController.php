@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\NewsCategoryRequest;
 use App\Models\NewsCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,20 +35,27 @@ class NewsCategoryController extends Controller
             $search = trim($request->search);
 
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%");
+
+                // Name is translatable — search every locale column, plus slug.
+                foreach (array_keys(config('locales.supported', [])) as $locale) {
+                    $q->orWhere("name_{$locale}", 'like', "%{$search}%");
+                }
+
+                $q->orWhere('slug', 'like', "%{$search}%");
             });
         }
+
+        $defaultName = 'name_'.config('locales.default');
 
         switch ($request->sort) {
             case 'oldest':
                 $query->oldest();
                 break;
             case 'name_asc':
-                $query->orderBy('name');
+                $query->orderBy($defaultName);
                 break;
             case 'name_desc':
-                $query->orderByDesc('name');
+                $query->orderByDesc($defaultName);
                 break;
             default:
                 $query->latest();
@@ -81,11 +89,14 @@ class NewsCategoryController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function store(Request $request)
+    public function store(NewsCategoryRequest $request)
     {
-        $validated = $this->validateData($request);
+        $validated = $request->validated();
 
-        $validated['slug'] = $this->generateUniqueSlug($validated['name']);
+        // Slug derives from the default-locale name and stays stable across locales.
+        $defaultName = $validated['name_'.config('locales.default')];
+
+        $validated['slug'] = $this->generateUniqueSlug($defaultName);
 
         try {
 
@@ -130,13 +141,17 @@ class NewsCategoryController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function update(Request $request, NewsCategory $newsCategory)
+    public function update(NewsCategoryRequest $request, NewsCategory $newsCategory)
     {
-        $validated = $this->validateData($request);
+        $validated = $request->validated();
 
-        if ($newsCategory->name !== $validated['name']) {
+        $default = config('locales.default');
+        $defaultName = $validated['name_'.$default];
+
+        // Regenerate the slug only when the default-locale name actually changed.
+        if ($newsCategory->{'name_'.$default} !== $defaultName) {
             $validated['slug'] = $this->generateUniqueSlug(
-                $validated['name'],
+                $defaultName,
                 $newsCategory->id
             );
         }
@@ -209,19 +224,6 @@ class NewsCategoryController extends Controller
 
             return back()->with('error', friendly_error($e));
         }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Helper: Validate
-    |--------------------------------------------------------------------------
-    */
-
-    private function validateData(Request $request): array
-    {
-        return $request->validate([
-            'name' => ['required', 'string', 'max:191'],
-        ]);
     }
 
     /*

@@ -20,7 +20,7 @@ class NewsI18nTest extends TestCase
 
     private function category(): NewsCategory
     {
-        return NewsCategory::create(['name' => 'Cat', 'slug' => 'cat']);
+        return NewsCategory::create(['name_en' => 'Cat', 'slug' => 'cat']);
     }
 
     private function published(array $attributes = []): News
@@ -224,7 +224,7 @@ class NewsI18nTest extends TestCase
 
     public function test_search_matches_indonesian_term_and_facets(): void
     {
-        $cat = NewsCategory::create(['name' => 'Geospatial', 'slug' => 'geospatial']);
+        $cat = NewsCategory::create(['name_en' => 'Geospatial', 'slug' => 'geospatial']);
         $this->published([
             'category_id' => $cat->id,
             'title_en' => 'Consulting', 'title_id' => 'Konsultasi', 'slug' => 'unique-marker',

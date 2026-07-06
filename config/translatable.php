@@ -41,6 +41,13 @@ return [
         'html' => ['content'],
     ],
 
+    'news_categories' => [
+        // Lightweight taxonomy — only the display name is translated. slug stays
+        // single (generated from name_en) so public news-category URLs are stable.
+        'fields' => ['name'],
+        'html' => [],
+    ],
+
     'about_sections' => [
         'fields' => ['name'],
         'html' => [],

@@ -13,6 +13,7 @@ use App\Models\Faq;
 use App\Models\HeroBanner;
 use App\Models\KeyMetric;
 use App\Models\News;
+use App\Models\NewsCategory;
 use App\Models\OfficeLocation;
 use App\Models\Project;
 use App\Models\Service;
@@ -35,6 +36,7 @@ class TranslationProgress
         ['label' => 'Service Categories', 'model' => ServiceCategory::class, 'route' => 'admin.service-categories.index'],
         ['label' => 'Projects', 'model' => Project::class, 'route' => 'admin.projects.index'],
         ['label' => 'News', 'model' => News::class, 'route' => 'admin.news.index'],
+        ['label' => 'News Categories', 'model' => NewsCategory::class, 'route' => 'admin.news-categories.index'],
         ['label' => 'About — Sections', 'model' => AboutSection::class, 'route' => 'admin.about-sections.index'],
         ['label' => 'About — Contents', 'model' => AboutContent::class, 'route' => 'admin.about-contents.index'],
         ['label' => 'About — Histories', 'model' => AboutHistory::class, 'route' => 'admin.about-histories.index'],

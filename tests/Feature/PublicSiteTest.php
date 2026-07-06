@@ -89,7 +89,7 @@ class PublicSiteTest extends TestCase
 
     private function publishedArticle(): News
     {
-        $cat = NewsCategory::create(['name' => 'Cat', 'slug' => 'cat']);
+        $cat = NewsCategory::create(['name_en' => 'Cat', 'slug' => 'cat']);
 
         return News::create([
             'category_id' => $cat->id, 'title_en' => 'Breaking', 'slug' => 'breaking',

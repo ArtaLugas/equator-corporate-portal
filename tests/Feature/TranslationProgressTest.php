@@ -43,8 +43,8 @@ class TranslationProgressTest extends TestCase
         $this->assertSame(1, $services['untranslated']);
 
         // Every registry module appears in the report (14 original + Company
-        // Credentials + Credential Items).
-        $this->assertCount(16, $rows);
+        // Credentials + Credential Items + News Categories).
+        $this->assertCount(17, $rows);
     }
 
     public function test_command_runs_successfully(): void

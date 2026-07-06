@@ -20,7 +20,7 @@ class NewsCategoryDeleteTest extends TestCase
 
     public function test_category_with_only_trashed_articles_is_blocked_by_the_guard(): void
     {
-        $cat = NewsCategory::create(['name' => 'Cat', 'slug' => 'cat']);
+        $cat = NewsCategory::create(['name_en' => 'Cat', 'slug' => 'cat']);
         $news = News::create([
             'category_id' => $cat->id, 'title_en' => 'X', 'slug' => 'x',
             'status' => 'draft', 'views_count' => 0, 'is_featured' => false,
@@ -39,7 +39,7 @@ class NewsCategoryDeleteTest extends TestCase
 
     public function test_empty_category_deletes_successfully(): void
     {
-        $cat = NewsCategory::create(['name' => 'Empty', 'slug' => 'empty']);
+        $cat = NewsCategory::create(['name_en' => 'Empty', 'slug' => 'empty']);
 
         $this->actingAs(Admin::factory()->create(), 'admin')
             ->delete(route('admin.news-categories.destroy', $cat))

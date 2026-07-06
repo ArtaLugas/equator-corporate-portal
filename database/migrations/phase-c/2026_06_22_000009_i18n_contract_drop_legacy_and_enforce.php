@@ -89,6 +89,11 @@ return new class extends Migration
             ],
             'required' => ['title'],
         ],
+        'news_categories' => [
+            // Only the display name is translatable; slug stays single-language.
+            'fields' => ['name' => 'string:191'],
+            'required' => ['name'],
+        ],
         'about_sections' => [
             'fields' => ['name' => 'string:191'],
             'required' => ['name'],
