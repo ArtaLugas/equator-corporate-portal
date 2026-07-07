@@ -24,4 +24,15 @@ return [
     */
     'auto_regenerate_slug' => env('CMS_AUTO_REGENERATE_SLUG', true),
 
+    /*
+    | Admin audit-log (activity_logs) retention, in days. The scheduled
+    | `model:prune` command deletes entries older than this so the table stays
+    | bounded. Audit logs are append-only and are never cleared by hand — a
+    | manual "wipe" would defeat the trail — so pruning is strictly time-based.
+    |
+    | Default 365 (one year). Set to 0 (or below) to retain indefinitely
+    | (pruning disabled).
+    */
+    'activity_log_retention_days' => (int) env('ACTIVITY_LOG_RETENTION_DAYS', 365),
+
 ];

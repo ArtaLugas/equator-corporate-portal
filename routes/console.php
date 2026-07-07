@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ActivityLog;
 use App\Models\Visitor;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -17,9 +18,11 @@ Artisan::command('inspire', function () {
 |   * * * * * cd /path-to-app && php artisan schedule:run >> /dev/null 2>&1
 */
 
-// Prune visitor-analytics rows older than Visitor::RETENTION_DAYS so the
-// table stays bounded and analytics queries remain fast as traffic grows.
-Schedule::command('model:prune', ['--model' => [Visitor::class]])
+// Prune expired rows so the tables stay bounded:
+//   - Visitor: analytics older than Visitor::RETENTION_DAYS.
+//   - ActivityLog: audit rows older than cms.activity_log_retention_days
+//     (default 365). Time-based retention — there is no manual "clear log".
+Schedule::command('model:prune', ['--model' => [Visitor::class, ActivityLog::class]])
     ->daily();
 
 // Process queued jobs (transactional email, notifications) WITHOUT a long-running
