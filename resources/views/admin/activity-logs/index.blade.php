@@ -77,34 +77,34 @@
     {{-- TABLE --}}
     <x-admin.table>
         <x-admin.table-head>
-            <x-admin.th class="w-px whitespace-nowrap">Date &amp; Time</x-admin.th>
-            <x-admin.th class="w-px whitespace-nowrap">Admin</x-admin.th>
-            <x-admin.th class="w-px whitespace-nowrap">Module</x-admin.th>
-            <x-admin.th class="whitespace-normal">Description</x-admin.th>
-            <x-admin.th class="w-px whitespace-nowrap">IP Address</x-admin.th>
+            <x-admin.th class="w-36 whitespace-nowrap">Date &amp; Time</x-admin.th>
+            <x-admin.th class="w-48 whitespace-nowrap">Admin</x-admin.th>
+            <x-admin.th class="w-44 whitespace-nowrap">Module</x-admin.th>
+            <x-admin.th>Description</x-admin.th>
+            <x-admin.th class="w-40 whitespace-nowrap text-right">IP Address</x-admin.th>
         </x-admin.table-head>
 
         <x-admin.table-body>
             @forelse($logs as $log)
                 <tr class="transition-colors hover:bg-gray-50/50">
-                    <x-admin.td>
+                    <x-admin.td class="whitespace-nowrap align-top">
                         <span class="text-xs font-semibold text-gray-700">{{ $log->created_at?->format('d M Y') }}</span>
                         <span class="block text-[11px] font-medium text-gray-400">{{ $log->created_at?->format('H:i:s') }}</span>
                     </x-admin.td>
-                    <x-admin.td>
+                    <x-admin.td class="whitespace-nowrap align-top">
                         <span class="text-sm font-bold text-gray-900">{{ $log->admin?->name ?? 'System' }}</span>
                     </x-admin.td>
-                    <x-admin.td>
+                    <x-admin.td class="whitespace-nowrap align-top">
                         @if ($log->module)
                             <span class="inline-flex items-center rounded-lg bg-equator-dark/5 px-2.5 py-1 text-xs font-bold text-equator-dark">{{ $log->module }}</span>
                         @else
                             <span class="text-xs italic text-gray-400">—</span>
                         @endif
                     </x-admin.td>
-                    <x-admin.td class="whitespace-normal">
+                    <x-admin.td class="whitespace-normal align-top">
                         <span class="text-sm text-gray-600">{{ $log->description }}</span>
                     </x-admin.td>
-                    <x-admin.td>
+                    <x-admin.td class="whitespace-nowrap text-right align-top">
                         <span class="font-mono text-xs text-gray-500">{{ $log->ip_address ?: '—' }}</span>
                     </x-admin.td>
                 </tr>
