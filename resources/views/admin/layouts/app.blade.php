@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>@yield('title', 'Admin Panel') · {{ app_setting('company_name', 'Equator Group') }}</title>
+    <title>@yield('title', 'Admin Panel') &middot; {{ app_setting('company_name', 'Equator Group') }}</title>
 
     {{-- Favicon (from CMS settings) --}}
     @if (app_setting('favicon'))

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Report — {{ $company }}</title>
+    <title>Dashboard Report &mdash; {{ $company }}</title>
     @if (app_setting('favicon'))
         <link rel="icon" href="{{ asset('storage/' . app_setting('favicon')) }}">
     @endif

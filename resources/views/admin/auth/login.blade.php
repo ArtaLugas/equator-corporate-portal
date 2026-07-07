@@ -12,7 +12,7 @@
     @if (app_setting('favicon'))
         <link rel="icon" href="{{ asset('storage/' . app_setting('favicon')) }}">
     @endif
-    <title>Sign In — {{ app_setting('company_name', 'Equator Group') }}</title>
+    <title>Sign In &mdash; {{ app_setting('company_name', 'Equator Group') }}</title>
 </head>
 
 <body
