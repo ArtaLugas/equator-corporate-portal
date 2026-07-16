@@ -10,7 +10,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class SendContactReply implements ShouldQueue
 {
@@ -37,5 +39,21 @@ class SendContactReply implements ShouldQueue
                 $this->subject,
                 $this->body,
             ));
+    }
+
+    /**
+     * Runs after the final retry fails: surface the failure instead of letting
+     * it die silently in the failed_jobs table (the admin CMS shows a health
+     * alert; report() routes to the configured log/Slack channels).
+     */
+    public function failed(Throwable $e): void
+    {
+        report($e);
+
+        Log::error('Contact reply email failed to send', [
+            'message_id' => $this->message->id ?? null,
+            'recipient' => $this->message->email ?? null,
+            'error' => $e->getMessage(),
+        ]);
     }
 }

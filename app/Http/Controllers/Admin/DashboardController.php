@@ -10,6 +10,8 @@ use App\Models\News;
 use App\Models\Project;
 use App\Models\Service;
 use App\Models\Visitor;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
@@ -23,12 +25,33 @@ class DashboardController extends Controller
         $stats = $this->stats();
         $chart = $this->visitorChart();
 
-        // Recent activity is restricted to super admins (audit log policy).
-        $recentActivities = auth('admin')->user()?->isSuperAdmin()
+        // Recent activity + system health are restricted to super admins.
+        $isSuperAdmin = auth('admin')->user()?->isSuperAdmin();
+
+        $recentActivities = $isSuperAdmin
             ? ActivityLog::with('admin')->latest()->take(8)->get()
             : collect();
 
-        return view('admin.dashboard', compact('stats', 'chart', 'recentActivities'));
+        $health = $isSuperAdmin ? $this->systemHealth() : null;
+
+        return view('admin.dashboard', compact('stats', 'chart', 'recentActivities', 'health'));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | System health — queue signals so failed emails/jobs are not silent.
+    |--------------------------------------------------------------------------
+    | failed_jobs > 0 means an email/notification exhausted its retries and did
+    | NOT send. A large pending backlog usually means the schedule:run cron (and
+    | thus the queue worker) is not running. Surfaced on the dashboard for admins.
+    */
+
+    private function systemHealth(): array
+    {
+        return [
+            'failed_jobs' => Schema::hasTable('failed_jobs') ? DB::table('failed_jobs')->count() : 0,
+            'pending_jobs' => Schema::hasTable('jobs') ? DB::table('jobs')->count() : 0,
+        ];
     }
 
     /*

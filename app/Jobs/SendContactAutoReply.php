@@ -10,7 +10,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 /**
  * Sends the visitor the auto-reply confirmation in the website's active locale
@@ -38,5 +40,19 @@ class SendContactAutoReply implements ShouldQueue
             ->to($this->message->email)
             ->locale($this->locale)
             ->send(new ContactAutoReplyMail($this->message));
+    }
+
+    /**
+     * Surface a final send failure (see SendContactReply::failed()).
+     */
+    public function failed(Throwable $e): void
+    {
+        report($e);
+
+        Log::error('Contact auto-reply email failed to send', [
+            'message_id' => $this->message->id ?? null,
+            'recipient' => $this->message->email ?? null,
+            'error' => $e->getMessage(),
+        ]);
     }
 }

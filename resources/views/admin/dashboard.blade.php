@@ -50,6 +50,40 @@
 
 </div>
 
+{{-- SYSTEM HEALTH — only rendered (to super admins) when something needs attention --}}
+@if (!empty($health) && (($health['failed_jobs'] ?? 0) > 0 || ($health['pending_jobs'] ?? 0) > 25))
+    <div class="mb-8 space-y-3">
+        @if (($health['failed_jobs'] ?? 0) > 0)
+            <div class="flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0 text-rose-600">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><line x1="12" x2="12" y1="9" y2="13" /><line x1="12" x2="12.01" y1="17" y2="17" />
+                </svg>
+                <div>
+                    <p class="text-sm font-bold text-rose-800">{{ number_format($health['failed_jobs']) }} background job(s) failed</p>
+                    <p class="mt-0.5 text-sm text-rose-700">
+                        Some emails or notifications may not have been sent. Inspect with
+                        <code class="rounded bg-rose-100 px-1 font-mono text-xs">php artisan queue:failed</code>
+                        (or the <code class="rounded bg-rose-100 px-1 font-mono text-xs">failed_jobs</code> table), then retry or purge them.
+                    </p>
+                </div>
+            </div>
+        @endif
+        @if (($health['pending_jobs'] ?? 0) > 25)
+            <div class="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0 text-amber-600">
+                    <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                </svg>
+                <div>
+                    <p class="text-sm font-bold text-amber-800">{{ number_format($health['pending_jobs']) }} jobs queued</p>
+                    <p class="mt-0.5 text-sm text-amber-700">The queue worker may be behind — confirm the <code class="rounded bg-amber-100 px-1 font-mono text-xs">schedule:run</code> cron is active on the server.</p>
+                </div>
+            </div>
+        @endif
+    </div>
+@endif
+
 {{-- STATS --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
 
