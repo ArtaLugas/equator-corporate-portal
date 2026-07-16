@@ -115,7 +115,7 @@
         </x-admin.stat-card>
     </a>
 
-    @if (auth('admin')->user()?->isSuperAdmin())
+    @if ($isSuperAdmin ?? false)
         {{-- USERS (super admin only) --}}
         <a href="{{ route('admin.admins.index') }}" class="block">
             <x-admin.stat-card title="Users" :value="number_format($stats['users'] ?? 0)" color="success" sub="Admin accounts">
@@ -229,7 +229,7 @@
 
             </div>
 
-            @if (auth('admin')->user()?->isSuperAdmin())
+            @if ($isSuperAdmin ?? false)
                 <a href="{{ route('admin.activity-logs.index') }}"
                     class="text-xs font-semibold text-blue-600 hover:text-blue-700 transition">
                     View all
@@ -270,7 +270,7 @@
             @empty
 
                 <div class="py-10 text-center">
-                    @if (auth('admin')->user()?->isSuperAdmin())
+                    @if ($isSuperAdmin ?? false)
                         <p class="text-sm font-medium text-gray-400">No activity recorded yet.</p>
                     @else
                         <div class="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-gray-50 text-gray-300">

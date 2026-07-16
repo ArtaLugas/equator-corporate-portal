@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Schema;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -25,8 +26,12 @@ class DashboardController extends Controller
         $stats = $this->stats();
         $chart = $this->visitorChart();
 
-        // Recent activity + system health are restricted to super admins.
-        $isSuperAdmin = auth('admin')->user()?->isSuperAdmin();
+        // Recent activity + system health are restricted to super admins. The flag
+        // is passed to the view so Blade never re-resolves auth()->user() itself.
+        /** @var Admin|null $admin */
+        $admin = auth('admin')->user();
+
+        $isSuperAdmin = (bool) $admin?->isSuperAdmin();
 
         $recentActivities = $isSuperAdmin
             ? ActivityLog::with('admin')->latest()->take(8)->get()
@@ -34,7 +39,7 @@ class DashboardController extends Controller
 
         $health = $isSuperAdmin ? $this->systemHealth() : null;
 
-        return view('admin.dashboard', compact('stats', 'chart', 'recentActivities', 'health'));
+        return view('admin.dashboard', compact('stats', 'chart', 'recentActivities', 'health', 'isSuperAdmin'));
     }
 
     /*
@@ -193,7 +198,7 @@ class DashboardController extends Controller
         ];
     }
 
-    private function styleHeader($sheet, string $range): void
+    private function styleHeader(Worksheet $sheet, string $range): void
     {
         $sheet->getStyle($range)->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
         $sheet->getStyle($range)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('263592');

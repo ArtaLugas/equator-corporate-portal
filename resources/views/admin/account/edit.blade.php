@@ -172,8 +172,11 @@
                             <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
                                 <div class="w-full sm:max-w-[180px]">
                                     <input type="text" name="code" inputmode="numeric" autocomplete="one-time-code"
-                                        placeholder="123456" required
-                                        class="@error('code') border-red-500 @else border-gray-200 @enderror block w-full rounded-xl border bg-gray-50/50 px-4 py-3 text-center font-mono text-lg tracking-widest text-equator-text focus:border-equator-bright focus:bg-white focus:outline-none focus:ring-2 focus:ring-equator-bright/50">
+                                        placeholder="123456" required @class([
+                                            'block w-full rounded-xl border bg-gray-50/50 px-4 py-3 text-center font-mono text-lg tracking-widest text-equator-text focus:border-equator-bright focus:bg-white focus:outline-none focus:ring-2 focus:ring-equator-bright/50',
+                                            'border-red-500' => $errors->has('code'),
+                                            'border-gray-200' => ! $errors->has('code'),
+                                        ])>
                                 </div>
 
                                 <button type="submit"

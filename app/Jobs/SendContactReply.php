@@ -32,8 +32,10 @@ class SendContactReply implements ShouldQueue
     {
         $mailer = BrevoMailConfigurator::resolveMailer();
 
+        // Passing the model lets the mailer read its email + name properties
+        // (single-argument call, matching the Mailer contract).
         Mail::mailer($mailer)
-            ->to($this->message->email, $this->message->name ?? '')
+            ->to($this->message)
             ->send(new ContactMessageReplyMail(
                 $this->message,
                 $this->subject,

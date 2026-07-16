@@ -37,8 +37,10 @@ class SendPasswordResetLink implements ShouldQueue
     {
         $mailer = BrevoMailConfigurator::resolveMailer();
 
+        // Passing the model lets the mailer read its email + name properties
+        // (single-argument call, matching the Mailer contract).
         Mail::mailer($mailer)
-            ->to($this->admin->email, $this->admin->name)
+            ->to($this->admin)
             ->send(new AdminPasswordResetMail($this->admin, $this->url, $this->expiresMinutes));
     }
 
