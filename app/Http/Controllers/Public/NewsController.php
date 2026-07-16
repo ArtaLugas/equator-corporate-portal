@@ -11,7 +11,7 @@ class NewsController extends Controller
 {
     public function index(Request $request)
     {
-        $categories = NewsCategory::withCount(['news' => fn ($q) => $q->where('status', 'published')])
+        $categories = NewsCategory::withCount(['news' => fn ($q) => $q->published()])
             ->orderBy('name')->get();
 
         $activeCategory = $request->filled('category')
@@ -23,10 +23,10 @@ class NewsController extends Controller
 
         // Editorial lead — newest article, only on the unfiltered view; excluded from the grid.
         $lead = ! $hasFilter
-            ? News::where('status', 'published')->with('category')->latest('published_at')->first()
+            ? News::published()->with('category')->latest('published_at')->first()
             : null;
 
-        $news = News::where('status', 'published')
+        $news = News::published()
             ->with('category')
             ->when($activeCategory, fn ($q) => $q->where('category_id', $activeCategory->id))
             ->when($search !== '', fn ($q) => $q->where(function ($w) use ($search) {
@@ -40,7 +40,7 @@ class NewsController extends Controller
             ->withQueryString();
 
         // Most Read — rendered only when real view data exists (no dummy).
-        $mostRead = News::where('status', 'published')->where('views_count', '>', 0)
+        $mostRead = News::published()->where('views_count', '>', 0)
             ->with('category')->orderByDesc('views_count')->take(5)->get();
 
         return view('public.news.index', compact('news', 'categories', 'activeCategory', 'lead', 'mostRead', 'search'));
@@ -48,7 +48,7 @@ class NewsController extends Controller
 
     public function show(Request $request, string $slug)
     {
-        $article = News::where('status', 'published')
+        $article = News::published()
             ->where('slug', $slug)
             ->with(['category', 'tags'])
             ->firstOrFail();
@@ -58,13 +58,13 @@ class NewsController extends Controller
         $this->recordView($request, $article);
 
         // Sidebar — latest articles (excluding current).
-        $recent = News::where('status', 'published')
+        $recent = News::published()
             ->where('id', '!=', $article->id)
             ->with('category')
             ->latest('published_at')->take(5)->get();
 
         // Sidebar — all categories with published counts (active highlighted in view).
-        $categories = NewsCategory::withCount(['news' => fn ($q) => $q->where('status', 'published')])
+        $categories = NewsCategory::withCount(['news' => fn ($q) => $q->published()])
             ->orderBy('name')->get();
 
         return view('public.news.show', compact('article', 'recent', 'categories'));

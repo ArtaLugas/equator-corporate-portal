@@ -54,7 +54,7 @@ class SitemapController extends Controller
             $entries[] = ['projects.show', ['slug' => $p->slug], $p->updated_at];
         }
 
-        foreach (News::where('status', 'published')->get(['slug', 'updated_at']) as $n) {
+        foreach (News::published()->get(['slug', 'updated_at']) as $n) {
             $entries[] = ['news.show', ['slug' => $n->slug], $n->updated_at];
         }
 
