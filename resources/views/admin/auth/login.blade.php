@@ -56,6 +56,14 @@
             </div>
         </div>
 
+        <!-- Success (e.g. after a password reset) -->
+        @if (session('status'))
+            <div class="mb-6 flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-700 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0 text-emerald-500"><path d="M20 6 9 17l-5-5" /></svg>
+                <p class="flex-1 font-medium">{{ session('status') }}</p>
+            </div>
+        @endif
+
         <!-- Alert Error -->
         @if ($errors->any())
             <div
@@ -110,7 +118,7 @@
                     <div class="flex items-center justify-between">
                         <label for="password"
                             class="block text-xs font-bold uppercase tracking-wider text-gray-600">Password</label>
-                        <a href="#"
+                        <a href="{{ route('admin.password.request') }}"
                             class="text-xs font-bold text-equator-bright transition-colors hover:text-equator-dark">Forgot
                             your password?</a>
                     </div>

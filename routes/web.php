@@ -5,6 +5,9 @@ use App\Http\Controllers\Admin\AboutHistoryController;
 use App\Http\Controllers\Admin\AboutSectionController;
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\ActivityLogController;
+use App\Http\Controllers\Admin\PasswordResetController;
+use App\Http\Controllers\Admin\TwoFactorChallengeController;
+use App\Http\Controllers\Admin\TwoFactorController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CompanyCredentialController;
@@ -137,6 +140,35 @@ Route::prefix('admin')
 
         /*
         |--------------------------------------------------------------------------
+        | Password Reset (self-service, guest) — throttled to curb abuse.
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('password/forgot', [PasswordResetController::class, 'showForgotForm'])
+            ->name('password.request');
+        Route::post('password/forgot', [PasswordResetController::class, 'sendResetLink'])
+            ->middleware('throttle:5,1')
+            ->name('password.email');
+        Route::get('password/reset/{token}', [PasswordResetController::class, 'showResetForm'])
+            ->name('password.reset');
+        Route::post('password/reset', [PasswordResetController::class, 'resetPassword'])
+            ->middleware('throttle:5,1')
+            ->name('password.update');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Two-Factor login challenge (second step; gated by a pending session).
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('login/two-factor', [TwoFactorChallengeController::class, 'create'])
+            ->name('two-factor.login');
+        Route::post('login/two-factor', [TwoFactorChallengeController::class, 'store'])
+            ->middleware('throttle:10,1')
+            ->name('two-factor.login.store');
+
+        /*
+        |--------------------------------------------------------------------------
         | Protected Routes
         |--------------------------------------------------------------------------
         */
@@ -196,6 +228,12 @@ Route::prefix('admin')
             Route::get('account', [AccountController::class, 'edit'])->name('account.edit');
             Route::put('account/profile', [AccountController::class, 'updateProfile'])->name('account.profile.update');
             Route::put('account/password', [AccountController::class, 'updatePassword'])->name('account.password.update');
+
+            // Two-factor enrollment (opt-in, from the Account page).
+            Route::post('account/2fa/enable', [TwoFactorController::class, 'enable'])->name('account.2fa.enable');
+            Route::post('account/2fa/confirm', [TwoFactorController::class, 'confirm'])->name('account.2fa.confirm');
+            Route::post('account/2fa/recovery-codes', [TwoFactorController::class, 'recoveryCodes'])->name('account.2fa.recovery');
+            Route::delete('account/2fa', [TwoFactorController::class, 'disable'])->name('account.2fa.disable');
 
             /*
             |--------------------------------------------------------------------------

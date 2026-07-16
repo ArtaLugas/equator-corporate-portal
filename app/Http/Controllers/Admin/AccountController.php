@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\TwoFactorAuthenticator;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -21,7 +22,23 @@ class AccountController extends Controller
     {
         $admin = auth('admin')->user();
 
-        return view('admin.account.edit', compact('admin'));
+        // When a secret exists but is not yet confirmed, the account page shows the
+        // enrollment panel (QR + manual key + recovery codes).
+        $twoFactor = null;
+
+        if (filled($admin->two_factor_secret) && ! $admin->hasTwoFactorEnabled()) {
+            $twoFactor = [
+                'secret' => $admin->two_factor_secret,
+                'uri' => (new TwoFactorAuthenticator)->otpauthUri(
+                    app_setting('company_name', 'Equator Group'),
+                    $admin->email,
+                    $admin->two_factor_secret,
+                ),
+                'recovery' => $admin->two_factor_recovery_codes ?? [],
+            ];
+        }
+
+        return view('admin.account.edit', compact('admin', 'twoFactor'));
     }
 
     /*

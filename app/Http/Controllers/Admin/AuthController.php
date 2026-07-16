@@ -77,10 +77,21 @@ class AuthController extends Controller
 
             RateLimiter::clear($throttleKey);
 
-            $request->session()->regenerate();
-
             /** @var Admin|null $admin */
             $admin = Auth::guard('admin')->user();
+
+            // Two-factor enabled → do NOT complete login yet. Log the guard back
+            // out and hand off to the second-step challenge, remembering the intent.
+            if ($admin && $admin->hasTwoFactorEnabled()) {
+                Auth::guard('admin')->logout();
+
+                $request->session()->put('2fa.pending_id', $admin->id);
+                $request->session()->put('2fa.remember', $remember);
+
+                return redirect()->route('admin.two-factor.login');
+            }
+
+            $request->session()->regenerate();
 
             if ($admin) {
                 $admin->update([

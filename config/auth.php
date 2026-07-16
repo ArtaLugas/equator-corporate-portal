@@ -20,7 +20,8 @@ return [
         // default ensures Gate/policy checks (@can, $this->authorize) and
         // auth() helpers resolve the logged-in admin.
         'guard' => 'admin',
-        'passwords' => 'users',
+        // Password resets use the "admins" broker below (the only user table).
+        'passwords' => 'admins',
     ],
 
     /*
