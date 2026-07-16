@@ -128,7 +128,9 @@ class ProjectController extends Controller
 
             case 'oldest':
 
-                $query->oldest();
+                // Order by the project's start date (matches the public site),
+                // with created_at as the tiebreaker for rows sharing a date / null.
+                $query->oldest('start_date')->oldest();
 
                 break;
 
@@ -146,7 +148,9 @@ class ProjectController extends Controller
 
             default:
 
-                $query->latest();
+                // "Newest": most recent project start date first, mirroring the
+                // public listing (featured pinning is a public-only concern).
+                $query->latest('start_date')->latest();
 
                 break;
         }
