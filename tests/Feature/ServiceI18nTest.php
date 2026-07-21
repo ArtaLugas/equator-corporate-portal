@@ -225,22 +225,32 @@ class ServiceI18nTest extends TestCase
             'slug' => 'unique-marker-slug', 'status' => 'draft', 'is_featured' => false,
         ]);
 
+        // Decoy in another category — every assertion below must exclude it, otherwise
+        // a search that matches everything would still look like it "works".
+        $other = ServiceCategory::create([
+            'name_en' => 'Marine', 'slug' => 'marine', 'status' => 'active', 'display_order' => 2,
+        ]);
+        Service::create([
+            'category_id' => $other->id, 'name_en' => 'Decoy Service',
+            'slug' => 'decoy-service', 'status' => 'published', 'is_featured' => false,
+        ]);
+
         $admin = Admin::factory()->create();
 
         // by slug
         $this->actingAs($admin, 'admin')
             ->get(route('admin.services.index', ['search' => 'unique-marker-slug']))
-            ->assertOk()->assertSee('Hidden Title');
+            ->assertOk()->assertSee('Hidden Title')->assertDontSee('Decoy Service');
 
         // by category name
         $this->actingAs($admin, 'admin')
             ->get(route('admin.services.index', ['search' => 'Geospatial']))
-            ->assertOk()->assertSee('Hidden Title');
+            ->assertOk()->assertSee('Hidden Title')->assertDontSee('Decoy Service');
 
         // by status
         $this->actingAs($admin, 'admin')
             ->get(route('admin.services.index', ['search' => 'draft']))
-            ->assertOk()->assertSee('Hidden Title');
+            ->assertOk()->assertSee('Hidden Title')->assertDontSee('Decoy Service');
     }
 
     /*
@@ -251,12 +261,19 @@ class ServiceI18nTest extends TestCase
 
     public function test_search_matches_indonesian_term(): void
     {
-        $this->published(['name_en' => 'Consulting', 'name_id' => 'Konsultasi']);
+        $service = $this->published(['name_en' => 'Consulting', 'name_id' => 'Konsultasi']);
 
-        // Admin list search by the Indonesian term finds the row (shown via EN name).
+        Service::create([
+            'category_id' => $service->category_id, 'name_en' => 'Decoy Service',
+            'slug' => 'decoy-service', 'status' => 'published', 'is_featured' => false,
+        ]);
+
+        // Admin list search by the Indonesian term finds the row (shown via EN name)
+        // and drops everything else.
         $this->actingAs(Admin::factory()->create(), 'admin')
             ->get(route('admin.services.index', ['search' => 'Konsultasi']))
             ->assertOk()
-            ->assertSee('Consulting');
+            ->assertSee('Consulting')
+            ->assertDontSee('Decoy Service');
     }
 }

@@ -55,10 +55,10 @@
     <div class="mb-6 rounded-2xl border border-gray-200 bg-white p-2.5">
 
         <form method="GET" action="{{ route('admin.services.index') }}"
-            class="flex flex-col items-center gap-3 md:flex-row">
+            class="flex flex-col items-center gap-3 md:flex-row md:flex-wrap">
 
             {{-- SEARCH INPUT GROUP --}}
-            <div class="relative w-full flex-1">
+            <div class="relative w-full flex-1 md:min-w-[14rem]">
                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -73,7 +73,8 @@
                     class="block w-full rounded-xl border border-transparent bg-gray-50 py-2.5 pl-11 pr-10 text-sm font-medium text-equator-text placeholder-gray-400 transition-colors hover:bg-gray-100 focus:border-equator-dark focus:bg-white focus:outline-none focus:ring-1 focus:ring-equator-dark">
 
                 @if (request('search'))
-                    <a href="{{ route('admin.services.index') }}"
+                    {{-- Only drop the keyword; the other active filters stay applied. --}}
+                    <a href="{{ route('admin.services.index', request()->except('search', 'page')) }}"
                         class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 transition-colors hover:text-red-500"
                         title="Clear search">
                         <div class="rounded-md p-1 hover:bg-red-50">
@@ -90,8 +91,61 @@
 
             <div class="hidden h-8 w-px bg-gray-200 md:block"></div>
 
+            {{-- CATEGORY FILTER --}}
+            <div class="relative w-full md:w-44">
+                <select name="category"
+                    class="block w-full cursor-pointer appearance-none rounded-xl border border-transparent bg-gray-50 py-2.5 pl-4 pr-10 text-sm font-medium text-equator-text transition-colors hover:bg-gray-100 focus:border-equator-dark focus:bg-white focus:outline-none focus:ring-1 focus:ring-equator-dark">
+                    <option value="">All Categories</option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}</option>
+                    @endforeach
+                </select>
+
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </div>
+            </div>
+
+            {{-- STATUS FILTER --}}
+            <div class="relative w-full md:w-36">
+                <select name="status"
+                    class="block w-full cursor-pointer appearance-none rounded-xl border border-transparent bg-gray-50 py-2.5 pl-4 pr-10 text-sm font-medium text-equator-text transition-colors hover:bg-gray-100 focus:border-equator-dark focus:bg-white focus:outline-none focus:ring-1 focus:ring-equator-dark">
+                    <option value="">All Status</option>
+                    <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
+                    <option value="published" {{ request('status') === 'published' ? 'selected' : '' }}>Published</option>
+                </select>
+
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </div>
+            </div>
+
+            {{-- FEATURED FILTER --}}
+            <div class="relative w-full md:w-36">
+                <select name="featured"
+                    class="block w-full cursor-pointer appearance-none rounded-xl border border-transparent bg-gray-50 py-2.5 pl-4 pr-10 text-sm font-medium text-equator-text transition-colors hover:bg-gray-100 focus:border-equator-dark focus:bg-white focus:outline-none focus:ring-1 focus:ring-equator-dark">
+                    <option value="">All Services</option>
+                    <option value="1" {{ request('featured') === '1' ? 'selected' : '' }}>Featured</option>
+                    <option value="0" {{ request('featured') === '0' ? 'selected' : '' }}>Not Featured</option>
+                </select>
+
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </div>
+            </div>
+
             {{-- SORT FILTER --}}
-            <div class="relative w-full md:w-48 lg:w-56">
+            <div class="relative w-full md:w-40">
                 <select name="sort"
                     class="block w-full cursor-pointer appearance-none rounded-xl border border-transparent bg-gray-50 py-2.5 pl-4 pr-10 text-sm font-medium text-equator-text transition-colors hover:bg-gray-100 focus:border-equator-dark focus:bg-white focus:outline-none focus:ring-1 focus:ring-equator-dark">
                     <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Newest</option>

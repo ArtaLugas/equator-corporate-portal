@@ -61,9 +61,14 @@ class ServiceController extends Controller
                     ->orWhere('status', 'like', "%{$search}%")
                     ->orWhereHas('category', function ($c) use ($search) {
                         // Category name is translatable — search every locale column.
-                        foreach (array_keys(config('locales.supported', [])) as $locale) {
-                            $c->orWhere("name_{$locale}", 'like', "%{$search}%");
-                        }
+                        // The locale ORs must be nested: starting the closure with a bare
+                        // orWhere() would OR against whereHas' own relation constraint,
+                        // making the EXISTS always true and disabling the whole search.
+                        $c->where(function ($cc) use ($search) {
+                            foreach (array_keys(config('locales.supported', [])) as $locale) {
+                                $cc->orWhere("name_{$locale}", 'like', "%{$search}%");
+                            }
+                        });
                     });
             });
         }
