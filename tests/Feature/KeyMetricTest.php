@@ -37,13 +37,19 @@ class KeyMetricTest extends TestCase
     {
         KeyMetric::create(['value' => '999+', 'label_en' => 'Custom Metric', 'status' => 'active', 'display_order' => 1]);
 
-        $this->get(route('home'))->assertOk()->assertSee('Custom Metric')->assertSee('999+');
+        // The stat tile splits "999+" into an Alpine count-up number and a suffix
+        // span, so the literal string never appears — assert the number, and that
+        // the CMS metric displaced the fallback set.
+        $this->get(route('home'))->assertOk()
+            ->assertSee('Custom Metric')
+            ->assertSee('999')
+            ->assertDontSee(__('home.stat_fallback_experience'));
     }
 
     public function test_homepage_falls_back_to_defaults_when_no_metrics(): void
     {
         // No KeyMetric rows → default labels rendered.
-        $this->get(route('home'))->assertOk()->assertSee('Years Experience');
+        $this->get(route('home'))->assertOk()->assertSee(__('home.stat_fallback_experience'));
     }
 
     public function test_inactive_metric_not_shown_on_homepage(): void
@@ -53,6 +59,6 @@ class KeyMetricTest extends TestCase
         // Inactive ignored → fallback defaults shown, hidden metric absent.
         $response = $this->get(route('home'))->assertOk();
         $response->assertDontSee('Hidden Metric');
-        $response->assertSee('Years Experience');
+        $response->assertSee(__('home.stat_fallback_experience'));
     }
 }

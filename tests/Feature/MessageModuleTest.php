@@ -7,6 +7,7 @@ use App\Jobs\SendNewMessageNotification;
 use App\Models\Admin;
 use App\Models\Message;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
@@ -18,11 +19,17 @@ class MessageModuleTest extends TestCase
     {
         Queue::fake();
 
+        // The public form always requires Turnstile (unlike admin login, which only
+        // enforces it when configured), so a happy-path submit must stub it.
+        config(['services.turnstile.secret_key' => 'test-secret']);
+        Http::fake(['*siteverify*' => Http::response(['success' => true])]);
+
         $this->post(route('contact.store'), [
             'name' => 'John Visitor',
             'email' => 'john@example.com',
             'subject' => 'Project inquiry',
             'message' => 'I would like to know more about your services.',
+            'cf-turnstile-response' => 'dummy-token',
         ])->assertRedirect();
 
         $this->assertDatabaseHas('messages', [

@@ -27,5 +27,11 @@
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
+        <!-- Turnstile must be neutralised here, not inherited from the developer's
+             .env: with a real secret present the CAPTCHA rule switches on and the
+             suite goes red on machines that have the key and green on those that
+             don't. Tests that need it enabled set the config themselves. -->
+        <env name="TURNSTILE_SITE_KEY" value=""/>
+        <env name="TURNSTILE_SECRET_KEY" value=""/>
     </php>
 </phpunit>

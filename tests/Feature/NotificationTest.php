@@ -6,6 +6,7 @@ use App\Models\Admin;
 use App\Models\Message;
 use App\Notifications\NewContactMessage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class NotificationTest extends TestCase
@@ -18,11 +19,17 @@ class NotificationTest extends TestCase
         $active2 = Admin::factory()->superAdmin()->create();
         $inactive = Admin::factory()->inactive()->create();
 
+        // The public form always requires Turnstile; stub it so this test exercises
+        // notification fan-out rather than CAPTCHA validation.
+        config(['services.turnstile.secret_key' => 'test-secret']);
+        Http::fake(['*siteverify*' => Http::response(['success' => true])]);
+
         $this->post(route('contact.store'), [
             'name' => 'Visitor',
             'email' => 'visitor@example.com',
             'subject' => 'Hello team',
             'message' => 'I have a question about your services.',
+            'cf-turnstile-response' => 'dummy-token',
         ])->assertRedirect();
 
         $this->assertSame(1, $active1->fresh()->notifications()->count());
