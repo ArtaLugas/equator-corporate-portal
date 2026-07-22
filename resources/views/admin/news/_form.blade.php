@@ -133,9 +133,32 @@
                 x-data="{
                     tags: @js($currentTags),
                     input: '',
+                    // Comma is the documented separator; newline/tab cover pastes out of
+                    // a spreadsheet column and semicolon covers Word-style lists. None of
+                    // them are plausible inside a tag name. No /g flag — test() would
+                    // otherwise carry lastIndex between calls.
+                    separators: /[,;\n\r\t]+/,
+                    push(value) {
+                        let v = value.trim();
+                        if (! v) return;
+                        // Case-insensitive: syncTags() keys tags by slug, so 'Survey' and
+                        // 'survey' resolve to one row. Two chips would misrepresent what
+                        // actually gets saved. First spelling pasted wins.
+                        if (this.tags.some(t => t.toLowerCase() === v.toLowerCase())) return;
+                        this.tags.push(v);
+                    },
                     add() {
-                        let v = this.input.replace(/,/g, '').trim();
-                        if (v && !this.tags.includes(v)) this.tags.push(v);
+                        // Enter/comma/blur: split too, so a hand-typed 'a, b' also lands
+                        // as two tags instead of one.
+                        this.input.split(this.separators).forEach(v => this.push(v));
+                        this.input = '';
+                    },
+                    paste(event) {
+                        let text = (event.clipboardData || window.clipboardData).getData('text');
+                        // Nothing to split — let it drop into the box so it stays editable.
+                        if (! this.separators.test(text)) return;
+                        event.preventDefault();
+                        (this.input + text).split(this.separators).forEach(v => this.push(v));
                         this.input = '';
                     },
                     remove(i) { this.tags.splice(i, 1); }
@@ -162,12 +185,14 @@
                     <input type="text" x-model="input"
                         @keydown.enter.prevent="add()"
                         @keydown.comma.prevent="add()"
+                        @paste="paste($event)"
                         @blur="add()"
-                        placeholder="Type a tag and press Enter..."
+                        placeholder="Type a tag, or paste a comma-separated list..."
                         class="flex-1 border-0 bg-transparent px-1 py-1 text-sm text-equator-text placeholder-gray-400 focus:outline-none focus:ring-0">
                 </div>
 
-                <p class="text-xs font-medium text-gray-400">Press Enter or comma to add. New tags are created automatically.</p>
+                <p class="text-xs font-medium text-gray-400">Press Enter or comma to add, or paste a comma-separated
+                    list to add them all at once. New tags are created automatically.</p>
             </div>
 
         </div>
