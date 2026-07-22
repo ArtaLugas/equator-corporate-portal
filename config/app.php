@@ -60,12 +60,20 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you may specify the default timezone for your application, which
-    | will be used by the PHP date and date-time functions. The timezone
-    | is set to "UTC" by default as it is suitable for most use cases.
+    | will be used by the PHP date and date-time functions.
+    |
+    | Asia/Jakarta (WIB), not Laravel's stock UTC: staff, audience and hosting
+    | are all Indonesian, and every datetime the CMS accepts or renders is a
+    | local wall-clock time. Under UTC the admin "Publish Date" field silently
+    | read WIB input as UTC, embargoing scheduled articles 7 hours past their
+    | intended slot while echoing the entered time back unchanged.
+    |
+    | The fallback is deliberate, not the env var alone — a deployment that
+    | forgets APP_TIMEZONE must not silently revert to UTC.
     |
     */
 
-    'timezone' => env('APP_TIMEZONE', 'UTC'),
+    'timezone' => env('APP_TIMEZONE', 'Asia/Jakarta'),
 
     /*
     |--------------------------------------------------------------------------
