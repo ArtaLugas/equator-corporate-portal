@@ -6,14 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAdminRequest;
 use App\Http\Requests\UpdateAdminRequest;
 use App\Models\Admin;
+use App\Support\Rbac;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 class AdminController extends Controller
 {
     private const PAGINATION = 15;
+
+    /** Role names assignable to an admin, for the create/edit dropdowns. */
+    private function assignableRoles(): array
+    {
+        return Role::where('guard_name', Rbac::GUARD)->orderBy('name')->pluck('name')->all();
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -58,7 +66,7 @@ class AdminController extends Controller
     {
         $this->authorize('create', Admin::class);
 
-        return view('admin.admins.create');
+        return view('admin.admins.create', ['roles' => $this->assignableRoles()]);
     }
 
     public function store(StoreAdminRequest $request)
@@ -88,7 +96,7 @@ class AdminController extends Controller
     {
         $this->authorize('update', $admin);
 
-        return view('admin.admins.edit', compact('admin'));
+        return view('admin.admins.edit', ['admin' => $admin, 'roles' => $this->assignableRoles()]);
     }
 
     public function update(UpdateAdminRequest $request, Admin $admin)

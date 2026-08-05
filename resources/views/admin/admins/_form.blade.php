@@ -25,8 +25,11 @@
 
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <x-admin.form.select name="role" label="Role" required>
-                        <option value="admin" {{ old('role', $admin->role ?? 'admin') == 'admin' ? 'selected' : '' }}>Admin</option>
-                        <option value="super_admin" {{ old('role', $admin->role ?? '') == 'super_admin' ? 'selected' : '' }}>Super Admin</option>
+                        @foreach ($roles as $roleName)
+                            <option value="{{ $roleName }}" {{ old('role', $admin->role ?? 'admin') == $roleName ? 'selected' : '' }}>
+                                {{ \Illuminate\Support\Str::headline($roleName) }}
+                            </option>
+                        @endforeach
                     </x-admin.form.select>
 
                     <x-admin.form.select name="status" label="Status" required>

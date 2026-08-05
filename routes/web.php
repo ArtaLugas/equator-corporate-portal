@@ -5,9 +5,6 @@ use App\Http\Controllers\Admin\AboutHistoryController;
 use App\Http\Controllers\Admin\AboutSectionController;
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\ActivityLogController;
-use App\Http\Controllers\Admin\PasswordResetController;
-use App\Http\Controllers\Admin\TwoFactorChallengeController;
-use App\Http\Controllers\Admin\TwoFactorController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CompanyCredentialController;
@@ -23,13 +20,17 @@ use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\OfficeLocationController;
 use App\Http\Controllers\Admin\PartnerController;
+use App\Http\Controllers\Admin\PasswordResetController;
 use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\ServiceCategoryController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SocialLinkController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\TranslationProgressController;
+use App\Http\Controllers\Admin\TwoFactorChallengeController;
+use App\Http\Controllers\Admin\TwoFactorController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\LegalController;
@@ -545,5 +546,13 @@ Route::prefix('admin')
             */
 
             Route::resource('admins', AdminController::class)->except(['show']);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Roles & Permissions (RBAC) — gated by role.* permissions (super admin)
+            |--------------------------------------------------------------------------
+            */
+
+            Route::resource('roles', RoleController::class)->except(['show']);
         });
     });
