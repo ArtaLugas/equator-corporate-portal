@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 class Admin extends Authenticatable
@@ -21,6 +22,27 @@ class Admin extends Authenticatable
      * with GuardDoesNotMatch. See App\Support\Rbac for the full rationale.
      */
     protected string $guard_name = Rbac::GUARD;
+
+    /**
+     * Keep the spatie role assignment in lock-step with the `role` column, which
+     * remains the single source of truth. Every create/update path — the admin
+     * CMS, the factory, the seeder — thus grants the right permissions without a
+     * separate assignRole() call, closing the gap where a UI-created admin would
+     * otherwise carry no permissions. No-ops until the named role exists (e.g.
+     * before RBAC is seeded), so the model stays usable in isolation.
+     */
+    protected static function booted(): void
+    {
+        static::saved(function (Admin $admin) {
+            if (! ($admin->wasRecentlyCreated || $admin->wasChanged('role'))) {
+                return;
+            }
+
+            if (Role::where('name', $admin->role)->where('guard_name', Rbac::GUARD)->exists()) {
+                $admin->syncRoles([$admin->role]);
+            }
+        });
+    }
 
     protected $fillable = [
         'name',

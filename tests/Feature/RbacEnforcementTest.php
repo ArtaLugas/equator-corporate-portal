@@ -54,4 +54,25 @@ class RbacEnforcementTest extends TestCase
         $this->actingAs($super, 'admin')->get(route('admin.news.index'))->assertOk();
         $this->actingAs($super, 'admin')->get(route('admin.news.create'))->assertOk();
     }
+
+    /**
+     * Regression guard: an admin created straight through the model (the path the
+     * admin-management UI uses) must receive the permissions of its role column
+     * via the model's saved event — otherwise every new admin lands permissionless
+     * once controllers enforce.
+     */
+    public function test_creating_an_admin_grants_its_role_column_permissions(): void
+    {
+        $admin = Admin::create([
+            'name' => 'Fresh Admin',
+            'email' => 'fresh@example.test',
+            'password' => 'secret1234',
+            'role' => 'admin',
+            'status' => 'active',
+        ]);
+
+        $this->assertTrue($admin->fresh()->hasRole('admin'));
+
+        $this->actingAs($admin, 'admin')->get(route('admin.news.index'))->assertOk();
+    }
 }

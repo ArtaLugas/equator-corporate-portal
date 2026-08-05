@@ -41,14 +41,17 @@ class RolePermissionSeeder extends Seeder
         // but syncing the full set keeps the matrix UI showing it as all-checked.
         $superAdmin->syncPermissions(Rbac::permissions());
 
-        // Bring existing admins onto their matching role, mapping the legacy
-        // `role` column value. Uses assignRole (idempotent) rather than sync so a
-        // manual role override made later in the UI is not clobbered on re-seed.
+        // Bring existing admins onto the role named by their `role` column (the
+        // source of truth). Rows predating RBAC are not re-saved, so the model's
+        // saved-event mirror never fired for them — sync here. Unknown role names
+        // fall back to `admin` so no account is left permission-less.
         Admin::query()->each(function (Admin $account) {
-            $role = $account->role === 'super_admin' ? 'super_admin' : 'admin';
+            $role = Role::where('name', $account->role)->where('guard_name', $guard)->exists()
+                ? $account->role
+                : 'admin';
 
             if (! $account->hasRole($role)) {
-                $account->assignRole($role);
+                $account->syncRoles([$role]);
             }
         });
 
