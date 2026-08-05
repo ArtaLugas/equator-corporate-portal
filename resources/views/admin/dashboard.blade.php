@@ -84,57 +84,37 @@
     </div>
 @endif
 
-{{-- STATS --}}
+{{-- STATS — permission-aware KPI row (see DashboardController::buildDashboardCards).
+     Stat cards for modules the admin can open, then quick links to other permitted
+     modules; no card ever leads to a 403. --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
 
-    {{-- SERVICES --}}
-    <a href="{{ route('admin.services.index') }}" class="block">
-        <x-admin.stat-card title="Services" :value="number_format($stats['services'] ?? 0)" color="bright" sub="Active service offerings">
-            <x-slot name="icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-            </x-slot>
-        </x-admin.stat-card>
-    </a>
-
-    {{-- MESSAGES --}}
-    <a href="{{ route('admin.messages.index') }}" class="block">
-        <x-admin.stat-card title="Messages" :value="number_format($stats['messages'] ?? 0)" color="orange"
-            :sub="($stats['unread_messages'] ?? 0) . ' unread'">
-            <x-slot name="icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-            </x-slot>
-        </x-admin.stat-card>
-    </a>
-
-    {{-- PROJECTS --}}
-    <a href="{{ route('admin.projects.index') }}" class="block">
-        <x-admin.stat-card title="Projects" :value="number_format($stats['projects'] ?? 0)" color="primary" sub="Portfolio projects">
-            <x-slot name="icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
-            </x-slot>
-        </x-admin.stat-card>
-    </a>
-
-    @if ($isSuperAdmin ?? false)
-        {{-- USERS (super admin only) --}}
-        <a href="{{ route('admin.admins.index') }}" class="block">
-            <x-admin.stat-card title="Users" :value="number_format($stats['users'] ?? 0)" color="success" sub="Admin accounts">
+    @foreach ($dashboardCards['stats'] as $card)
+        <a href="{{ $card['url'] }}" class="block">
+            <x-admin.stat-card :title="$card['title']" :value="$card['value']" :color="$card['color']" :sub="$card['sub']">
                 <x-slot name="icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    @include('admin.partials.stat-icon', ['icon' => $card['icon']])
                 </x-slot>
             </x-admin.stat-card>
         </a>
-    @else
-        {{-- NEWS (regular admin) --}}
-        <a href="{{ route('admin.news.index') }}" class="block">
-            <x-admin.stat-card title="News" :value="number_format($stats['news'] ?? 0)" color="success"
-                :sub="($stats['published_news'] ?? 0) . ' published'">
-                <x-slot name="icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
-                </x-slot>
-            </x-admin.stat-card>
+    @endforeach
+
+    {{-- Quick-link fillers to other permitted modules --}}
+    @foreach ($dashboardCards['quick'] as $card)
+        <a href="{{ $card['url'] }}"
+            class="group flex h-full flex-col justify-between rounded-2xl border border-dashed border-gray-200 bg-white p-5 shadow-sm transition-all hover:border-equator-dark hover:shadow-md">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 text-gray-500 transition-colors group-hover:bg-equator-dark/10 group-hover:text-equator-dark">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/></svg>
+            </div>
+            <div class="mt-4">
+                <p class="text-xs font-bold uppercase tracking-wide text-gray-500">Quick access</p>
+                <p class="mt-1 flex items-center gap-1 text-lg font-extrabold tracking-tight text-equator-text">
+                    {{ $card['title'] }}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-300 transition-transform group-hover:translate-x-1 group-hover:text-equator-dark"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </p>
+            </div>
         </a>
-    @endif
+    @endforeach
 
 </div>
 

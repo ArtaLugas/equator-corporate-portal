@@ -42,7 +42,86 @@ class DashboardController extends Controller
 
         $health = $isSuperAdmin ? $this->systemHealth() : null;
 
-        return view('admin.dashboard', compact('stats', 'chart', 'recentActivities', 'health', 'isSuperAdmin'));
+        // Permission-aware KPI row: only cards the admin may open, topped up with
+        // quick links to other permitted modules so the grid never shows a card
+        // that 403s and never looks empty for a narrow role.
+        $dashboardCards = $this->buildDashboardCards($admin, $stats);
+
+        return view('admin.dashboard', compact('stats', 'chart', 'recentActivities', 'health', 'isSuperAdmin', 'dashboardCards'));
+    }
+
+    /**
+     * Build the KPI row for the given admin: up to four stat cards for modules
+     * they can view (with live counts), then quick-link cards to other permitted
+     * modules to fill any remaining slots. A null admin (should not happen behind
+     * auth) yields an empty row rather than an error.
+     *
+     * @return array{stats: list<array>, quick: list<array>}
+     */
+    private function buildDashboardCards(?Admin $admin, array $stats): array
+    {
+        if (! $admin) {
+            return ['stats' => [], 'quick' => []];
+        }
+
+        // Priority stat cards. `perm` gates visibility; Users is super-admin-only
+        // because only the super_admin role holds administrator.view.
+        $statPool = [
+            ['perm' => 'service.view', 'title' => 'Services', 'value' => $stats['services'] ?? 0, 'sub' => 'Active service offerings', 'color' => 'bright', 'route' => 'admin.services.index', 'icon' => 'services'],
+            ['perm' => 'message.view', 'title' => 'Messages', 'value' => $stats['messages'] ?? 0, 'sub' => ($stats['unread_messages'] ?? 0).' unread', 'color' => 'orange', 'route' => 'admin.messages.index', 'icon' => 'messages'],
+            ['perm' => 'project.view', 'title' => 'Projects', 'value' => $stats['projects'] ?? 0, 'sub' => 'Portfolio projects', 'color' => 'primary', 'route' => 'admin.projects.index', 'icon' => 'projects'],
+            ['perm' => 'administrator.view', 'title' => 'Users', 'value' => $stats['users'] ?? 0, 'sub' => 'Admin accounts', 'color' => 'success', 'route' => 'admin.admins.index', 'icon' => 'users'],
+            ['perm' => 'news.view', 'title' => 'News', 'value' => $stats['news'] ?? 0, 'sub' => ($stats['published_news'] ?? 0).' published', 'color' => 'success', 'route' => 'admin.news.index', 'icon' => 'news'],
+        ];
+
+        $statCards = [];
+        foreach ($statPool as $c) {
+            if (count($statCards) === 4) {
+                break;
+            }
+            if ($admin->can($c['perm'])) {
+                $statCards[] = [
+                    'title' => $c['title'],
+                    'value' => number_format($c['value']),
+                    'sub' => $c['sub'],
+                    'color' => $c['color'],
+                    'url' => route($c['route']),
+                    'icon' => $c['icon'],
+                ];
+            }
+        }
+
+        // Quick-link fillers — curated so each has a real index route (module slugs
+        // do not map to route names mechanically). Skips modules already shown.
+        $quickPool = [
+            ['perm' => 'news.view', 'title' => 'News', 'route' => 'admin.news.index'],
+            ['perm' => 'faq.view', 'title' => 'FAQ', 'route' => 'admin.faqs.index'],
+            ['perm' => 'team.view', 'title' => 'Teams', 'route' => 'admin.teams.index'],
+            ['perm' => 'partner.view', 'title' => 'Partners', 'route' => 'admin.partners.index'],
+            ['perm' => 'hero-banner.view', 'title' => 'Hero Banners', 'route' => 'admin.hero-banners.index'],
+            ['perm' => 'service.view', 'title' => 'Services', 'route' => 'admin.services.index'],
+            ['perm' => 'project.view', 'title' => 'Projects', 'route' => 'admin.projects.index'],
+            ['perm' => 'key-metric.view', 'title' => 'Key Metrics', 'route' => 'admin.key-metrics.index'],
+            ['perm' => 'core-value.view', 'title' => 'Core Values', 'route' => 'admin.core-values.index'],
+            ['perm' => 'company-credential.view', 'title' => 'Credentials', 'route' => 'admin.company-credentials.index'],
+            ['perm' => 'office-location.view', 'title' => 'Office Locations', 'route' => 'admin.office-locations.index'],
+            ['perm' => 'social-link.view', 'title' => 'Social Links', 'route' => 'admin.social-links.index'],
+        ];
+
+        $shown = array_column($statCards, 'url');
+        $quickCards = [];
+        foreach ($quickPool as $c) {
+            if (count($statCards) + count($quickCards) >= 4) {
+                break;
+            }
+            $url = route($c['route']);
+            if (! in_array($url, $shown, true) && $admin->can($c['perm'])) {
+                $quickCards[] = ['title' => $c['title'], 'url' => $url];
+                $shown[] = $url;
+            }
+        }
+
+        return ['stats' => $statCards, 'quick' => $quickCards];
     }
 
     /*
