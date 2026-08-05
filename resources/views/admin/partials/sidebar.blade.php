@@ -63,6 +63,7 @@
                     <span class="text-sm">Dashboard</span>
                 </a>
 
+                @can('translation-progress.view')
                 {{-- Translation Progress --}}
                 <a href="{{ route('admin.translations.index') }}"
                     class="{{ request()->routeIs('admin.translations.*') ? 'bg-equator-dark/5 text-equator-dark font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
@@ -75,7 +76,9 @@
                     </svg>
                     <span class="text-sm">Translation Progress</span>
                 </a>
+                @endcan
 
+                @canany(['service-category.view', 'service.view'])
                 {{-- SERVICE MENU (Accordion) --}}
                 <div x-data="{ open: {{ request()->routeIs('admin.services.*') || request()->routeIs('admin.service-categories.*') ? 'true' : 'false' }} }" class="space-y-1">
 
@@ -104,18 +107,24 @@
                     {{-- Nested Tree Content --}}
                     <div x-show="open" x-collapse x-cloak>
                         <div class="ml-5 mt-1 space-y-1 border-l border-gray-100 pl-3">
-                            <a href="{{ route('admin.service-categories.index') }}"
-                                class="{{ request()->routeIs('admin.service-categories.*') ? 'text-equator-dark font-bold bg-gray-50/50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} block rounded-lg px-3 py-2 text-sm transition-colors">
-                                Categories
-                            </a>
-                            <a href="{{ route('admin.services.index') }}"
-                                class="{{ request()->routeIs('admin.services.*') ? 'text-equator-dark font-bold bg-gray-50/50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} block rounded-lg px-3 py-2 text-sm transition-colors">
-                                All Services
-                            </a>
+                            @can('service-category.view')
+                                <a href="{{ route('admin.service-categories.index') }}"
+                                    class="{{ request()->routeIs('admin.service-categories.*') ? 'text-equator-dark font-bold bg-gray-50/50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} block rounded-lg px-3 py-2 text-sm transition-colors">
+                                    Categories
+                                </a>
+                            @endcan
+                            @can('service.view')
+                                <a href="{{ route('admin.services.index') }}"
+                                    class="{{ request()->routeIs('admin.services.*') ? 'text-equator-dark font-bold bg-gray-50/50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} block rounded-lg px-3 py-2 text-sm transition-colors">
+                                    All Services
+                                </a>
+                            @endcan
                         </div>
                     </div>
                 </div>
+                @endcanany
 
+                @can('project.view')
                 {{-- Projects --}}
                 <a href="{{ route('admin.projects.index') }}"
                     class="{{ request()->routeIs('admin.projects.*') ? 'bg-equator-dark/5 text-equator-dark font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
@@ -131,6 +140,7 @@
                     </svg>
                     <span class="text-sm">Projects</span>
                 </a>
+                @endcan
             </div>
         </div>
 
@@ -145,6 +155,7 @@
 
             <div class="space-y-1">
 
+                @can('hero-banner.view')
                 {{-- HERO BANNERS --}}
                 <a href="{{ route('admin.hero-banners.index') }}"
                     class="{{ request()->routeIs('admin.hero-banners.*') ? 'bg-equator-dark/5 text-equator-dark font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
@@ -168,7 +179,9 @@
                     </span>
 
                 </a>
+                @endcan
 
+                @canany(['about-section.view', 'about-content.view', 'about-history.view'])
                 {{-- ABOUT MENU (Accordion) --}}
                 <div x-data="{ open: {{ request()->routeIs('admin.about-sections.*') || request()->routeIs('admin.about-contents.*') || request()->routeIs('admin.about-histories.*') ? 'true' : 'false' }} }" class="space-y-1">
 
@@ -227,42 +240,50 @@
 
                         <div class="ml-5 mt-1 space-y-1 border-l border-gray-100 pl-3">
 
-                            {{-- ABOUT SECTIONS --}}
-                            <a href="{{ route('admin.about-sections.index') }}"
-                                class="{{ request()->routeIs('admin.about-sections.*')
-                                    ? 'text-equator-dark font-bold bg-gray-50/50'
-                                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} block rounded-lg px-3 py-2 text-sm transition-colors">
+                            @can('about-section.view')
+                                {{-- ABOUT SECTIONS --}}
+                                <a href="{{ route('admin.about-sections.index') }}"
+                                    class="{{ request()->routeIs('admin.about-sections.*')
+                                        ? 'text-equator-dark font-bold bg-gray-50/50'
+                                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} block rounded-lg px-3 py-2 text-sm transition-colors">
 
-                                Sections
+                                    Sections
 
-                            </a>
+                                </a>
+                            @endcan
 
-                            {{-- ABOUT CONTENTS --}}
-                            <a href="{{ route('admin.about-contents.index') }}"
-                                class="{{ request()->routeIs('admin.about-contents.*')
-                                    ? 'text-equator-dark font-bold bg-gray-50/50'
-                                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} block rounded-lg px-3 py-2 text-sm transition-colors">
+                            @can('about-content.view')
+                                {{-- ABOUT CONTENTS --}}
+                                <a href="{{ route('admin.about-contents.index') }}"
+                                    class="{{ request()->routeIs('admin.about-contents.*')
+                                        ? 'text-equator-dark font-bold bg-gray-50/50'
+                                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} block rounded-lg px-3 py-2 text-sm transition-colors">
 
-                                Contents
+                                    Contents
 
-                            </a>
+                                </a>
+                            @endcan
 
-                            {{-- ABOUT HISTORIES --}}
-                            <a href="{{ route('admin.about-histories.index') }}"
-                                class="{{ request()->routeIs('admin.about-histories.*')
-                                    ? 'text-equator-dark font-bold bg-gray-50/50'
-                                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} block rounded-lg px-3 py-2 text-sm transition-colors">
+                            @can('about-history.view')
+                                {{-- ABOUT HISTORIES --}}
+                                <a href="{{ route('admin.about-histories.index') }}"
+                                    class="{{ request()->routeIs('admin.about-histories.*')
+                                        ? 'text-equator-dark font-bold bg-gray-50/50'
+                                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} block rounded-lg px-3 py-2 text-sm transition-colors">
 
-                                Histories
+                                    Histories
 
-                            </a>
+                                </a>
+                            @endcan
 
                         </div>
 
                     </div>
 
                 </div>
+                @endcanany
 
+                @can('core-value.view')
                 {{-- CORE VALUES --}}
                 <a href="{{ route('admin.core-values.index') }}"
                     class="{{ request()->routeIs('admin.core-values.*') ? 'bg-equator-dark/5 text-equator-dark font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
@@ -285,7 +306,9 @@
                     </span>
 
                 </a>
+                @endcan
 
+                @can('company-document.view')
                 <a href="{{ route('admin.company-documents.index') }}"
                     class="{{ request()->routeIs('admin.company-documents.*') ? 'text-equator-dark font-bold bg-gray-50/50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
 
@@ -305,7 +328,9 @@
                     </span>
 
                 </a>
+                @endcan
 
+                @can('company-credential.view')
                 {{-- COMPANY CREDENTIALS --}}
                 <a href="{{ route('admin.company-credentials.index') }}"
                     class="{{ request()->routeIs('admin.company-credentials.*') ? 'text-equator-dark font-bold bg-gray-50/50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
@@ -326,7 +351,9 @@
                     </span>
 
                 </a>
+                @endcan
 
+                @can('partner.view')
                 {{-- PARTNERS --}}
                 <a href="{{ route('admin.partners.index') }}"
                     class="{{ request()->routeIs('admin.partners.*') ? 'bg-equator-dark/5 text-equator-dark font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
@@ -353,8 +380,10 @@
                     </span>
 
                 </a>
+                @endcan
 
 
+                @canany(['news-category.view', 'news.view'])
                 {{-- NEWS MENU (Accordion) --}}
                 <div x-data="{ open: {{ request()->routeIs('admin.news.*') || request()->routeIs('admin.news-categories.*') ? 'true' : 'false' }} }" class="space-y-1">
 
@@ -384,19 +413,25 @@
 
                     <div x-show="open" x-collapse x-cloak>
                         <div class="ml-5 mt-1 space-y-1 border-l border-gray-100 pl-3">
-                            <a href="{{ route('admin.news-categories.index') }}"
-                                class="{{ request()->routeIs('admin.news-categories.*') ? 'text-equator-dark font-bold bg-gray-50/50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} block rounded-lg px-3 py-2 text-sm transition-colors">
-                                Categories
-                            </a>
-                            <a href="{{ route('admin.news.index') }}"
-                                class="{{ request()->routeIs('admin.news.*') ? 'text-equator-dark font-bold bg-gray-50/50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} block rounded-lg px-3 py-2 text-sm transition-colors">
-                                All News
-                            </a>
+                            @can('news-category.view')
+                                <a href="{{ route('admin.news-categories.index') }}"
+                                    class="{{ request()->routeIs('admin.news-categories.*') ? 'text-equator-dark font-bold bg-gray-50/50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} block rounded-lg px-3 py-2 text-sm transition-colors">
+                                    Categories
+                                </a>
+                            @endcan
+                            @can('news.view')
+                                <a href="{{ route('admin.news.index') }}"
+                                    class="{{ request()->routeIs('admin.news.*') ? 'text-equator-dark font-bold bg-gray-50/50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium' }} block rounded-lg px-3 py-2 text-sm transition-colors">
+                                    All News
+                                </a>
+                            @endcan
                         </div>
                     </div>
 
                 </div>
+                @endcanany
 
+                @can('faq.view')
                 {{-- FAQ --}}
                 <a href="{{ route('admin.faqs.index') }}"
                     class="{{ request()->routeIs('admin.faqs.*') ? 'bg-equator-dark/5 text-equator-dark font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
@@ -410,7 +445,9 @@
                     </svg>
                     <span class="text-sm">FAQ</span>
                 </a>
+                @endcan
 
+                @can('key-metric.view')
                 {{-- KEY METRICS --}}
                 <a href="{{ route('admin.key-metrics.index') }}"
                     class="{{ request()->routeIs('admin.key-metrics.*') ? 'bg-equator-dark/5 text-equator-dark font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
@@ -424,6 +461,7 @@
                     </svg>
                     <span class="text-sm">Key Metrics</span>
                 </a>
+                @endcan
 
             </div>
 
@@ -435,6 +473,7 @@
             <div class="space-y-1">
                 @php $unreadMessages = \App\Models\Message::where('status', 'unread')->count(); @endphp
 
+                @can('message.view')
                 {{-- Messages (live unread badge) --}}
                 <a href="{{ route('admin.messages.index') }}"
                     class="{{ request()->routeIs('admin.messages.*') ? 'bg-equator-dark/5 text-equator-dark font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
@@ -450,6 +489,7 @@
                             class="flex h-5 min-w-[20px] items-center justify-center rounded-md bg-equator-bright px-1.5 text-[10px] font-bold text-white">{{ $unreadMessages }}</span>
                     @endif
                 </a>
+                @endcan
             </div>
         </div>
 
@@ -457,6 +497,7 @@
         <div>
             <h3 class="mb-3 px-3 text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Workspace</h3>
             <div class="space-y-1">
+                @can('team.view')
                 {{-- Team --}}
                 <a href="{{ route('admin.teams.index') }}"
                     class="{{ request()->routeIs('admin.teams.*') ? 'bg-equator-dark/5 text-equator-dark font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
@@ -471,6 +512,7 @@
                     </svg>
                     <span class="text-sm">Team</span>
                 </a>
+                @endcan
 
             </div>
         </div>
@@ -480,6 +522,7 @@
             <h3 class="mb-3 px-3 text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Settings</h3>
             <div class="space-y-1">
 
+                @can('setting.view')
                 {{-- General Settings --}}
                 <a href="{{ route('admin.settings.general') }}"
                     class="{{ request()->routeIs('admin.settings.general') ? 'bg-equator-dark/5 text-equator-dark font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
@@ -493,7 +536,9 @@
                     </svg>
                     <span class="text-sm">General Settings</span>
                 </a>
+                @endcan
 
+                @can('social-link.view')
                 {{-- Social Links --}}
                 <a href="{{ route('admin.social-links.index') }}"
                     class="{{ request()->routeIs('admin.social-links.*') ? 'bg-equator-dark/5 text-equator-dark font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
@@ -509,7 +554,9 @@
                     </svg>
                     <span class="text-sm">Social Links</span>
                 </a>
+                @endcan
 
+                @can('office-location.view')
                 {{-- Office Locations --}}
                 <a href="{{ route('admin.office-locations.index') }}"
                     class="{{ request()->routeIs('admin.office-locations.*') ? 'bg-equator-dark/5 text-equator-dark font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
@@ -522,6 +569,7 @@
                     </svg>
                     <span class="text-sm">Office Locations</span>
                 </a>
+                @endcan
 
                 @if (auth('admin')->user()?->isSuperAdmin())
                     {{-- Admin Management (Super Admin) --}}
