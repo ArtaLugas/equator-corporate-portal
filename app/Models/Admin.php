@@ -3,14 +3,24 @@
 namespace App\Models;
 
 use App\Jobs\SendPasswordResetLink;
+use App\Support\Rbac;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class Admin extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, HasRoles, Notifiable;
+
+    /**
+     * Pin spatie to the `admin` guard. Both `web` and `admin` guards share the
+     * `admins` provider and `web` is declared first, so without this spatie would
+     * derive the `web` guard for this model and reject `admin`-guard permissions
+     * with GuardDoesNotMatch. See App\Support\Rbac for the full rationale.
+     */
+    protected string $guard_name = Rbac::GUARD;
 
     protected $fillable = [
         'name',

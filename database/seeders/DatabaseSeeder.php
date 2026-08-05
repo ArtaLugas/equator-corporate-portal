@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             // Accounts & settings
             AdminSeeder::class,
+            RolePermissionSeeder::class, // roles/permissions + assign to seeded admins
             SettingSeeder::class,
 
             // Services
