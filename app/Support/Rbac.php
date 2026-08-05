@@ -38,8 +38,10 @@ class Rbac
     public static function modules(): array
     {
         return [
+            // Note: the dashboard is intentionally absent — it is the universal
+            // landing page and is never permission-gated (see DashboardController).
+
             // ---- Konten utama ----
-            'dashboard' => ['label' => 'Dashboard', 'group' => 'Umum', 'abilities' => ['view']],
             'news' => ['label' => 'News', 'group' => 'Konten', 'abilities' => self::CRUD],
             'news-category' => ['label' => 'News Category', 'group' => 'Konten', 'abilities' => self::CRUD],
             'service' => ['label' => 'Services', 'group' => 'Konten', 'abilities' => self::CRUD],

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Concerns\AuthorizesModuleActions;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Admin;
@@ -11,7 +10,6 @@ use App\Models\News;
 use App\Models\Project;
 use App\Models\Service;
 use App\Models\Visitor;
-use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -21,15 +19,10 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class DashboardController extends Controller implements HasMiddleware
+class DashboardController extends Controller
 {
-    use AuthorizesModuleActions;
-
-    public static function middleware(): array
-    {
-        // report/export are read views too — fold them into dashboard.view.
-        return static::moduleMiddleware('dashboard', ['view' => ['report', 'export']]);
-    }
+    // The dashboard is the universal post-login landing page — deliberately not
+    // permission-gated, so no role can be locked out of its own home screen.
 
     public function index()
     {
