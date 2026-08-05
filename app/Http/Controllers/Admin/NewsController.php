@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesModuleActions;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\NewsRequest;
 use App\Models\News;
@@ -9,12 +10,20 @@ use App\Models\NewsCategory;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class NewsController extends Controller
+class NewsController extends Controller implements HasMiddleware
 {
+    use AuthorizesModuleActions;
+
+    public static function middleware(): array
+    {
+        return static::moduleMiddleware('news');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Pagination

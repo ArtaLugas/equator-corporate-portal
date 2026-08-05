@@ -2,18 +2,27 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesModuleActions;
 use App\Http\Controllers\Concerns\GeneratesUniqueSlug;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CompanyDocumentRequest;
 use App\Models\CompanyDocument;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class CompanyDocumentController extends Controller
+class CompanyDocumentController extends Controller implements HasMiddleware
 {
+    use AuthorizesModuleActions;
+
+    public static function middleware(): array
+    {
+        return static::moduleMiddleware('company-document');
+    }
+
     use GeneratesUniqueSlug;
 
     private const PAGINATION = 10;

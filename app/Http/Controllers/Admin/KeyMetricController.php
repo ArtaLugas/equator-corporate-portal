@@ -2,13 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesModuleActions;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\KeyMetricRequest;
 use App\Models\KeyMetric;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class KeyMetricController extends Controller
+class KeyMetricController extends Controller implements HasMiddleware
 {
+    use AuthorizesModuleActions;
+
+    public static function middleware(): array
+    {
+        return static::moduleMiddleware('key-metric');
+    }
+
     private const PAGINATION = 15;
 
     public function index(Request $request)

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesModuleActions;
 use App\Http\Controllers\Concerns\GeneratesUniqueSlug;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ServiceCategoryRequest;
@@ -9,11 +10,19 @@ use App\Models\ServiceCategory;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
-class ServiceCategoryController extends Controller
+class ServiceCategoryController extends Controller implements HasMiddleware
 {
+    use AuthorizesModuleActions;
+
+    public static function middleware(): array
+    {
+        return static::moduleMiddleware('service-category');
+    }
+
     use GeneratesUniqueSlug;
 
     /*

@@ -2,13 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesModuleActions;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\FaqRequest;
 use App\Models\Faq;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class FaqController extends Controller
+class FaqController extends Controller implements HasMiddleware
 {
+    use AuthorizesModuleActions;
+
+    public static function middleware(): array
+    {
+        return static::moduleMiddleware('faq');
+    }
+
     private const PAGINATION = 15;
 
     /*

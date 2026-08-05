@@ -2,16 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesModuleActions;
 use App\Http\Controllers\Controller;
 use App\Support\TranslationProgress;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
 /**
  * Read-only overview of translation completeness per content module, so editors
  * can see how close each module is to being publishable in the non-default
  * locale. Does not change any data or fallback behaviour.
  */
-class TranslationProgressController extends Controller
+class TranslationProgressController extends Controller implements HasMiddleware
 {
+    use AuthorizesModuleActions;
+
+    public static function middleware(): array
+    {
+        return static::moduleMiddleware('translation-progress');
+    }
+
     public function index()
     {
         $locale = TranslationProgress::firstNonDefaultLocale();

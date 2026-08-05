@@ -2,13 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesModuleActions;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\OfficeLocationRequest;
 use App\Models\OfficeLocation;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class OfficeLocationController extends Controller
+class OfficeLocationController extends Controller implements HasMiddleware
 {
+    use AuthorizesModuleActions;
+
+    public static function middleware(): array
+    {
+        return static::moduleMiddleware('office-location');
+    }
+
     private const PAGINATION = 15;
 
     public function index(Request $request)

@@ -2,15 +2,24 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesModuleActions;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\NewsCategoryRequest;
 use App\Models\NewsCategory;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class NewsCategoryController extends Controller
+class NewsCategoryController extends Controller implements HasMiddleware
 {
+    use AuthorizesModuleActions;
+
+    public static function middleware(): array
+    {
+        return static::moduleMiddleware('news-category');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Pagination

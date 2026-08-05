@@ -2,15 +2,28 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesModuleActions;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Storage;
 
-class SettingController extends Controller
+class SettingController extends Controller implements HasMiddleware
 {
+    use AuthorizesModuleActions;
+
+    public static function middleware(): array
+    {
+        // Non-REST action names: read pages vs their update handlers.
+        return static::moduleMiddleware('setting', [
+            'view' => ['general', 'email'],
+            'update' => ['updateGeneral', 'updateEmail'],
+        ]);
+    }
+
     /**
      * Email / SMTP settings are sensitive — restrict to super admins.
      */
