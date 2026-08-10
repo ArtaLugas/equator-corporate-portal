@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesModuleActions;
 use App\Http\Controllers\Concerns\GeneratesUniqueSlug;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CompanyCredentialRequest;
@@ -9,13 +10,26 @@ use App\Models\CompanyCredential;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class CompanyCredentialController extends Controller
+class CompanyCredentialController extends Controller implements HasMiddleware
 {
+    use AuthorizesModuleActions;
     use GeneratesUniqueSlug;
+
+    /**
+     * Gate each resource action behind its "company-credential.{ability}"
+     * permission, matching the sidebar's @can('company-credential.view') so a
+     * restricted role cannot reach these endpoints directly. Permanent deletion
+     * stays super-admin-only via the untouched CompanyCredentialPolicy.
+     */
+    public static function middleware(): array
+    {
+        return static::moduleMiddleware('company-credential');
+    }
 
     private const PAGINATION = 10;
 

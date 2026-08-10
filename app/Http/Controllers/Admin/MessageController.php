@@ -2,16 +2,39 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesModuleActions;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SendMessageReplyRequest;
 use App\Jobs\SendContactReply;
 use App\Models\Message;
 use App\Services\LeadAnalytics;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\DB;
 
-class MessageController extends Controller
+class MessageController extends Controller implements HasMiddleware
 {
+    use AuthorizesModuleActions;
+
+    /**
+     * Gate each action behind its "message.{ability}" permission. Mirrors the
+     * sidebar's @can('message.view') so a restricted role that cannot see the
+     * Messages menu also cannot reach its endpoints directly. The non-REST
+     * actions map to the module's extra abilities; reply in particular has no
+     * in-method policy call, so this middleware is its only authorization gate.
+     * Super-admin-only actions (destroy/trash/restore/forceDelete) keep their
+     * stricter MessagePolicy checks on top of the can:message.delete gate.
+     */
+    public static function middleware(): array
+    {
+        return static::moduleMiddleware('message', [
+            'view' => ['analytics'],
+            'reply' => ['reply'],
+            'archive' => ['archive', 'unarchive'],
+            'spam' => ['markSpam', 'markUnread'],
+        ]);
+    }
+
     private const PAGINATION = 15;
 
     /*
